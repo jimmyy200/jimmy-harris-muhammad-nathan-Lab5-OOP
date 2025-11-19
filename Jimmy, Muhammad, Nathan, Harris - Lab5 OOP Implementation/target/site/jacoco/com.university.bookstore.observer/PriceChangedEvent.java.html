@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PriceChangedEvent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">PriceChangedEvent.java</span></div><h1>PriceChangedEvent.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Event that occurs when a material's price changes.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class PriceChangedEvent implements MaterialEvent {
+    
+    private final Material material;
+    private final double oldPrice;
+    private final double newPrice;
+    private final long timestamp;
+    
+    /**
+     * Creates a new price changed event.
+     * 
+     * @param material the material whose price changed
+     * @param oldPrice the previous price
+     * @param newPrice the new price
+     * @throws IllegalArgumentException if material is null or prices are negative
+     */
+<span class="fc" id="L29">    public PriceChangedEvent(Material material, double oldPrice, double newPrice) {</span>
+<span class="fc" id="L30">        this.material = Objects.requireNonNull(material, &quot;Material cannot be null&quot;);</span>
+<span class="pc bpc" id="L31" title="1 of 2 branches missed.">        if (oldPrice &lt; 0) {</span>
+<span class="nc" id="L32">            throw new IllegalArgumentException(&quot;Old price cannot be negative: &quot; + oldPrice);</span>
+        }
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (newPrice &lt; 0) {</span>
+<span class="nc" id="L35">            throw new IllegalArgumentException(&quot;New price cannot be negative: &quot; + newPrice);</span>
+        }
+        
+<span class="fc" id="L38">        this.oldPrice = oldPrice;</span>
+<span class="fc" id="L39">        this.newPrice = newPrice;</span>
+<span class="fc" id="L40">        this.timestamp = System.currentTimeMillis();</span>
+<span class="fc" id="L41">    }</span>
+    
+    @Override
+    public Material getMaterial() {
+<span class="fc" id="L45">        return material;</span>
+    }
+    
+    @Override
+    public long getTimestamp() {
+<span class="fc" id="L50">        return timestamp;</span>
+    }
+    
+    @Override
+    public String getEventType() {
+<span class="fc" id="L55">        return &quot;PRICE_CHANGED&quot;;</span>
+    }
+    
+    @Override
+    public String getDescription() {
+<span class="fc" id="L60">        return String.format(&quot;Price changed for %s: $%.2f -&gt; $%.2f (Change: $%.2f)&quot;,</span>
+<span class="fc" id="L61">            material.getTitle(), oldPrice, newPrice, newPrice - oldPrice);</span>
+    }
+    
+    /**
+     * Gets the old price.
+     * 
+     * @return the previous price
+     */
+    public double getOldPrice() {
+<span class="fc" id="L70">        return oldPrice;</span>
+    }
+    
+    /**
+     * Gets the new price.
+     * 
+     * @return the new price
+     */
+    public double getNewPrice() {
+<span class="fc" id="L79">        return newPrice;</span>
+    }
+    
+    /**
+     * Gets the price change amount.
+     * 
+     * @return the price change (new - old)
+     */
+    public double getPriceChange() {
+<span class="fc" id="L88">        return newPrice - oldPrice;</span>
+    }
+    
+    /**
+     * Gets the price change percentage.
+     * 
+     * @return the price change percentage
+     */
+    public double getPriceChangePercentage() {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        if (oldPrice == 0) {</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            return newPrice &gt; 0 ? 100.0 : 0.0;</span>
+        }
+<span class="nc" id="L100">        return ((newPrice - oldPrice) / oldPrice) * 100.0;</span>
+    }
+    
+    /**
+     * Checks if the price increased.
+     * 
+     * @return true if the price increased
+     */
+    public boolean isPriceIncrease() {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        return newPrice &gt; oldPrice;</span>
+    }
+    
+    /**
+     * Checks if the price decreased.
+     * 
+     * @return true if the price decreased
+     */
+    public boolean isPriceDecrease() {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        return newPrice &lt; oldPrice;</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (this == obj) return true;</span>
+<span class="nc bnc" id="L124" title="All 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="nc" id="L126">        PriceChangedEvent that = (PriceChangedEvent) obj;</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        return Double.compare(that.oldPrice, oldPrice) == 0 &amp;&amp;</span>
+<span class="nc bnc" id="L128" title="All 4 branches missed.">               Double.compare(that.newPrice, newPrice) == 0 &amp;&amp;</span>
+               timestamp == that.timestamp &amp;&amp;
+<span class="nc bnc" id="L130" title="All 2 branches missed.">               Objects.equals(material, that.material);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="nc" id="L135">        return Objects.hash(material, oldPrice, newPrice, timestamp);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L140">        return String.format(&quot;PriceChangedEvent[%s: $%.2f -&gt; $%.2f at %d]&quot;,</span>
+<span class="nc" id="L141">            material.getTitle(), oldPrice, newPrice, timestamp);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

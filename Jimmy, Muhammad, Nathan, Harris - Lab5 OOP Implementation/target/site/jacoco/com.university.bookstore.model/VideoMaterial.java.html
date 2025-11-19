@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VideoMaterial.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">VideoMaterial.java</span></div><h1>VideoMaterial.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Represents video content (movies, documentaries, educational videos).
+ * Implements both Material and Media interfaces to demonstrate multiple inheritance.
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+public class VideoMaterial extends Material implements Media {
+    
+    private final String director;
+    private final int duration;
+    private final String format;
+    private final double fileSize;
+    private final MediaQuality quality;
+    private final VideoType videoType;
+    private final String rating;
+    private final List&lt;String&gt; cast;
+    private final boolean subtitlesAvailable;
+    private final String aspectRatio;
+    
+    /**
+     * Types of video content.
+     */
+<span class="fc" id="L30">    public enum VideoType {</span>
+<span class="fc" id="L31">        MOVIE(&quot;Movie&quot;),</span>
+<span class="fc" id="L32">        DOCUMENTARY(&quot;Documentary&quot;),</span>
+<span class="fc" id="L33">        EDUCATIONAL(&quot;Educational&quot;),</span>
+<span class="fc" id="L34">        TV_SERIES(&quot;TV Series&quot;),</span>
+<span class="fc" id="L35">        SHORT_FILM(&quot;Short Film&quot;),</span>
+<span class="fc" id="L36">        TUTORIAL(&quot;Tutorial&quot;);</span>
+        
+        private final String label;
+        
+<span class="fc" id="L40">        VideoType(String label) {</span>
+<span class="fc" id="L41">            this.label = label;</span>
+<span class="fc" id="L42">        }</span>
+        
+        @Override
+        public String toString() {
+<span class="fc" id="L46">            return label;</span>
+        }
+    }
+    
+    /**
+     * Creates a new VideoMaterial.
+     * 
+     * @param id unique identifier (UPC/EAN code)
+     * @param title video title
+     * @param director director or producer
+     * @param price price in dollars
+     * @param year release year
+     * @param duration duration in minutes
+     * @param format video format (MP4, AVI, MKV, etc.)
+     * @param fileSize size in megabytes
+     * @param quality video quality
+     * @param videoType type of video
+     * @param rating content rating (G, PG, PG-13, R, etc.)
+     * @param cast list of main cast members
+     * @param subtitlesAvailable whether subtitles are included
+     * @param aspectRatio aspect ratio (16:9, 4:3, etc.)
+     */
+    public VideoMaterial(String id, String title, String director, double price,
+                        int year, int duration, String format, double fileSize,
+                        MediaQuality quality, VideoType videoType, String rating,
+                        List&lt;String&gt; cast, boolean subtitlesAvailable, String aspectRatio) {
+<span class="fc" id="L72">        super(id, title, price, year, </span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">              videoType == VideoType.DOCUMENTARY ? MaterialType.DOCUMENTARY : MaterialType.VIDEO);</span>
+<span class="fc" id="L74">        this.director = validateStringField(director, &quot;Director&quot;);</span>
+<span class="fc" id="L75">        this.duration = validateDuration(duration);</span>
+<span class="fc" id="L76">        this.format = validateStringField(format, &quot;Format&quot;);</span>
+<span class="fc" id="L77">        this.fileSize = validateFileSize(fileSize);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        this.quality = quality != null ? quality : MediaQuality.HD;</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        this.videoType = videoType != null ? videoType : VideoType.MOVIE;</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        this.rating = rating != null ? rating : &quot;NR&quot;;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        this.cast = cast != null ? cast : Arrays.asList();</span>
+<span class="fc" id="L82">        this.subtitlesAvailable = subtitlesAvailable;</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        this.aspectRatio = aspectRatio != null ? aspectRatio : &quot;16:9&quot;;</span>
+<span class="fc" id="L84">    }</span>
+    
+    private int validateDuration(int duration) {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (duration &lt;= 0) {</span>
+<span class="fc" id="L88">            throw new IllegalArgumentException(</span>
+                &quot;Duration must be positive. Provided: &quot; + duration);
+        }
+<span class="fc" id="L91">        return duration;</span>
+    }
+    
+    private double validateFileSize(double fileSize) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (fileSize &lt;= 0) {</span>
+<span class="nc" id="L96">            throw new IllegalArgumentException(</span>
+                &quot;File size must be positive. Provided: &quot; + fileSize);
+        }
+<span class="fc" id="L99">        return fileSize;</span>
+    }
+    
+    @Override
+    public String getCreator() {
+<span class="fc" id="L104">        return director;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L109">        return String.format(&quot;%s (%d) - Directed by %s, %s, %d min, Rated %s, $%.2f&quot;,</span>
+<span class="fc" id="L110">            title, year, director, videoType, duration, rating, price);</span>
+    }
+    
+    @Override
+    public int getDuration() {
+<span class="fc" id="L115">        return duration;</span>
+    }
+    
+    @Override
+    public String getFormat() {
+<span class="fc" id="L120">        return format;</span>
+    }
+    
+    @Override
+    public double getFileSize() {
+<span class="fc" id="L125">        return fileSize;</span>
+    }
+    
+    @Override
+    public boolean isStreamingOnly() {
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        return fileSize &gt; 4096;</span>
+    }
+    
+    @Override
+    public MediaQuality getQuality() {
+<span class="fc" id="L135">        return quality;</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L140">        int currentYear = java.time.Year.now().getValue();</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (year &lt; currentYear - 5) {</span>
+<span class="fc" id="L142">            return 0.30;</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        } else if (year &lt; currentYear - 2) {</span>
+<span class="nc" id="L144">            return 0.15;</span>
+        }
+<span class="fc" id="L146">        return 0.0;</span>
+    }
+    
+    /**
+     * Checks if this is a feature-length video.
+     * 
+     * @return true if duration &gt;= 60 minutes
+     */
+    public boolean isFeatureLength() {
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">        return duration &gt;= 60;</span>
+    }
+    
+    /**
+     * Gets bandwidth requirement for streaming in Mbps.
+     * 
+     * @return required bandwidth
+     */
+    public double getStreamingBandwidth() {
+<span class="pc bpc" id="L164" title="5 of 6 branches missed.">        switch (quality) {</span>
+<span class="nc" id="L165">            case LOW: return 1.5;</span>
+<span class="nc" id="L166">            case STANDARD: return 3.0;</span>
+<span class="nc" id="L167">            case HIGH: return 5.0;</span>
+<span class="fc" id="L168">            case HD: return 8.0;</span>
+<span class="nc" id="L169">            case ULTRA_HD: return 25.0;</span>
+<span class="nc" id="L170">            default: return 5.0;</span>
+        }
+    }
+    
+    /**
+     * Gets storage space required with compression.
+     * 
+     * @param compressionRatio compression ratio (0.5 = 50% compression)
+     * @return compressed size in MB
+     */
+    public double getCompressedSize(double compressionRatio) {
+<span class="nc bnc" id="L181" title="All 4 branches missed.">        if (compressionRatio &lt;= 0 || compressionRatio &gt; 1) {</span>
+<span class="nc" id="L182">            throw new IllegalArgumentException(&quot;Compression ratio must be between 0 and 1&quot;);</span>
+        }
+<span class="nc" id="L184">        return fileSize * compressionRatio;</span>
+    }
+    
+    public String getDirector() {
+<span class="nc" id="L188">        return director;</span>
+    }
+    
+    public VideoType getVideoType() {
+<span class="nc" id="L192">        return videoType;</span>
+    }
+    
+    public String getRating() {
+<span class="nc" id="L196">        return rating;</span>
+    }
+    
+    public List&lt;String&gt; getCast() {
+<span class="nc" id="L200">        return cast;</span>
+    }
+    
+    public boolean hasSubtitles() {
+<span class="nc" id="L204">        return subtitlesAvailable;</span>
+    }
+    
+    public String getAspectRatio() {
+<span class="nc" id="L208">        return aspectRatio;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L213">        return String.format(&quot;VideoMaterial[ID=%s, Title='%s', Director='%s', Type=%s, Duration=%dmin, Quality=%s, Rating=%s, Price=$%.2f]&quot;,</span>
+<span class="fc" id="L214">            id, title, director, videoType, duration, quality, rating, price);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AudioBook.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">AudioBook.java</span></div><h1>AudioBook.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+/**
+ * Represents an audio book that implements both Material and Media interfaces.
+ * Demonstrates multiple inheritance through interfaces.
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+public class AudioBook extends Material implements Media {
+    
+    private final String isbn;
+    private final String author;
+    private final String narrator;
+    private final int duration;
+    private final String format;
+    private final double fileSize;
+    private final boolean streamingOnly;
+    private final MediaQuality quality;
+    private final String language;
+    private final boolean unabridged;
+    
+    /**
+     * Creates a new AudioBook with full specifications.
+     * 
+     * @param isbn ISBN identifier
+     * @param title book title
+     * @param author original author
+     * @param narrator voice narrator
+     * @param price price in dollars
+     * @param year publication year
+     * @param duration duration in minutes
+     * @param format audio format (MP3, M4B, etc.)
+     * @param fileSize size in megabytes
+     * @param quality audio quality level
+     * @param language narration language
+     * @param unabridged true if unabridged version
+     */
+    public AudioBook(String isbn, String title, String author, String narrator,
+                     double price, int year, int duration, String format,
+                     double fileSize, MediaQuality quality, String language,
+                     boolean unabridged) {
+<span class="fc" id="L44">        super(validateIsbn(isbn), title, price, year, MaterialType.AUDIO_BOOK);</span>
+<span class="fc" id="L45">        this.isbn = this.id;</span>
+<span class="fc" id="L46">        this.author = validateStringField(author, &quot;Author&quot;);</span>
+<span class="fc" id="L47">        this.narrator = validateStringField(narrator, &quot;Narrator&quot;);</span>
+<span class="fc" id="L48">        this.duration = validateDuration(duration);</span>
+<span class="fc" id="L49">        this.format = validateStringField(format, &quot;Format&quot;);</span>
+<span class="fc" id="L50">        this.fileSize = validateFileSize(fileSize);</span>
+<span class="fc" id="L51">        this.streamingOnly = false;</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        this.quality = quality != null ? quality : MediaQuality.STANDARD;</span>
+<span class="fc" id="L53">        this.language = validateStringField(language, &quot;Language&quot;);</span>
+<span class="fc" id="L54">        this.unabridged = unabridged;</span>
+<span class="fc" id="L55">    }</span>
+    
+    private static String validateIsbn(String isbn) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (isbn == null) {</span>
+<span class="fc" id="L59">            throw new NullPointerException(&quot;ISBN cannot be null&quot;);</span>
+        }
+<span class="fc" id="L61">        String cleaned = isbn.replaceAll(&quot;-&quot;, &quot;&quot;).trim();</span>
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">        if (cleaned.length() &lt; 10 || cleaned.length() &gt; 13) {</span>
+<span class="fc" id="L63">            throw new IllegalArgumentException(&quot;Invalid ISBN: &quot; + isbn);</span>
+        }
+<span class="fc" id="L65">        return cleaned;</span>
+    }
+    
+    private int validateDuration(int duration) {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (duration &lt;= 0) {</span>
+<span class="fc" id="L70">            throw new IllegalArgumentException(</span>
+                &quot;Duration must be positive. Provided: &quot; + duration);
+        }
+<span class="fc" id="L73">        return duration;</span>
+    }
+    
+    private double validateFileSize(double fileSize) {
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        if (fileSize &lt;= 0) {</span>
+<span class="fc" id="L78">            throw new IllegalArgumentException(</span>
+                &quot;File size must be positive. Provided: &quot; + fileSize);
+        }
+<span class="fc" id="L81">        return fileSize;</span>
+    }
+    
+    @Override
+    public String getCreator() {
+<span class="fc" id="L86">        return author + &quot; (Narrated by &quot; + narrator + &quot;)&quot;;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L91">        return String.format(&quot;%s by %s, narrated by %s - %s, %d hours %d minutes, $%.2f&quot;,</span>
+            title, author, narrator,
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            unabridged ? &quot;Unabridged&quot; : &quot;Abridged&quot;,</span>
+<span class="fc" id="L94">            duration / 60, duration % 60, price);</span>
+    }
+    
+    @Override
+    public int getDuration() {
+<span class="fc" id="L99">        return duration;</span>
+    }
+    
+    @Override
+    public String getFormat() {
+<span class="fc" id="L104">        return format;</span>
+    }
+    
+    @Override
+    public double getFileSize() {
+<span class="fc" id="L109">        return fileSize;</span>
+    }
+    
+    @Override
+    public boolean isStreamingOnly() {
+<span class="fc" id="L114">        return streamingOnly;</span>
+    }
+    
+    @Override
+    public MediaQuality getQuality() {
+<span class="fc" id="L119">        return quality;</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (!unabridged) {</span>
+<span class="fc" id="L125">            return 0.10;</span>
+        }
+<span class="fc" id="L127">        return 0.0;</span>
+    }
+    
+    /**
+     * Calculates listening sessions based on daily listening time.
+     * 
+     * @param minutesPerDay daily listening time
+     * @return number of days to complete
+     */
+    public int calculateListeningSessions(int minutesPerDay) {
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (minutesPerDay &lt;= 0) {</span>
+<span class="nc" id="L138">            return 0;</span>
+        }
+<span class="fc" id="L140">        return (int) Math.ceil((double) duration / minutesPerDay);</span>
+    }
+    
+    /**
+     * Gets playback speed adjusted duration.
+     * 
+     * @param speed playback speed (1.0 = normal, 1.5 = 1.5x, etc.)
+     * @return adjusted duration in minutes
+     */
+    public int getAdjustedDuration(double speed) {
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (speed &lt;= 0) {</span>
+<span class="nc" id="L151">            throw new IllegalArgumentException(&quot;Speed must be positive&quot;);</span>
+        }
+<span class="nc" id="L153">        return (int) Math.ceil(duration / speed);</span>
+    }
+    
+    /** Gets the ISBN. @return the ISBN */
+    public String getIsbn() {
+<span class="fc" id="L158">        return isbn;</span>
+    }
+    
+    /** Gets the author. @return the author */
+    public String getAuthor() {
+<span class="fc" id="L163">        return author;</span>
+    }
+    
+    /** Gets the narrator. @return the narrator */
+    public String getNarrator() {
+<span class="fc" id="L168">        return narrator;</span>
+    }
+    
+    /** Gets the language. @return the language */
+    public String getLanguage() {
+<span class="fc" id="L173">        return language;</span>
+    }
+    
+    /** Checks if unabridged. @return true if unabridged */
+    public boolean isUnabridged() {
+<span class="fc" id="L178">        return unabridged;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L183">        return String.format(&quot;AudioBook[ISBN=%s, Title='%s', Author='%s', Narrator='%s', Duration=%dmin, Format=%s, %s, Price=$%.2f]&quot;,</span>
+<span class="fc" id="L184">            isbn, title, author, narrator, duration, format,</span>
+<span class="pc bpc" id="L185" title="1 of 2 branches missed.">            unabridged ? &quot;Unabridged&quot; : &quot;Abridged&quot;, price);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

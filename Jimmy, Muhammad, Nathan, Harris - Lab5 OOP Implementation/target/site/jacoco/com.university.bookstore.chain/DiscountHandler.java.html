@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DiscountHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.chain</a> &gt; <span class="el_source">DiscountHandler.java</span></div><h1>DiscountHandler.java</h1><pre class="source lang-java linenums">package com.university.bookstore.chain;
+
+/**
+ * Abstract base class for discount approval handlers in the Chain of Responsibility pattern.
+ * Defines the interface for handling discount requests and managing the chain.
+ * 
+ * &lt;p&gt;This class provides the basic structure for the chain of responsibility,
+ * allowing handlers to either process requests or pass them to the next handler.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="fc" id="L14">public abstract class DiscountHandler {</span>
+    
+    protected DiscountHandler nextHandler;
+    
+    /**
+     * Sets the next handler in the chain.
+     * 
+     * @param nextHandler the next handler
+     */
+    public void setNext(DiscountHandler nextHandler) {
+<span class="fc" id="L24">        this.nextHandler = nextHandler;</span>
+<span class="fc" id="L25">    }</span>
+    
+    /**
+     * Gets the next handler in the chain.
+     * 
+     * @return the next handler
+     */
+    public DiscountHandler getNext() {
+<span class="nc" id="L33">        return nextHandler;</span>
+    }
+    
+    /**
+     * Handles a discount request.
+     * Subclasses must implement this method to define their approval logic.
+     * 
+     * @param request the discount request to handle
+     */
+    public abstract void handleRequest(DiscountRequest request);
+    
+    /**
+     * Passes the request to the next handler in the chain.
+     * 
+     * @param request the request to pass
+     */
+    protected void passToNext(DiscountRequest request) {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (nextHandler != null) {</span>
+<span class="fc" id="L51">            nextHandler.handleRequest(request);</span>
+        } else {
+            // End of chain - reject if not approved
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            if (!request.isApproved()) {</span>
+<span class="nc" id="L55">                request.setRejectionReason(&quot;No handler could approve this discount&quot;);</span>
+            }
+        }
+<span class="fc" id="L58">    }</span>
+    
+    /**
+     * Gets the name of this handler for identification purposes.
+     * 
+     * @return the handler name
+     */
+    public abstract String getHandlerName();
+    
+    /**
+     * Gets the maximum discount this handler can approve.
+     * 
+     * @return the maximum discount rate (0.0 to 1.0)
+     */
+    public abstract double getMaxDiscount();
+    
+    /**
+     * Checks if this handler can approve the given discount amount.
+     * 
+     * @param discount the discount rate to check
+     * @return true if this handler can approve the discount
+     */
+    public boolean canApprove(double discount) {
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        return discount &lt;= getMaxDiscount();</span>
+    }
+    
+    /**
+     * Gets the chain length from this handler to the end.
+     * 
+     * @return the chain length
+     */
+    public int getChainLength() {
+<span class="nc" id="L90">        int length = 1;</span>
+<span class="nc" id="L91">        DiscountHandler current = nextHandler;</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        while (current != null) {</span>
+<span class="nc" id="L93">            length++;</span>
+<span class="nc" id="L94">            current = current.getNext();</span>
+        }
+<span class="nc" id="L96">        return length;</span>
+    }
+    
+    /**
+     * Gets information about this handler and the chain.
+     * 
+     * @return handler information
+     */
+    public String getHandlerInfo() {
+<span class="nc" id="L105">        return String.format(&quot;%s[MaxDiscount=%.1f%%, ChainLength=%d]&quot;,</span>
+<span class="nc" id="L106">            getHandlerName(), getMaxDiscount() * 100, getChainLength());</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L111">        return getHandlerInfo();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

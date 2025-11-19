@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialObserver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">MaterialObserver.java</span></div><h1>MaterialObserver.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+/**
+ * Observer interface for material-related events in the Observer pattern.
+ * Defines the contract for objects that need to be notified of material events.
+ * 
+ * &lt;p&gt;This interface allows components to subscribe to material events and be
+ * automatically notified when events occur, enabling loose coupling between
+ * the event source and event handlers.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public interface MaterialObserver {
+    
+    /**
+     * Called when a material event occurs.
+     * 
+     * @param event the material event that occurred
+     */
+    void onEvent(MaterialEvent event);
+    
+    /**
+     * Gets the name of this observer for identification purposes.
+     * 
+     * @return the observer name
+     */
+    default String getObserverName() {
+<span class="nc" id="L30">        return getClass().getSimpleName();</span>
+    }
+    
+    /**
+     * Called when the observer is added to a subject.
+     * Can be used for initialization or setup.
+     * 
+     * @param subject the subject this observer was added to
+     */
+    default void onAdded(MaterialSubject subject) {
+        // Default implementation does nothing
+<span class="fc" id="L41">    }</span>
+    
+    /**
+     * Called when the observer is removed from a subject.
+     * Can be used for cleanup.
+     * 
+     * @param subject the subject this observer was removed from
+     */
+    default void onRemoved(MaterialSubject subject) {
+        // Default implementation does nothing
+<span class="nc" id="L51">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

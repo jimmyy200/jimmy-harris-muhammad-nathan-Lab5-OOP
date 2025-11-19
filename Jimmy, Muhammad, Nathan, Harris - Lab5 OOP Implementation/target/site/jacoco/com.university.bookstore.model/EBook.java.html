@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EBook.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">EBook.java</span></div><h1>EBook.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+import java.util.Objects;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * Represents an electronic book (e-book) in the bookstore system.
+ * Extends Material and implements Media interface to demonstrate
+ * multiple inheritance through interfaces.
+ * 
+ * &lt;p&gt;EBooks support various file formats, DRM protection, and
+ * provide reading time estimation based on word count.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EBook extends Material implements Media {
+    
+<span class="fc" id="L24">    private static final Set&lt;String&gt; VALID_FORMATS = Set.of(&quot;PDF&quot;, &quot;EPUB&quot;, &quot;MOBI&quot;);</span>
+    private static final int WORDS_PER_MINUTE = 250;
+    private static final double DRM_FREE_DISCOUNT = 0.15;
+    
+    private final String author;
+    private final String fileFormat;
+    private final double fileSize; // in MB
+    private final boolean drmEnabled;
+    private final int wordCount;
+    private final MediaQuality quality;
+    
+    /**
+     * Constructs a new EBook with validation.
+     * 
+     * @param id unique identifier
+     * @param title the book title
+     * @param author the author name
+     * @param price the price in dollars
+     * @param year the publication year
+     * @param fileFormat the file format (PDF, EPUB, or MOBI)
+     * @param fileSize the file size in MB
+     * @param drmEnabled whether DRM is enabled
+     * @param wordCount the number of words in the book
+     * @param quality the media quality
+     * @throws IllegalArgumentException if validation fails
+     */
+    @JsonCreator
+    public EBook(@JsonProperty(&quot;id&quot;) String id, 
+                 @JsonProperty(&quot;title&quot;) String title, 
+                 @JsonProperty(&quot;author&quot;) String author, 
+                 @JsonProperty(&quot;price&quot;) double price, 
+                 @JsonProperty(&quot;year&quot;) int year,
+                 @JsonProperty(&quot;fileFormat&quot;) String fileFormat, 
+                 @JsonProperty(&quot;fileSize&quot;) double fileSize, 
+                 @JsonProperty(&quot;drmEnabled&quot;) boolean drmEnabled, 
+                 @JsonProperty(&quot;wordCount&quot;) int wordCount, 
+                 @JsonProperty(&quot;quality&quot;) MediaQuality quality) {
+<span class="fc" id="L61">        super(id, title, price, year, MaterialType.E_BOOK);</span>
+<span class="fc" id="L62">        this.author = validateStringField(author, &quot;Author&quot;);</span>
+<span class="fc" id="L63">        this.fileFormat = validateFileFormat(fileFormat);</span>
+<span class="fc" id="L64">        this.fileSize = validateFileSize(fileSize);</span>
+<span class="fc" id="L65">        this.drmEnabled = drmEnabled;</span>
+<span class="fc" id="L66">        this.wordCount = validateWordCount(wordCount);</span>
+<span class="fc" id="L67">        this.quality = Objects.requireNonNull(quality, &quot;Media quality cannot be null&quot;);</span>
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * Validates that the file format is supported.
+     * 
+     * @param format the file format to validate
+     * @return the validated format
+     * @throws IllegalArgumentException if format is not supported
+     */
+    private String validateFileFormat(String format) {
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (format == null) {</span>
+<span class="nc" id="L79">            throw new NullPointerException(&quot;File format cannot be null&quot;);</span>
+        }
+<span class="fc" id="L81">        String upperFormat = format.trim().toUpperCase();</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (!VALID_FORMATS.contains(upperFormat)) {</span>
+<span class="fc" id="L83">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L84">                String.format(&quot;Unsupported file format: %s. Supported formats: %s&quot;, </span>
+                    format, VALID_FORMATS));
+        }
+<span class="fc" id="L87">        return upperFormat;</span>
+    }
+    
+    /**
+     * Validates that the file size is positive.
+     * 
+     * @param size the file size to validate
+     * @return the validated size
+     * @throws IllegalArgumentException if size is not positive
+     */
+    private double validateFileSize(double size) {
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        if (size &lt;= 0.0) {</span>
+<span class="fc" id="L99">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L100">                String.format(&quot;File size must be positive. Provided: %.2f MB&quot;, size));</span>
+        }
+<span class="fc bfc" id="L102" title="All 4 branches covered.">        if (Double.isNaN(size) || Double.isInfinite(size)) {</span>
+<span class="fc" id="L103">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L104">                String.format(&quot;File size must be a valid number. Provided: %.2f MB&quot;, size));</span>
+        }
+<span class="fc" id="L106">        return size;</span>
+    }
+    
+    /**
+     * Validates that the word count is non-negative.
+     * 
+     * @param count the word count to validate
+     * @return the validated count
+     * @throws IllegalArgumentException if count is negative
+     */
+    private int validateWordCount(int count) {
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if (count &lt; 0) {</span>
+<span class="fc" id="L118">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L119">                String.format(&quot;Word count cannot be negative. Provided: %d&quot;, count));</span>
+        }
+<span class="fc" id="L121">        return count;</span>
+    }
+    
+    @Override
+    public String getCreator() {
+<span class="fc" id="L126">        return author;</span>
+    }
+    
+    /**
+     * Gets the author of the e-book.
+     * @return the author
+     */
+    public String getAuthor() {
+<span class="fc" id="L134">        return author;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L139">        return String.format(&quot;EBook: %s by %s (%s, %.1f MB, %s, %d words)&quot;, </span>
+<span class="fc" id="L140">            getTitle(), author, fileFormat, fileSize, </span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">            drmEnabled ? &quot;DRM&quot; : &quot;DRM-free&quot;, wordCount);</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+        // DRM-free books get a 15% discount
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        return drmEnabled ? 0.0 : DRM_FREE_DISCOUNT;</span>
+    }
+    
+    /**
+     * Calculates estimated reading time in minutes based on average reading speed.
+     * 
+     * @return estimated reading time in minutes
+     */
+    public int getReadingTimeMinutes() {
+<span class="fc" id="L156">        return wordCount / WORDS_PER_MINUTE;</span>
+    }
+    
+    /**
+     * Gets the file format of the ebook.
+     * 
+     * @return the file format
+     */
+    public String getFileFormat() {
+<span class="fc" id="L165">        return fileFormat;</span>
+    }
+    
+    /**
+     * Gets the file size in MB.
+     * 
+     * @return the file size
+     */
+    public double getFileSize() {
+<span class="fc" id="L174">        return fileSize;</span>
+    }
+    
+    /**
+     * Checks if DRM is enabled.
+     * 
+     * @return true if DRM is enabled
+     */
+    public boolean isDrmEnabled() {
+<span class="fc" id="L183">        return drmEnabled;</span>
+    }
+    
+    /**
+     * Gets the word count of the book.
+     * 
+     * @return the word count
+     */
+    public int getWordCount() {
+<span class="fc" id="L192">        return wordCount;</span>
+    }
+    
+    @Override
+    public MediaQuality getQuality() {
+<span class="fc" id="L197">        return quality;</span>
+    }
+    
+    public String getDescription() {
+<span class="fc" id="L201">        return String.format(&quot;Digital %s format book by %s. %s, %.1f MB. Estimated reading time: %d minutes.&quot;,</span>
+            fileFormat, author, 
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            drmEnabled ? &quot;DRM protected&quot; : &quot;DRM-free&quot;, </span>
+<span class="fc" id="L204">            fileSize, </span>
+<span class="fc" id="L205">            getReadingTimeMinutes());</span>
+    }
+    
+    // Media interface implementation
+    @Override
+    public int getDuration() {
+<span class="fc" id="L211">        return getReadingTimeMinutes();</span>
+    }
+    
+    @Override
+    public String getFormat() {
+<span class="fc" id="L216">        return fileFormat;</span>
+    }
+    
+    @Override
+    public boolean isStreamingOnly() {
+<span class="fc" id="L221">        return false; // E-books are downloadable, not streaming</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L226" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (!(obj instanceof EBook)) return false;</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">        if (!super.equals(obj)) return false;</span>
+        
+<span class="fc" id="L230">        EBook other = (EBook) obj;</span>
+<span class="pc bpc" id="L231" title="3 of 6 branches missed.">        return Double.compare(other.fileSize, fileSize) == 0 &amp;&amp;</span>
+               drmEnabled == other.drmEnabled &amp;&amp;
+               wordCount == other.wordCount &amp;&amp;
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">               Objects.equals(author, other.author) &amp;&amp;</span>
+<span class="pc bpc" id="L235" title="2 of 4 branches missed.">               Objects.equals(fileFormat, other.fileFormat) &amp;&amp;</span>
+               quality == other.quality;
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L241">        return Objects.hash(super.hashCode(), author, fileFormat, fileSize, </span>
+<span class="fc" id="L242">                           drmEnabled, wordCount, quality);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L247">        return String.format(&quot;EBook[ID=%s, Title='%s', Author='%s', Price=$%.2f, Year=%d, &quot; +</span>
+                           &quot;Format=%s, Size=%.1fMB, DRM=%s, Words=%d, Quality=%s]&quot;,
+<span class="fc" id="L249">            getId(), getTitle(), author, getPrice(), getYear(), </span>
+<span class="fc" id="L250">            fileFormat, fileSize, drmEnabled, wordCount, quality);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

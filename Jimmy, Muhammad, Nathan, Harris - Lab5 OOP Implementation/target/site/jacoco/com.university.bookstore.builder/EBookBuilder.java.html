@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EBookBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.builder</a> &gt; <span class="el_source">EBookBuilder.java</span></div><h1>EBookBuilder.java</h1><pre class="source lang-java linenums">package com.university.bookstore.builder;
+
+import com.university.bookstore.model.EBook;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+
+/**
+ * Builder for creating EBook instances with a fluent interface.
+ * Demonstrates the Builder pattern for complex object construction.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="fc" id="L15">public class EBookBuilder implements MaterialBuilder&lt;EBook&gt; {</span>
+    
+    private String id;
+    private String title;
+    private String author;
+    private double price;
+    private int year;
+    private String fileFormat;
+    private double fileSize;
+<span class="fc" id="L24">    private boolean drmEnabled = false;</span>
+    private int wordCount;
+<span class="fc" id="L26">    private Media.MediaQuality quality = Media.MediaQuality.MEDIUM;</span>
+    
+    /**
+     * Sets the eBook ID.
+     * 
+     * @param id the eBook ID
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setId(String id) {
+<span class="fc" id="L35">        this.id = id;</span>
+<span class="fc" id="L36">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook title.
+     * 
+     * @param title the eBook title
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setTitle(String title) {
+<span class="fc" id="L46">        this.title = title;</span>
+<span class="fc" id="L47">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook author.
+     * 
+     * @param author the eBook author
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setAuthor(String author) {
+<span class="fc" id="L57">        this.author = author;</span>
+<span class="fc" id="L58">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook price.
+     * 
+     * @param price the eBook price
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setPrice(double price) {
+<span class="fc" id="L68">        this.price = price;</span>
+<span class="fc" id="L69">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook publication year.
+     * 
+     * @param year the publication year
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setYear(int year) {
+<span class="fc" id="L79">        this.year = year;</span>
+<span class="fc" id="L80">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook file format.
+     * 
+     * @param fileFormat the file format (e.g., &quot;EPUB&quot;, &quot;PDF&quot;, &quot;MOBI&quot;)
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setFileFormat(String fileFormat) {
+<span class="fc" id="L90">        this.fileFormat = fileFormat;</span>
+<span class="fc" id="L91">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook file size.
+     * 
+     * @param fileSize the file size in MB
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setFileSize(double fileSize) {
+<span class="fc" id="L101">        this.fileSize = fileSize;</span>
+<span class="fc" id="L102">        return this;</span>
+    }
+    
+    /**
+     * Sets the DRM enabled status.
+     * 
+     * @param drmEnabled true if DRM is enabled
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setDrmEnabled(boolean drmEnabled) {
+<span class="fc" id="L112">        this.drmEnabled = drmEnabled;</span>
+<span class="fc" id="L113">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook word count.
+     * 
+     * @param wordCount the word count
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setWordCount(int wordCount) {
+<span class="fc" id="L123">        this.wordCount = wordCount;</span>
+<span class="fc" id="L124">        return this;</span>
+    }
+    
+    /**
+     * Sets the eBook quality.
+     * 
+     * @param quality the media quality
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setQuality(Media.MediaQuality quality) {
+<span class="fc" id="L134">        this.quality = quality;</span>
+<span class="fc" id="L135">        return this;</span>
+    }
+    
+    /**
+     * Sets DRM enabled to true.
+     * 
+     * @return this builder for method chaining
+     */
+    public EBookBuilder enableDRM() {
+<span class="nc" id="L144">        this.drmEnabled = true;</span>
+<span class="nc" id="L145">        return this;</span>
+    }
+    
+    /**
+     * Sets DRM enabled to false.
+     * 
+     * @return this builder for method chaining
+     */
+    public EBookBuilder disableDRM() {
+<span class="nc" id="L154">        this.drmEnabled = false;</span>
+<span class="nc" id="L155">        return this;</span>
+    }
+    
+    /**
+     * Sets the quality to high.
+     * 
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setHighQuality() {
+<span class="nc" id="L164">        this.quality = Media.MediaQuality.HIGH;</span>
+<span class="nc" id="L165">        return this;</span>
+    }
+    
+    /**
+     * Sets the quality to low.
+     * 
+     * @return this builder for method chaining
+     */
+    public EBookBuilder setLowQuality() {
+<span class="nc" id="L174">        this.quality = Media.MediaQuality.LOW;</span>
+<span class="nc" id="L175">        return this;</span>
+    }
+    
+    @Override
+    public EBook build() {
+<span class="fc" id="L180">        validate();</span>
+<span class="fc" id="L181">        return new EBook(id, title, author, price, year, fileFormat, </span>
+                        fileSize, drmEnabled, wordCount, quality);
+    }
+    
+    @Override
+    public void validate() {
+<span class="pc bpc" id="L187" title="1 of 4 branches missed.">        if (id == null || id.trim().isEmpty()) {</span>
+<span class="fc" id="L188">            throw new IllegalStateException(&quot;ID is required&quot;);</span>
+        }
+<span class="pc bpc" id="L190" title="2 of 4 branches missed.">        if (title == null || title.trim().isEmpty()) {</span>
+<span class="nc" id="L191">            throw new IllegalStateException(&quot;Title is required&quot;);</span>
+        }
+<span class="pc bpc" id="L193" title="2 of 4 branches missed.">        if (author == null || author.trim().isEmpty()) {</span>
+<span class="nc" id="L194">            throw new IllegalStateException(&quot;Author is required&quot;);</span>
+        }
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        if (price &lt; 0) {</span>
+<span class="fc" id="L197">            throw new IllegalStateException(&quot;Price must be non-negative: &quot; + price);</span>
+        }
+<span class="pc bpc" id="L199" title="2 of 4 branches missed.">        if (year &lt; 1000 || year &gt; 2100) {</span>
+<span class="nc" id="L200">            throw new IllegalStateException(&quot;Year must be between 1000 and 2100: &quot; + year);</span>
+        }
+<span class="pc bpc" id="L202" title="2 of 4 branches missed.">        if (fileFormat == null || fileFormat.trim().isEmpty()) {</span>
+<span class="nc" id="L203">            throw new IllegalStateException(&quot;File format is required&quot;);</span>
+        }
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">        if (fileSize &lt; 0) {</span>
+<span class="nc" id="L206">            throw new IllegalStateException(&quot;File size must be non-negative: &quot; + fileSize);</span>
+        }
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">        if (wordCount &lt; 0) {</span>
+<span class="nc" id="L209">            throw new IllegalStateException(&quot;Word count must be non-negative: &quot; + wordCount);</span>
+        }
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">        if (quality == null) {</span>
+<span class="nc" id="L212">            throw new IllegalStateException(&quot;Quality is required&quot;);</span>
+        }
+<span class="fc" id="L214">    }</span>
+    
+    @Override
+    public void reset() {
+<span class="nc" id="L218">        this.id = null;</span>
+<span class="nc" id="L219">        this.title = null;</span>
+<span class="nc" id="L220">        this.author = null;</span>
+<span class="nc" id="L221">        this.price = 0.0;</span>
+<span class="nc" id="L222">        this.year = 0;</span>
+<span class="nc" id="L223">        this.fileFormat = null;</span>
+<span class="nc" id="L224">        this.fileSize = 0.0;</span>
+<span class="nc" id="L225">        this.drmEnabled = false;</span>
+<span class="nc" id="L226">        this.wordCount = 0;</span>
+<span class="nc" id="L227">        this.quality = Media.MediaQuality.MEDIUM;</span>
+<span class="nc" id="L228">    }</span>
+    
+    /**
+     * Gets the current ID.
+     * 
+     * @return the current ID
+     */
+    public String getId() {
+<span class="nc" id="L236">        return id;</span>
+    }
+    
+    /**
+     * Gets the current title.
+     * 
+     * @return the current title
+     */
+    public String getTitle() {
+<span class="nc" id="L245">        return title;</span>
+    }
+    
+    /**
+     * Gets the current author.
+     * 
+     * @return the current author
+     */
+    public String getAuthor() {
+<span class="nc" id="L254">        return author;</span>
+    }
+    
+    /**
+     * Gets the current price.
+     * 
+     * @return the current price
+     */
+    public double getPrice() {
+<span class="nc" id="L263">        return price;</span>
+    }
+    
+    /**
+     * Gets the current year.
+     * 
+     * @return the current year
+     */
+    public int getYear() {
+<span class="nc" id="L272">        return year;</span>
+    }
+    
+    /**
+     * Gets the current file format.
+     * 
+     * @return the current file format
+     */
+    public String getFileFormat() {
+<span class="nc" id="L281">        return fileFormat;</span>
+    }
+    
+    /**
+     * Gets the current file size.
+     * 
+     * @return the current file size
+     */
+    public double getFileSize() {
+<span class="nc" id="L290">        return fileSize;</span>
+    }
+    
+    /**
+     * Gets the current DRM enabled status.
+     * 
+     * @return the current DRM enabled status
+     */
+    public boolean isDrmEnabled() {
+<span class="nc" id="L299">        return drmEnabled;</span>
+    }
+    
+    /**
+     * Gets the current word count.
+     * 
+     * @return the current word count
+     */
+    public int getWordCount() {
+<span class="nc" id="L308">        return wordCount;</span>
+    }
+    
+    /**
+     * Gets the current quality.
+     * 
+     * @return the current quality
+     */
+    public Media.MediaQuality getQuality() {
+<span class="nc" id="L317">        return quality;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L322">        return String.format(&quot;EBookBuilder[ID=%s, Title=%s, Author=%s, Price=$%.2f, Year=%d, Format=%s, Size=%.2fMB, DRM=%s, Words=%d, Quality=%s]&quot;,</span>
+<span class="nc" id="L323">            id, title, author, price, year, fileFormat, fileSize, drmEnabled, wordCount, quality);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

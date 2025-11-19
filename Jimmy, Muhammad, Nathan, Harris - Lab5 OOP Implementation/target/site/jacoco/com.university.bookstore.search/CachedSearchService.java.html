@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CachedSearchService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.search</a> &gt; <span class="el_source">CachedSearchService.java</span></div><h1>CachedSearchService.java</h1><pre class="source lang-java linenums">package com.university.bookstore.search;
+
+import java.util.List;
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+import com.university.bookstore.repository.MaterialRepository;
+
+/**
+ * Service that integrates Trie-based prefix search with LRU caching for optimal performance.
+ * Provides fast prefix-based material searching with intelligent result caching.
+ * 
+ * &lt;p&gt;This service combines the efficiency of Trie data structures for prefix searching
+ * with LRU caching to avoid repeated computation for frequently accessed queries.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class CachedSearchService {
+    
+    private final MaterialTrie trie;
+    private final SearchResultCache cache;
+    private final MaterialRepository repository;
+    
+    /**
+     * Creates a new cached search service.
+     * 
+     * @param repository the material repository to search
+     * @param cacheSize the maximum number of cached search results
+     */
+<span class="fc" id="L32">    public CachedSearchService(MaterialRepository repository, int cacheSize) {</span>
+<span class="fc" id="L33">        this.repository = Objects.requireNonNull(repository, &quot;Repository cannot be null&quot;);</span>
+<span class="fc" id="L34">        this.trie = new MaterialTrie();</span>
+<span class="fc" id="L35">        this.cache = new SearchResultCache(cacheSize);</span>
+<span class="fc" id="L36">        initializeTrie();</span>
+<span class="fc" id="L37">    }</span>
+    
+    /**
+     * Searches for materials by title prefix with caching.
+     * 
+     * @param prefix the title prefix to search for
+     * @return list of materials matching the prefix
+     */
+    public List&lt;Material&gt; searchByPrefix(String prefix) {
+<span class="fc bfc" id="L46" title="All 4 branches covered.">        if (prefix == null || prefix.trim().isEmpty()) {</span>
+<span class="fc" id="L47">            return List.of();</span>
+        }
+        
+<span class="fc" id="L50">        String cacheKey = &quot;prefix:&quot; + prefix.toLowerCase().trim();</span>
+        
+        // Check cache first
+<span class="fc" id="L53">        var cached = cache.get(cacheKey);</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (cached.isPresent()) {</span>
+<span class="fc" id="L55">            return cached.get();</span>
+        }
+        
+        // Perform search using trie
+<span class="fc" id="L59">        List&lt;Material&gt; results = trie.searchByPrefix(prefix);</span>
+        
+        // Cache results
+<span class="fc" id="L62">        cache.put(cacheKey, results);</span>
+        
+<span class="fc" id="L64">        return results;</span>
+    }
+    
+    /**
+     * Searches for materials by title prefix with result limit and caching.
+     * 
+     * @param prefix the title prefix to search for
+     * @param limit the maximum number of results to return
+     * @return list of materials matching the prefix, limited to the specified count
+     */
+    public List&lt;Material&gt; searchByPrefixWithLimit(String prefix, int limit) {
+<span class="fc bfc" id="L75" title="All 6 branches covered.">        if (prefix == null || prefix.trim().isEmpty() || limit &lt;= 0) {</span>
+<span class="fc" id="L76">            return List.of();</span>
+        }
+        
+<span class="fc" id="L79">        String cacheKey = &quot;prefix:&quot; + prefix.toLowerCase().trim() + &quot;:limit:&quot; + limit;</span>
+        
+        // Check cache first
+<span class="fc" id="L82">        var cached = cache.get(cacheKey);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (cached.isPresent()) {</span>
+<span class="fc" id="L84">            return cached.get();</span>
+        }
+        
+        // Perform search using trie
+<span class="fc" id="L88">        List&lt;Material&gt; results = trie.searchByPrefixWithLimit(prefix, limit);</span>
+        
+        // Cache results
+<span class="fc" id="L91">        cache.put(cacheKey, results);</span>
+        
+<span class="fc" id="L93">        return results;</span>
+    }
+    
+    /**
+     * Adds a material to the search index and invalidates relevant cache entries.
+     * 
+     * @param material the material to add
+     */
+    public void addMaterial(Material material) {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L103">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L106">        trie.insert(material);</span>
+<span class="fc" id="L107">        invalidateCacheForMaterial(material);</span>
+<span class="fc" id="L108">    }</span>
+    
+    /**
+     * Removes a material from the search index and invalidates relevant cache entries.
+     * 
+     * @param material the material to remove
+     */
+    public void removeMaterial(Material material) {
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L117">            return;</span>
+        }
+        
+<span class="fc" id="L120">        trie.remove(material);</span>
+<span class="fc" id="L121">        invalidateCacheForMaterial(material);</span>
+<span class="fc" id="L122">    }</span>
+    
+    /**
+     * Refreshes the search index from the repository.
+     * Clears the cache to ensure consistency.
+     */
+    public void refreshIndex() {
+<span class="fc" id="L129">        trie.clear();</span>
+<span class="fc" id="L130">        cache.clear();</span>
+<span class="fc" id="L131">        initializeTrie();</span>
+<span class="fc" id="L132">    }</span>
+    
+    /**
+     * Gets cache statistics for performance monitoring.
+     * 
+     * @return cache statistics
+     */
+    public SearchResultCache.CacheStats getCacheStats() {
+<span class="fc" id="L140">        return cache.getStats();</span>
+    }
+    
+    /**
+     * Gets the current size of the search index.
+     * 
+     * @return the number of materials in the index
+     */
+    public int getIndexSize() {
+<span class="fc" id="L149">        return trie.size();</span>
+    }
+    
+    /**
+     * Checks if the search index is empty.
+     * 
+     * @return true if no materials are indexed
+     */
+    public boolean isIndexEmpty() {
+<span class="fc" id="L158">        return trie.isEmpty();</span>
+    }
+    
+    /**
+     * Clears the search index and cache.
+     */
+    public void clear() {
+<span class="fc" id="L165">        trie.clear();</span>
+<span class="fc" id="L166">        cache.clear();</span>
+<span class="fc" id="L167">    }</span>
+    
+    /**
+     * Initializes the trie with all materials from the repository.
+     */
+    private void initializeTrie() {
+<span class="fc" id="L173">        List&lt;Material&gt; materials = repository.findAll();</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        for (Material material : materials) {</span>
+<span class="fc" id="L175">            trie.insert(material);</span>
+<span class="fc" id="L176">        }</span>
+<span class="fc" id="L177">    }</span>
+    
+    /**
+     * Invalidates cache entries that might be affected by changes to a material.
+     * 
+     * @param material the material that was changed
+     */
+    private void invalidateCacheForMaterial(Material material) {
+<span class="fc" id="L185">        String title = material.getTitle().toLowerCase();</span>
+        
+        // Invalidate cache entries for all possible prefixes of the material's title
+<span class="fc bfc" id="L188" title="All 2 branches covered.">        for (int i = 1; i &lt;= title.length(); i++) {</span>
+<span class="fc" id="L189">            String prefix = title.substring(0, i);</span>
+<span class="fc" id="L190">            String cacheKey = &quot;prefix:&quot; + prefix;</span>
+<span class="fc" id="L191">            cache.remove(cacheKey);</span>
+            
+            // Also remove limit-based cache entries
+<span class="fc bfc" id="L194" title="All 2 branches covered.">            for (int limit = 10; limit &lt;= 100; limit += 10) {</span>
+<span class="fc" id="L195">                String limitCacheKey = cacheKey + &quot;:limit:&quot; + limit;</span>
+<span class="fc" id="L196">                cache.remove(limitCacheKey);</span>
+            }
+        }
+<span class="fc" id="L199">    }</span>
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L203">        return String.format(&quot;CachedSearchService[IndexSize=%d, CacheSize=%d/%d, HitRatio=%.2f%%]&quot;,</span>
+<span class="fc" id="L204">            getIndexSize(),</span>
+<span class="fc" id="L205">            cache.size(),</span>
+<span class="fc" id="L206">            cache.getMaxSize(),</span>
+<span class="fc" id="L207">            getCacheStats().getHitRatio() * 100);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

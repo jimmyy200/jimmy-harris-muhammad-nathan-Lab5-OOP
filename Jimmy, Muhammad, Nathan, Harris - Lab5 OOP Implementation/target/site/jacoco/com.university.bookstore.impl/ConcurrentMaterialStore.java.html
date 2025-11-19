@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConcurrentMaterialStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.impl</a> &gt; <span class="el_source">ConcurrentMaterialStore.java</span></div><h1>ConcurrentMaterialStore.java</h1><pre class="source lang-java linenums">package com.university.bookstore.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import com.university.bookstore.api.MaterialStore;
+import com.university.bookstore.model.Magazine;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+import com.university.bookstore.model.PrintedBook;
+
+/**
+ * Thread-safe implementation of MaterialStore using synchronization primitives.
+ * Demonstrates concurrency patterns and thread safety in multi-threaded environments.
+ * 
+ * &lt;p&gt;This implementation uses ReentrantReadWriteLock to optimize for read-heavy workloads
+ * and ConcurrentHashMap for thread-safe storage with minimal locking overhead.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class ConcurrentMaterialStore implements MaterialStore {
+    
+    private final Map&lt;String, Material&gt; materials;
+    private final ReadWriteLock lock;
+    private final Lock readLock;
+    private final Lock writeLock;
+    
+    /**
+     * Creates a new thread-safe material store.
+     */
+<span class="fc" id="L46">    public ConcurrentMaterialStore() {</span>
+<span class="fc" id="L47">        this.materials = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L48">        this.lock = new ReentrantReadWriteLock();</span>
+<span class="fc" id="L49">        this.readLock = lock.readLock();</span>
+<span class="fc" id="L50">        this.writeLock = lock.writeLock();</span>
+<span class="fc" id="L51">    }</span>
+    
+    /**
+     * Creates a material store with initial materials.
+     * 
+     * @param initialMaterials materials to add initially
+     */
+    public ConcurrentMaterialStore(Collection&lt;Material&gt; initialMaterials) {
+<span class="nc" id="L59">        this();</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (initialMaterials != null) {</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">            for (Material material : initialMaterials) {</span>
+<span class="nc" id="L62">                addMaterial(material);</span>
+<span class="nc" id="L63">            }</span>
+        }
+<span class="nc" id="L65">    }</span>
+    
+    @Override
+    public boolean addMaterial(Material material) {
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L70">            throw new NullPointerException(&quot;Cannot add null material&quot;);</span>
+        }
+        
+<span class="fc" id="L73">        writeLock.lock();</span>
+        try {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            return materials.putIfAbsent(material.getId(), material) == null;</span>
+        } finally {
+<span class="fc" id="L77">            writeLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public Optional&lt;Material&gt; removeMaterial(String id) {
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L84">            return Optional.empty();</span>
+        }
+        
+<span class="nc" id="L87">        writeLock.lock();</span>
+        try {
+<span class="nc" id="L89">            return Optional.ofNullable(materials.remove(id));</span>
+        } finally {
+<span class="nc" id="L91">            writeLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public Optional&lt;Material&gt; findById(String id) {
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L98">            return Optional.empty();</span>
+        }
+        
+<span class="fc" id="L101">        readLock.lock();</span>
+        try {
+<span class="fc" id="L103">            return Optional.ofNullable(materials.get(id));</span>
+        } finally {
+<span class="fc" id="L105">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; searchByTitle(String title) {
+<span class="pc bpc" id="L111" title="2 of 4 branches missed.">        if (title == null || title.trim().isEmpty()) {</span>
+<span class="nc" id="L112">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L115">        String searchTerm = title.toLowerCase().trim();</span>
+<span class="fc" id="L116">        readLock.lock();</span>
+        try {
+<span class="fc" id="L118">            return materials.values().stream()</span>
+<span class="fc" id="L119">                .filter(m -&gt; m.getTitle().toLowerCase().contains(searchTerm))</span>
+<span class="fc" id="L120">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="fc" id="L122">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; searchByCreator(String creator) {
+<span class="nc bnc" id="L128" title="All 4 branches missed.">        if (creator == null || creator.trim().isEmpty()) {</span>
+<span class="nc" id="L129">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L132">        String searchTerm = creator.toLowerCase().trim();</span>
+<span class="nc" id="L133">        readLock.lock();</span>
+        try {
+<span class="nc" id="L135">            return materials.values().stream()</span>
+<span class="nc" id="L136">                .filter(m -&gt; m.getCreator().toLowerCase().contains(searchTerm))</span>
+<span class="nc" id="L137">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L139">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByType(Material.MaterialType type) {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (type == null) {</span>
+<span class="nc" id="L146">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L149">        readLock.lock();</span>
+        try {
+<span class="nc" id="L151">            return materials.values().stream()</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">                .filter(m -&gt; m.getType() == type)</span>
+<span class="nc" id="L153">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L155">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Media&gt; getMediaMaterials() {
+<span class="nc" id="L161">        readLock.lock();</span>
+        try {
+<span class="nc" id="L163">            return materials.values().stream()</span>
+<span class="nc" id="L164">                .filter(m -&gt; m instanceof Media)</span>
+<span class="nc" id="L165">                .map(m -&gt; (Media) m)</span>
+<span class="nc" id="L166">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L168">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; filterMaterials(Predicate&lt;Material&gt; predicate) {
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        if (predicate == null) {</span>
+<span class="nc" id="L175">            throw new NullPointerException(&quot;Predicate cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L178">        readLock.lock();</span>
+        try {
+<span class="nc" id="L180">            return materials.values().stream()</span>
+<span class="nc" id="L181">                .filter(predicate)</span>
+<span class="nc" id="L182">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L184">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByPriceRange(double minPrice, double maxPrice) {
+<span class="nc bnc" id="L190" title="All 6 branches missed.">        if (minPrice &lt; 0 || maxPrice &lt; 0 || minPrice &gt; maxPrice) {</span>
+<span class="nc" id="L191">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L194">        readLock.lock();</span>
+        try {
+<span class="nc" id="L196">            return materials.values().stream()</span>
+<span class="nc bnc" id="L197" title="All 4 branches missed.">                .filter(m -&gt; m.getPrice() &gt;= minPrice &amp;&amp; m.getPrice() &lt;= maxPrice)</span>
+<span class="nc" id="L198">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L200">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByYear(int year) {
+<span class="nc" id="L206">        readLock.lock();</span>
+        try {
+<span class="nc" id="L208">            return materials.values().stream()</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                .filter(m -&gt; m.getYear() == year)</span>
+<span class="nc" id="L210">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L212">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getAllMaterialsSorted() {
+<span class="nc" id="L218">        readLock.lock();</span>
+        try {
+<span class="nc" id="L220">            List&lt;Material&gt; sorted = new ArrayList&lt;&gt;(materials.values());</span>
+<span class="nc" id="L221">            Collections.sort(sorted);</span>
+<span class="nc" id="L222">            return sorted;</span>
+        } finally {
+<span class="nc" id="L224">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getAllMaterials() {
+<span class="fc" id="L230">        readLock.lock();</span>
+        try {
+<span class="fc" id="L232">            return new ArrayList&lt;&gt;(materials.values());</span>
+        } finally {
+<span class="fc" id="L234">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public double getTotalInventoryValue() {
+<span class="nc" id="L240">        readLock.lock();</span>
+        try {
+<span class="nc" id="L242">            return materials.values().stream()</span>
+<span class="nc" id="L243">                .mapToDouble(Material::getPrice)</span>
+<span class="nc" id="L244">                .sum();</span>
+        } finally {
+<span class="nc" id="L246">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public double getTotalDiscountedValue() {
+<span class="nc" id="L252">        readLock.lock();</span>
+        try {
+<span class="nc" id="L254">            return materials.values().stream()</span>
+<span class="nc" id="L255">                .mapToDouble(Material::getDiscountedPrice)</span>
+<span class="nc" id="L256">                .sum();</span>
+        } finally {
+<span class="nc" id="L258">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public InventoryStats getInventoryStats() {
+<span class="nc" id="L264">        readLock.lock();</span>
+        try {
+<span class="nc bnc" id="L266" title="All 2 branches missed.">            if (materials.isEmpty()) {</span>
+<span class="nc" id="L267">                return new InventoryStats(0, 0, 0, 0, 0, 0);</span>
+            }
+            
+<span class="nc" id="L270">            List&lt;Double&gt; prices = materials.values().stream()</span>
+<span class="nc" id="L271">                .map(Material::getPrice)</span>
+<span class="nc" id="L272">                .sorted()</span>
+<span class="nc" id="L273">                .collect(Collectors.toList());</span>
+            
+<span class="nc" id="L275">            double averagePrice = prices.stream()</span>
+<span class="nc" id="L276">                .mapToDouble(Double::doubleValue)</span>
+<span class="nc" id="L277">                .average()</span>
+<span class="nc" id="L278">                .orElse(0.0);</span>
+            
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            double medianPrice = prices.size() % 2 == 0</span>
+<span class="nc" id="L281">                ? (prices.get(prices.size() / 2 - 1) + prices.get(prices.size() / 2)) / 2</span>
+<span class="nc" id="L282">                : prices.get(prices.size() / 2);</span>
+            
+<span class="nc" id="L284">            int uniqueTypes = (int) materials.values().stream()</span>
+<span class="nc" id="L285">                .map(Material::getType)</span>
+<span class="nc" id="L286">                .distinct()</span>
+<span class="nc" id="L287">                .count();</span>
+            
+<span class="nc" id="L289">            int mediaCount = (int) materials.values().stream()</span>
+<span class="nc" id="L290">                .filter(m -&gt; m instanceof Media)</span>
+<span class="nc" id="L291">                .count();</span>
+            
+<span class="nc" id="L293">            int printCount = (int) materials.values().stream()</span>
+<span class="nc bnc" id="L294" title="All 4 branches missed.">                .filter(m -&gt; m instanceof PrintedBook || m instanceof Magazine)</span>
+<span class="nc" id="L295">                .count();</span>
+            
+<span class="nc" id="L297">            return new InventoryStats(</span>
+<span class="nc" id="L298">                materials.size(),</span>
+                averagePrice,
+                medianPrice,
+                uniqueTypes,
+                mediaCount,
+                printCount
+            );
+        } finally {
+<span class="nc" id="L306">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public void clearInventory() {
+<span class="nc" id="L312">        writeLock.lock();</span>
+        try {
+<span class="nc" id="L314">            materials.clear();</span>
+        } finally {
+<span class="nc" id="L316">            writeLock.unlock();</span>
+        }
+<span class="nc" id="L318">    }</span>
+    
+    @Override
+    public int size() {
+<span class="fc" id="L322">        readLock.lock();</span>
+        try {
+<span class="fc" id="L324">            return materials.size();</span>
+        } finally {
+<span class="fc" id="L326">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public boolean isEmpty() {
+<span class="nc" id="L332">        readLock.lock();</span>
+        try {
+<span class="nc" id="L334">            return materials.isEmpty();</span>
+        } finally {
+<span class="nc" id="L336">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; findRecentMaterials(int years) {
+<span class="nc bnc" id="L342" title="All 2 branches missed.">        if (years &lt; 0) {</span>
+<span class="nc" id="L343">            throw new IllegalArgumentException(&quot;Years cannot be negative: &quot; + years);</span>
+        }
+        
+<span class="nc" id="L346">        int currentYear = java.time.Year.now().getValue();</span>
+<span class="nc" id="L347">        int cutoffYear = currentYear - years;</span>
+        
+<span class="nc" id="L349">        readLock.lock();</span>
+        try {
+<span class="nc" id="L351">            return materials.values().stream()</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">                .filter(material -&gt; material.getYear() &gt;= cutoffYear)</span>
+<span class="nc" id="L353">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L355">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; findByCreators(String... creators) {
+<span class="nc bnc" id="L361" title="All 4 branches missed.">        if (creators == null || creators.length == 0) {</span>
+<span class="nc" id="L362">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L365">        Set&lt;String&gt; creatorSet = java.util.Arrays.stream(creators)</span>
+<span class="nc" id="L366">            .filter(Objects::nonNull)</span>
+<span class="nc" id="L367">            .map(String::trim)</span>
+<span class="nc bnc" id="L368" title="All 2 branches missed.">            .filter(s -&gt; !s.isEmpty())</span>
+<span class="nc" id="L369">            .collect(Collectors.toSet());</span>
+        
+<span class="nc bnc" id="L371" title="All 2 branches missed.">        if (creatorSet.isEmpty()) {</span>
+<span class="nc" id="L372">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="nc" id="L375">        readLock.lock();</span>
+        try {
+<span class="nc" id="L377">            return materials.values().stream()</span>
+<span class="nc" id="L378">                .filter(material -&gt; creatorSet.contains(material.getCreator()))</span>
+<span class="nc" id="L379">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L381">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; findWithPredicate(Predicate&lt;Material&gt; condition) {
+<span class="nc bnc" id="L387" title="All 2 branches missed.">        if (condition == null) {</span>
+<span class="nc" id="L388">            throw new NullPointerException(&quot;Predicate cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L391">        readLock.lock();</span>
+        try {
+<span class="nc" id="L393">            return materials.values().stream()</span>
+<span class="nc" id="L394">                .filter(condition)</span>
+<span class="nc" id="L395">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L397">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; getSorted(Comparator&lt;Material&gt; comparator) {
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        if (comparator == null) {</span>
+<span class="nc" id="L404">            throw new NullPointerException(&quot;Comparator cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L407">        readLock.lock();</span>
+        try {
+<span class="nc" id="L409">            return materials.values().stream()</span>
+<span class="nc" id="L410">                .sorted(comparator)</span>
+<span class="nc" id="L411">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L413">            readLock.unlock();</span>
+        }
+    }
+    
+    /**
+     * Gets all display info for materials (thread-safe).
+     * 
+     * @return list of display strings
+     */
+    public List&lt;String&gt; getAllDisplayInfo() {
+<span class="nc" id="L423">        readLock.lock();</span>
+        try {
+<span class="nc" id="L425">            return materials.values().stream()</span>
+<span class="nc" id="L426">                .map(Material::getDisplayInfo)</span>
+<span class="nc" id="L427">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L429">            readLock.unlock();</span>
+        }
+    }
+    
+    /**
+     * Groups materials by type for reporting (thread-safe).
+     * 
+     * @return map of type to materials
+     */
+    public Map&lt;Material.MaterialType, List&lt;Material&gt;&gt; groupByType() {
+<span class="nc" id="L439">        readLock.lock();</span>
+        try {
+<span class="nc" id="L441">            return materials.values().stream()</span>
+<span class="nc" id="L442">                .collect(Collectors.groupingBy(Material::getType));</span>
+        } finally {
+<span class="nc" id="L444">            readLock.unlock();</span>
+        }
+    }
+    
+    /**
+     * Gets materials with active discounts (thread-safe).
+     * 
+     * @return list of discounted materials
+     */
+    public List&lt;Material&gt; getDiscountedMaterials() {
+<span class="nc" id="L454">        readLock.lock();</span>
+        try {
+<span class="nc" id="L456">            return materials.values().stream()</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">                .filter(m -&gt; m.getDiscountRate() &gt; 0)</span>
+<span class="nc" id="L458">                .collect(Collectors.toList());</span>
+        } finally {
+<span class="nc" id="L460">            readLock.unlock();</span>
+        }
+    }
+    
+    /**
+     * Calculates total savings from discounts (thread-safe).
+     * 
+     * @return total discount amount
+     */
+    public double getTotalDiscountAmount() {
+<span class="nc" id="L470">        readLock.lock();</span>
+        try {
+<span class="nc" id="L472">            return materials.values().stream()</span>
+<span class="nc" id="L473">                .mapToDouble(m -&gt; m.getPrice() * m.getDiscountRate())</span>
+<span class="nc" id="L474">                .sum();</span>
+        } finally {
+<span class="nc" id="L476">            readLock.unlock();</span>
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L482">        readLock.lock();</span>
+        try {
+<span class="nc" id="L484">            return String.format(&quot;ConcurrentMaterialStore[Size=%d, Types=%d, Value=$%.2f]&quot;,</span>
+<span class="nc" id="L485">                size(),</span>
+<span class="nc" id="L486">                groupByType().size(),</span>
+<span class="nc" id="L487">                getTotalInventoryValue());</span>
+        } finally {
+<span class="nc" id="L489">            readLock.unlock();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

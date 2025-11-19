@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialIteratorFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.iterator</a> &gt; <span class="el_source">MaterialIteratorFactory.java</span></div><h1>MaterialIteratorFactory.java</h1><pre class="source lang-java linenums">package com.university.bookstore.iterator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Factory for creating different types of material iterators.
+ * Provides a centralized way to create iterators with different traversal strategies.
+ * 
+ * &lt;p&gt;This factory demonstrates the Factory pattern by providing methods to create
+ * various types of iterators without exposing the concrete iterator classes.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="nc" id="L21">public class MaterialIteratorFactory {</span>
+    
+    /**
+     * Creates a type-filtering iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param type the material type to filter for
+     * @return iterator for materials of the specified type
+     */
+    public MaterialIterator createTypeIterator(List&lt;Material&gt; materials, Material.MaterialType type) {
+<span class="nc" id="L31">        return new MaterialTypeIterator(materials, type);</span>
+    }
+    
+    /**
+     * Creates a price-sorted iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param ascending true for ascending order, false for descending
+     * @return iterator for materials sorted by price
+     */
+    public MaterialIterator createPriceSortedIterator(List&lt;Material&gt; materials, boolean ascending) {
+<span class="nc" id="L42">        return new PriceSortedIterator(materials, ascending);</span>
+    }
+    
+    /**
+     * Creates a price range iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param minPrice the minimum price (inclusive)
+     * @param maxPrice the maximum price (inclusive)
+     * @return iterator for materials within the price range
+     */
+    public MaterialIterator createPriceRangeIterator(List&lt;Material&gt; materials, double minPrice, double maxPrice) {
+<span class="nc" id="L54">        return new PriceRangeIterator(materials, minPrice, maxPrice);</span>
+    }
+    
+    /**
+     * Creates an e-book iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @return iterator for e-books only
+     */
+    public MaterialIterator createEBookIterator(List&lt;Material&gt; materials) {
+<span class="nc" id="L64">        return new MaterialTypeIterator(materials, Material.MaterialType.E_BOOK);</span>
+    }
+    
+    /**
+     * Creates an expensive materials iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param threshold the minimum price threshold
+     * @return iterator for materials above the price threshold
+     */
+    public MaterialIterator createExpensiveIterator(List&lt;Material&gt; materials, double threshold) {
+<span class="nc" id="L75">        return new PriceRangeIterator(materials, threshold, Double.MAX_VALUE);</span>
+    }
+    
+    /**
+     * Creates a cheap materials iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param threshold the maximum price threshold
+     * @return iterator for materials below the price threshold
+     */
+    public MaterialIterator createCheapIterator(List&lt;Material&gt; materials, double threshold) {
+<span class="nc" id="L86">        return new PriceRangeIterator(materials, 0.0, threshold);</span>
+    }
+    
+    /**
+     * Creates a book iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @return iterator for books only
+     */
+    public MaterialIterator createBookIterator(List&lt;Material&gt; materials) {
+<span class="nc" id="L96">        return new MaterialTypeIterator(materials, Material.MaterialType.BOOK);</span>
+    }
+    
+    /**
+     * Creates a magazine iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @return iterator for magazines only
+     */
+    public MaterialIterator createMagazineIterator(List&lt;Material&gt; materials) {
+<span class="nc" id="L106">        return new MaterialTypeIterator(materials, Material.MaterialType.MAGAZINE);</span>
+    }
+    
+    /**
+     * Creates an audio book iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @return iterator for audio books only
+     */
+    public MaterialIterator createAudioBookIterator(List&lt;Material&gt; materials) {
+<span class="nc" id="L116">        return new MaterialTypeIterator(materials, Material.MaterialType.AUDIO_BOOK);</span>
+    }
+    
+    /**
+     * Creates a video iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @return iterator for videos only
+     */
+    public MaterialIterator createVideoIterator(List&lt;Material&gt; materials) {
+<span class="nc" id="L126">        return new MaterialTypeIterator(materials, Material.MaterialType.VIDEO);</span>
+    }
+    
+    /**
+     * Collects all materials from an iterator into a list.
+     * 
+     * @param iterator the iterator to collect from
+     * @return list of all materials from the iterator
+     */
+    public List&lt;Material&gt; collectAll(MaterialIterator iterator) {
+<span class="nc" id="L136">        List&lt;Material&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L137">        iterator.reset();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L139">            result.add(iterator.next());</span>
+        }
+<span class="nc" id="L141">        return result;</span>
+    }
+    
+    /**
+     * Finds the first material matching a predicate.
+     * 
+     * @param iterator the iterator to search
+     * @param predicate the predicate to test
+     * @return Optional containing the first matching material
+     */
+    public Optional&lt;Material&gt; findFirst(MaterialIterator iterator, Predicate&lt;Material&gt; predicate) {
+<span class="nc" id="L152">        iterator.reset();</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L154">            Material material = iterator.next();</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (predicate.test(material)) {</span>
+<span class="nc" id="L156">                return Optional.of(material);</span>
+            }
+<span class="nc" id="L158">        }</span>
+<span class="nc" id="L159">        return Optional.empty();</span>
+    }
+    
+    /**
+     * Finds all materials matching a predicate.
+     * 
+     * @param iterator the iterator to search
+     * @param predicate the predicate to test
+     * @return list of all matching materials
+     */
+    public List&lt;Material&gt; findAll(MaterialIterator iterator, Predicate&lt;Material&gt; predicate) {
+<span class="nc" id="L170">        List&lt;Material&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L171">        iterator.reset();</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L173">            Material material = iterator.next();</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (predicate.test(material)) {</span>
+<span class="nc" id="L175">                result.add(material);</span>
+            }
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">        return result;</span>
+    }
+    
+    /**
+     * Counts materials matching a predicate.
+     * 
+     * @param iterator the iterator to count
+     * @param predicate the predicate to test
+     * @return the count of matching materials
+     */
+    public int count(MaterialIterator iterator, Predicate&lt;Material&gt; predicate) {
+<span class="nc" id="L189">        int count = 0;</span>
+<span class="nc" id="L190">        iterator.reset();</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L192">            Material material = iterator.next();</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">            if (predicate.test(material)) {</span>
+<span class="nc" id="L194">                count++;</span>
+            }
+<span class="nc" id="L196">        }</span>
+<span class="nc" id="L197">        return count;</span>
+    }
+    
+    /**
+     * Checks if any material matches a predicate.
+     * 
+     * @param iterator the iterator to check
+     * @param predicate the predicate to test
+     * @return true if any material matches
+     */
+    public boolean anyMatch(MaterialIterator iterator, Predicate&lt;Material&gt; predicate) {
+<span class="nc" id="L208">        iterator.reset();</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L210">            Material material = iterator.next();</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">            if (predicate.test(material)) {</span>
+<span class="nc" id="L212">                return true;</span>
+            }
+<span class="nc" id="L214">        }</span>
+<span class="nc" id="L215">        return false;</span>
+    }
+    
+    /**
+     * Checks if all materials match a predicate.
+     * 
+     * @param iterator the iterator to check
+     * @param predicate the predicate to test
+     * @return true if all materials match
+     */
+    public boolean allMatch(MaterialIterator iterator, Predicate&lt;Material&gt; predicate) {
+<span class="nc" id="L226">        iterator.reset();</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L228">            Material material = iterator.next();</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">            if (!predicate.test(material)) {</span>
+<span class="nc" id="L230">                return false;</span>
+            }
+<span class="nc" id="L232">        }</span>
+<span class="nc" id="L233">        return true;</span>
+    }
+    
+    /**
+     * Gets the total count of materials in an iterator.
+     * 
+     * @param iterator the iterator to count
+     * @return the total count
+     */
+    public int getTotalCount(MaterialIterator iterator) {
+<span class="nc" id="L243">        return iterator.getTotalCount();</span>
+    }
+    
+    /**
+     * Gets the remaining count of materials in an iterator.
+     * 
+     * @param iterator the iterator to check
+     * @return the remaining count
+     */
+    public int getRemainingCount(MaterialIterator iterator) {
+<span class="nc" id="L253">        return iterator.getRemainingCount();</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L258">        return &quot;MaterialIteratorFactory[Available iterators: Type, PriceSorted, PriceRange, EBook, Expensive, Cheap, Book, Magazine, AudioBook, Video]&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

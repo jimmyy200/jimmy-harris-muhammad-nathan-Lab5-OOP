@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DirectorHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.chain</a> &gt; <span class="el_source">DirectorHandler.java</span></div><h1>DirectorHandler.java</h1><pre class="source lang-java linenums">package com.university.bookstore.chain;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Director-level discount approval handler.
+ * Can approve discounts up to 25%.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="fc" id="L14">public class DirectorHandler extends DiscountHandler {</span>
+    
+<span class="fc" id="L16">    private static final Logger LOGGER = LoggerFactory.getLogger(DirectorHandler.class);</span>
+    private static final double MAX_DISCOUNT = 0.25; // 25%
+    
+    @Override
+    public void handleRequest(DiscountRequest request) {
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (request.getRequestedDiscount() &lt;= MAX_DISCOUNT) {</span>
+            // Director can approve this discount
+<span class="fc" id="L23">            request.setApproved(true);</span>
+<span class="fc" id="L24">            request.setApprovedBy(&quot;Director&quot;);</span>
+<span class="fc" id="L25">            LOGGER.info(&quot;Director approved {}% discount for {}&quot;, </span>
+<span class="fc" id="L26">                       request.getRequestedDiscountPercentage(), request.getMaterial().getTitle());</span>
+        } else {
+            // Director cannot approve, pass to next handler
+<span class="fc" id="L29">            LOGGER.info(&quot;Director cannot approve discount &gt; {}%. Passing to VP.&quot;, </span>
+<span class="fc" id="L30">                       (MAX_DISCOUNT * 100));</span>
+<span class="fc" id="L31">            passToNext(request);</span>
+        }
+<span class="fc" id="L33">    }</span>
+    
+    @Override
+    public String getHandlerName() {
+<span class="nc" id="L37">        return &quot;DirectorHandler&quot;;</span>
+    }
+    
+    @Override
+    public double getMaxDiscount() {
+<span class="nc" id="L42">        return MAX_DISCOUNT;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialBundleBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.builder</a> &gt; <span class="el_source">MaterialBundleBuilder.java</span></div><h1>MaterialBundleBuilder.java</h1><pre class="source lang-java linenums">package com.university.bookstore.builder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.university.bookstore.composite.MaterialBundle;
+import com.university.bookstore.composite.MaterialComponent;
+import com.university.bookstore.composite.MaterialLeaf;
+import com.university.bookstore.model.Material;
+
+/**
+ * Builder for creating MaterialBundle instances with a fluent interface.
+ * Demonstrates the Builder pattern for complex composite object construction.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="fc" id="L19">public class MaterialBundleBuilder implements ComponentBuilder&lt;MaterialBundle&gt; {</span>
+    
+    private String bundleName;
+<span class="fc" id="L22">    private double bundleDiscount = 0.0;</span>
+<span class="fc" id="L23">    private final List&lt;MaterialComponent&gt; components = new ArrayList&lt;&gt;();</span>
+    
+    /**
+     * Sets the bundle name.
+     * 
+     * @param bundleName the bundle name
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setBundleName(String bundleName) {
+<span class="fc" id="L32">        this.bundleName = bundleName;</span>
+<span class="fc" id="L33">        return this;</span>
+    }
+    
+    /**
+     * Sets the bundle discount rate.
+     * 
+     * @param discount the discount rate (0.0 to 1.0)
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setBundleDiscount(double discount) {
+<span class="fc" id="L43">        this.bundleDiscount = Math.max(0.0, Math.min(1.0, discount));</span>
+<span class="fc" id="L44">        return this;</span>
+    }
+    
+    /**
+     * Sets the bundle discount percentage.
+     * 
+     * @param discountPercent the discount percentage (0.0 to 100.0)
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setBundleDiscountPercent(double discountPercent) {
+<span class="nc" id="L54">        return setBundleDiscount(discountPercent / 100.0);</span>
+    }
+    
+    /**
+     * Adds a material to the bundle.
+     * 
+     * @param material the material to add
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder addMaterial(Material material) {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (material != null) {</span>
+<span class="fc" id="L65">            components.add(new MaterialLeaf(material));</span>
+        }
+<span class="fc" id="L67">        return this;</span>
+    }
+    
+    /**
+     * Adds a bundle to this bundle (nested bundles).
+     * 
+     * @param bundle the bundle to add
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder addBundle(MaterialBundle bundle) {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (bundle != null) {</span>
+<span class="nc" id="L78">            components.add(bundle);</span>
+        }
+<span class="nc" id="L80">        return this;</span>
+    }
+    
+    /**
+     * Adds a material component to the bundle.
+     * 
+     * @param component the component to add
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder addComponent(MaterialComponent component) {
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        if (component != null) {</span>
+<span class="fc" id="L91">            components.add(component);</span>
+        }
+<span class="fc" id="L93">        return this;</span>
+    }
+    
+    /**
+     * Adds multiple materials to the bundle.
+     * 
+     * @param materials the materials to add
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder addMaterials(List&lt;Material&gt; materials) {
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (materials != null) {</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            for (Material material : materials) {</span>
+<span class="nc" id="L105">                addMaterial(material);</span>
+<span class="nc" id="L106">            }</span>
+        }
+<span class="nc" id="L108">        return this;</span>
+    }
+    
+    /**
+     * Adds multiple components to the bundle.
+     * 
+     * @param components the components to add
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder addComponents(List&lt;MaterialComponent&gt; components) {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (components != null) {</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">            for (MaterialComponent component : components) {</span>
+<span class="nc" id="L120">                addComponent(component);</span>
+<span class="nc" id="L121">            }</span>
+        }
+<span class="nc" id="L123">        return this;</span>
+    }
+    
+    /**
+     * Removes a material from the bundle.
+     * 
+     * @param material the material to remove
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder removeMaterial(Material material) {
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (material != null) {</span>
+<span class="nc" id="L134">            components.removeIf(component -&gt; </span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">                component instanceof MaterialLeaf &amp;&amp; </span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">                ((MaterialLeaf) component).getMaterial().equals(material));</span>
+        }
+<span class="nc" id="L138">        return this;</span>
+    }
+    
+    /**
+     * Removes a component from the bundle.
+     * 
+     * @param component the component to remove
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder removeComponent(MaterialComponent component) {
+<span class="nc" id="L148">        components.remove(component);</span>
+<span class="nc" id="L149">        return this;</span>
+    }
+    
+    /**
+     * Clears all components from the bundle.
+     * 
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder clearComponents() {
+<span class="nc" id="L158">        components.clear();</span>
+<span class="nc" id="L159">        return this;</span>
+    }
+    
+    /**
+     * Sets a 10% discount.
+     * 
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setSmallDiscount() {
+<span class="nc" id="L168">        return setBundleDiscount(0.10);</span>
+    }
+    
+    /**
+     * Sets a 20% discount.
+     * 
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setMediumDiscount() {
+<span class="nc" id="L177">        return setBundleDiscount(0.20);</span>
+    }
+    
+    /**
+     * Sets a 30% discount.
+     * 
+     * @return this builder for method chaining
+     */
+    public MaterialBundleBuilder setLargeDiscount() {
+<span class="nc" id="L186">        return setBundleDiscount(0.30);</span>
+    }
+    
+    @Override
+    public MaterialBundle build() {
+<span class="fc" id="L191">        validate();</span>
+        
+<span class="fc" id="L193">        MaterialBundle bundle = new MaterialBundle(bundleName, bundleDiscount);</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        for (MaterialComponent component : components) {</span>
+<span class="fc" id="L195">            bundle.addComponent(component);</span>
+<span class="fc" id="L196">        }</span>
+<span class="fc" id="L197">        return bundle;</span>
+    }
+    
+    @Override
+    public void validate() {
+<span class="pc bpc" id="L202" title="2 of 4 branches missed.">        if (bundleName == null || bundleName.trim().isEmpty()) {</span>
+<span class="nc" id="L203">            throw new IllegalStateException(&quot;Bundle name is required&quot;);</span>
+        }
+<span class="pc bpc" id="L205" title="2 of 4 branches missed.">        if (bundleDiscount &lt; 0.0 || bundleDiscount &gt; 1.0) {</span>
+<span class="nc" id="L206">            throw new IllegalStateException(&quot;Bundle discount must be between 0.0 and 1.0: &quot; + bundleDiscount);</span>
+        }
+<span class="fc" id="L208">    }</span>
+    
+    @Override
+    public void reset() {
+<span class="nc" id="L212">        this.bundleName = null;</span>
+<span class="nc" id="L213">        this.bundleDiscount = 0.0;</span>
+<span class="nc" id="L214">        this.components.clear();</span>
+<span class="nc" id="L215">    }</span>
+    
+    /**
+     * Gets the current bundle name.
+     * 
+     * @return the current bundle name
+     */
+    public String getBundleName() {
+<span class="nc" id="L223">        return bundleName;</span>
+    }
+    
+    /**
+     * Gets the current bundle discount.
+     * 
+     * @return the current bundle discount
+     */
+    public double getBundleDiscount() {
+<span class="nc" id="L232">        return bundleDiscount;</span>
+    }
+    
+    /**
+     * Gets the current bundle discount percentage.
+     * 
+     * @return the current bundle discount percentage
+     */
+    public double getBundleDiscountPercent() {
+<span class="nc" id="L241">        return bundleDiscount * 100.0;</span>
+    }
+    
+    /**
+     * Gets the current components.
+     * 
+     * @return the current components
+     */
+    public List&lt;MaterialComponent&gt; getComponents() {
+<span class="nc" id="L250">        return new ArrayList&lt;&gt;(components);</span>
+    }
+    
+    /**
+     * Gets the number of components.
+     * 
+     * @return the component count
+     */
+    public int getComponentCount() {
+<span class="nc" id="L259">        return components.size();</span>
+    }
+    
+    /**
+     * Checks if the bundle has any components.
+     * 
+     * @return true if the bundle has components
+     */
+    public boolean hasComponents() {
+<span class="nc bnc" id="L268" title="All 2 branches missed.">        return !components.isEmpty();</span>
+    }
+    
+    /**
+     * Gets the total price of all components.
+     * 
+     * @return the total price
+     */
+    public double getTotalPrice() {
+<span class="nc" id="L277">        return components.stream()</span>
+<span class="nc" id="L278">            .mapToDouble(MaterialComponent::getPrice)</span>
+<span class="nc" id="L279">            .sum();</span>
+    }
+    
+    /**
+     * Gets the total discounted price of all components.
+     * 
+     * @return the total discounted price
+     */
+    public double getTotalDiscountedPrice() {
+<span class="nc" id="L288">        double totalPrice = getTotalPrice();</span>
+<span class="nc" id="L289">        return totalPrice * (1.0 - bundleDiscount);</span>
+    }
+    
+    /**
+     * Gets the total savings from the bundle discount.
+     * 
+     * @return the total savings
+     */
+    public double getTotalSavings() {
+<span class="nc" id="L298">        return getTotalPrice() - getTotalDiscountedPrice();</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L303">        return String.format(&quot;MaterialBundleBuilder[Name=%s, Discount=%.1f%%, Components=%d, TotalPrice=$%.2f, Savings=$%.2f]&quot;,</span>
+<span class="nc" id="L304">            bundleName, getBundleDiscountPercent(), getComponentCount(), getTotalPrice(), getTotalSavings());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

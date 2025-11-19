@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModernSearchCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.search</a> &gt; <span class="el_source">ModernSearchCache.java</span></div><h1>ModernSearchCache.java</h1><pre class="source lang-java linenums">package com.university.bookstore.search;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.function.Function;
+import java.util.logging.Logger;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Modern high-performance cache implementation with advanced features.
+ * Features:
+ * - Time-based and size-based eviction
+ * - Async loading with CompletableFuture
+ * - Statistics tracking
+ * - Warm-up and refresh capabilities
+ * - Thread-safe operations
+ * 
+ * @author Navid Mohaghegh
+ * @version 4.0
+ * @since 2024-09-15
+ */
+public class ModernSearchCache implements AutoCloseable {
+    
+<span class="nc" id="L41">    private static final Logger LOGGER = Logger.getLogger(ModernSearchCache.class.getName());</span>
+    
+    /**
+     * Cache entry with metadata.
+     */
+<span class="nc" id="L46">    private record CacheEntry(</span>
+        List&lt;Material&gt; value,
+        Instant createdAt,
+        Instant lastAccessedAt,
+        AtomicLong accessCount
+    ) {
+        /**
+         * Creates a new cache entry.
+         */
+        public static CacheEntry of(List&lt;Material&gt; value) {
+<span class="nc" id="L56">            return new CacheEntry(</span>
+<span class="nc" id="L57">                Collections.unmodifiableList(new ArrayList&lt;&gt;(value)),</span>
+<span class="nc" id="L58">                Instant.now(),</span>
+<span class="nc" id="L59">                Instant.now(),</span>
+                new AtomicLong(1)
+            );
+        }
+        
+        /**
+         * Records an access to this entry.
+         */
+        public CacheEntry recordAccess() {
+<span class="nc" id="L68">            accessCount.incrementAndGet();</span>
+<span class="nc" id="L69">            return new CacheEntry(value, createdAt, Instant.now(), accessCount);</span>
+        }
+        
+        /**
+         * Checks if the entry is expired.
+         */
+        public boolean isExpired(Duration ttl) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            return Duration.between(createdAt, Instant.now()).compareTo(ttl) &gt; 0;</span>
+        }
+        
+        /**
+         * Checks if the entry is stale (not accessed recently).
+         */
+        public boolean isStale(Duration idleTime) {
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            return Duration.between(lastAccessedAt, Instant.now()).compareTo(idleTime) &gt; 0;</span>
+        }
+    }
+    
+    /**
+     * Cache statistics record.
+     * 
+     * @param hitCount number of cache hits
+     * @param missCount number of cache misses
+     * @param evictionCount number of cache evictions
+     * @param loadCount number of cache loads
+     * @param hitRate cache hit rate (0.0 to 1.0)
+     * @param averageLoadTime average time to load data
+     * @param size current cache size
+     * @param totalAccessCount total number of cache accesses
+     */
+<span class="nc" id="L99">    public record CacheStats(</span>
+        long hitCount,
+        long missCount,
+        long evictionCount,
+        long loadCount,
+        double hitRate,
+        double averageLoadTime,
+        int size,
+        long totalAccessCount
+    ) {
+        /**
+         * Creates a summary string.
+         */
+        public String getSummary() {
+<span class="nc" id="L113">            return String.format(</span>
+                &quot;&quot;&quot;
+                Cache Statistics:
+                - Hit Rate: %.2f%%
+                - Total Hits: %d
+                - Total Misses: %d
+                - Evictions: %d
+                - Cache Size: %d
+                - Average Load Time: %.2f ms
+                - Total Accesses: %d
+                &quot;&quot;&quot;,
+<span class="nc" id="L124">                hitRate * 100, hitCount, missCount, evictionCount,</span>
+<span class="nc" id="L125">                size, averageLoadTime, totalAccessCount</span>
+            );
+        }
+    }
+    
+    private final Map&lt;String, CacheEntry&gt; cache;
+    private final ExecutorService loadingExecutor;
+    private final ScheduledExecutorService maintenanceExecutor;
+    private final int maxSize;
+    private final Duration ttl;
+    private final Duration idleTime;
+    
+    // Statistics
+<span class="nc" id="L138">    private final LongAdder hitCount = new LongAdder();</span>
+<span class="nc" id="L139">    private final LongAdder missCount = new LongAdder();</span>
+<span class="nc" id="L140">    private final LongAdder evictionCount = new LongAdder();</span>
+<span class="nc" id="L141">    private final LongAdder loadCount = new LongAdder();</span>
+<span class="nc" id="L142">    private final LongAdder totalLoadTime = new LongAdder();</span>
+    
+<span class="nc" id="L144">    private volatile boolean closed = false;</span>
+    
+    /**
+     * Creates a new modern cache with default settings.
+     */
+    public ModernSearchCache() {
+<span class="nc" id="L150">        this(1000, Duration.ofMinutes(10), Duration.ofMinutes(5));</span>
+<span class="nc" id="L151">    }</span>
+    
+    /**
+     * Creates a new modern cache with custom settings.
+     * 
+     * @param maxSize maximum number of entries
+     * @param ttl time to live for entries
+     * @param idleTime maximum idle time before eviction
+     */
+<span class="nc" id="L160">    public ModernSearchCache(int maxSize, Duration ttl, Duration idleTime) {</span>
+<span class="nc" id="L161">        this.maxSize = maxSize;</span>
+<span class="nc" id="L162">        this.ttl = ttl;</span>
+<span class="nc" id="L163">        this.idleTime = idleTime;</span>
+<span class="nc" id="L164">        this.cache = new ConcurrentHashMap&lt;&gt;();</span>
+        
+        // Use virtual threads if available, otherwise use cached thread pool
+<span class="nc" id="L167">        this.loadingExecutor = Executors.newCachedThreadPool(r -&gt; {</span>
+<span class="nc" id="L168">            Thread t = new Thread(r, &quot;Cache-Loader&quot;);</span>
+<span class="nc" id="L169">            t.setDaemon(true);</span>
+<span class="nc" id="L170">            return t;</span>
+        });
+        
+<span class="nc" id="L173">        this.maintenanceExecutor = Executors.newScheduledThreadPool(1, r -&gt; {</span>
+<span class="nc" id="L174">            Thread t = new Thread(r, &quot;Cache-Maintenance&quot;);</span>
+<span class="nc" id="L175">            t.setDaemon(true);</span>
+<span class="nc" id="L176">            return t;</span>
+        });
+        
+        // Schedule periodic maintenance
+<span class="nc" id="L180">        scheduleMaintenance();</span>
+<span class="nc" id="L181">    }</span>
+    
+    private void scheduleMaintenance() {
+        // Periodic cleanup of expired and stale entries
+<span class="nc" id="L185">        maintenanceExecutor.scheduleWithFixedDelay(</span>
+            this::performMaintenance,
+            1, 1, TimeUnit.MINUTES
+        );
+        
+        // Periodic statistics logging
+<span class="nc" id="L191">        maintenanceExecutor.scheduleWithFixedDelay(</span>
+<span class="nc" id="L192">            () -&gt; LOGGER.info(getStats().getSummary()),</span>
+            5, 5, TimeUnit.MINUTES
+        );
+<span class="nc" id="L195">    }</span>
+    
+    private void performMaintenance() {
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (closed) return;</span>
+        
+<span class="nc" id="L200">        int removed = 0;</span>
+<span class="nc" id="L201">        Iterator&lt;Map.Entry&lt;String, CacheEntry&gt;&gt; iterator = cache.entrySet().iterator();</span>
+        
+<span class="nc bnc" id="L203" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc" id="L204">            Map.Entry&lt;String, CacheEntry&gt; entry = iterator.next();</span>
+<span class="nc" id="L205">            CacheEntry cacheEntry = entry.getValue();</span>
+            
+<span class="nc bnc" id="L207" title="All 4 branches missed.">            if (cacheEntry.isExpired(ttl) || cacheEntry.isStale(idleTime)) {</span>
+<span class="nc" id="L208">                iterator.remove();</span>
+<span class="nc" id="L209">                evictionCount.increment();</span>
+<span class="nc" id="L210">                removed++;</span>
+            }
+<span class="nc" id="L212">        }</span>
+        
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        if (removed &gt; 0) {</span>
+<span class="nc" id="L215">            LOGGER.fine(&quot;Maintenance: Removed &quot; + removed + &quot; expired/stale entries&quot;);</span>
+        }
+        
+        // Size-based eviction if needed
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (cache.size() &gt; maxSize) {</span>
+<span class="nc" id="L220">            performSizeBasedEviction();</span>
+        }
+<span class="nc" id="L222">    }</span>
+    
+    private void performSizeBasedEviction() {
+<span class="nc" id="L225">        int toRemove = cache.size() - maxSize;</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (toRemove &lt;= 0) return;</span>
+        
+        // Remove least recently accessed entries
+<span class="nc" id="L229">        List&lt;Map.Entry&lt;String, CacheEntry&gt;&gt; entries = new ArrayList&lt;&gt;(cache.entrySet());</span>
+<span class="nc" id="L230">        entries.sort(Comparator.comparing(e -&gt; e.getValue().lastAccessedAt));</span>
+        
+<span class="nc bnc" id="L232" title="All 4 branches missed.">        for (int i = 0; i &lt; toRemove &amp;&amp; i &lt; entries.size(); i++) {</span>
+<span class="nc" id="L233">            cache.remove(entries.get(i).getKey());</span>
+<span class="nc" id="L234">            evictionCount.increment();</span>
+        }
+        
+<span class="nc" id="L237">        LOGGER.fine(&quot;Size-based eviction: Removed &quot; + toRemove + &quot; entries&quot;);</span>
+<span class="nc" id="L238">    }</span>
+    
+    /**
+     * Gets a value from the cache or loads it if not present.
+     * 
+     * @param key the cache key
+     * @param loader function to load the value if not cached
+     * @return the cached or loaded value
+     */
+    public List&lt;Material&gt; get(String key, Function&lt;String, List&lt;Material&gt;&gt; loader) {
+<span class="nc" id="L248">        Objects.requireNonNull(key, &quot;Key cannot be null&quot;);</span>
+<span class="nc" id="L249">        Objects.requireNonNull(loader, &quot;Loader cannot be null&quot;);</span>
+<span class="nc" id="L250">        ensureNotClosed();</span>
+        
+<span class="nc" id="L252">        CacheEntry entry = cache.get(key);</span>
+        
+<span class="nc bnc" id="L254" title="All 4 branches missed.">        if (entry != null &amp;&amp; !entry.isExpired(ttl)) {</span>
+            // Cache hit
+<span class="nc" id="L256">            hitCount.increment();</span>
+<span class="nc" id="L257">            cache.put(key, entry.recordAccess());</span>
+<span class="nc" id="L258">            return new ArrayList&lt;&gt;(entry.value);</span>
+        }
+        
+        // Cache miss
+<span class="nc" id="L262">        missCount.increment();</span>
+        
+        // Load synchronously
+<span class="nc" id="L265">        long startTime = System.currentTimeMillis();</span>
+<span class="nc" id="L266">        List&lt;Material&gt; value = loader.apply(key);</span>
+<span class="nc" id="L267">        long loadTime = System.currentTimeMillis() - startTime;</span>
+        
+<span class="nc" id="L269">        loadCount.increment();</span>
+<span class="nc" id="L270">        totalLoadTime.add(loadTime);</span>
+        
+<span class="nc bnc" id="L272" title="All 4 branches missed.">        if (value != null &amp;&amp; !value.isEmpty()) {</span>
+<span class="nc" id="L273">            put(key, value);</span>
+        }
+        
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        return value != null ? new ArrayList&lt;&gt;(value) : new ArrayList&lt;&gt;();</span>
+    }
+    
+    /**
+     * Gets a value from the cache or loads it asynchronously.
+     * 
+     * @param key the cache key
+     * @param asyncLoader async function to load the value
+     * @return CompletableFuture with the result
+     */
+    public CompletableFuture&lt;List&lt;Material&gt;&gt; getAsync(
+            String key, 
+            Function&lt;String, CompletableFuture&lt;List&lt;Material&gt;&gt;&gt; asyncLoader) {
+        
+<span class="nc" id="L290">        Objects.requireNonNull(key, &quot;Key cannot be null&quot;);</span>
+<span class="nc" id="L291">        Objects.requireNonNull(asyncLoader, &quot;Async loader cannot be null&quot;);</span>
+<span class="nc" id="L292">        ensureNotClosed();</span>
+        
+<span class="nc" id="L294">        CacheEntry entry = cache.get(key);</span>
+        
+<span class="nc bnc" id="L296" title="All 4 branches missed.">        if (entry != null &amp;&amp; !entry.isExpired(ttl)) {</span>
+            // Cache hit
+<span class="nc" id="L298">            hitCount.increment();</span>
+<span class="nc" id="L299">            cache.put(key, entry.recordAccess());</span>
+<span class="nc" id="L300">            return CompletableFuture.completedFuture(new ArrayList&lt;&gt;(entry.value));</span>
+        }
+        
+        // Cache miss - load asynchronously
+<span class="nc" id="L304">        missCount.increment();</span>
+        
+<span class="nc" id="L306">        long startTime = System.currentTimeMillis();</span>
+        
+<span class="nc" id="L308">        return asyncLoader.apply(key)</span>
+<span class="nc" id="L309">            .thenApply(value -&gt; {</span>
+<span class="nc" id="L310">                long loadTime = System.currentTimeMillis() - startTime;</span>
+<span class="nc" id="L311">                loadCount.increment();</span>
+<span class="nc" id="L312">                totalLoadTime.add(loadTime);</span>
+                
+<span class="nc bnc" id="L314" title="All 4 branches missed.">                if (value != null &amp;&amp; !value.isEmpty()) {</span>
+<span class="nc" id="L315">                    put(key, value);</span>
+                }
+                
+<span class="nc bnc" id="L318" title="All 2 branches missed.">                return value != null ? new ArrayList&lt;&gt;(value) : new ArrayList&lt;&gt;();</span>
+            });
+    }
+    
+    /**
+     * Puts a value in the cache.
+     * 
+     * @param key the cache key
+     * @param value the value to cache
+     */
+    public void put(String key, List&lt;Material&gt; value) {
+<span class="nc" id="L329">        Objects.requireNonNull(key, &quot;Key cannot be null&quot;);</span>
+<span class="nc" id="L330">        Objects.requireNonNull(value, &quot;Value cannot be null&quot;);</span>
+<span class="nc" id="L331">        ensureNotClosed();</span>
+        
+        // Check size limit
+<span class="nc bnc" id="L334" title="All 4 branches missed.">        if (cache.size() &gt;= maxSize &amp;&amp; !cache.containsKey(key)) {</span>
+<span class="nc" id="L335">            performSizeBasedEviction();</span>
+        }
+        
+<span class="nc" id="L338">        cache.put(key, CacheEntry.of(value));</span>
+<span class="nc" id="L339">    }</span>
+    
+    /**
+     * Invalidates a cache entry.
+     * 
+     * @param key the key to invalidate
+     * @return true if an entry was removed
+     */
+    public boolean invalidate(String key) {
+<span class="nc" id="L348">        ensureNotClosed();</span>
+<span class="nc" id="L349">        CacheEntry removed = cache.remove(key);</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">        if (removed != null) {</span>
+<span class="nc" id="L351">            evictionCount.increment();</span>
+        }
+<span class="nc bnc" id="L353" title="All 2 branches missed.">        return removed != null;</span>
+    }
+    
+    /**
+     * Invalidates all cache entries.
+     */
+    public void invalidateAll() {
+<span class="nc" id="L360">        ensureNotClosed();</span>
+<span class="nc" id="L361">        int size = cache.size();</span>
+<span class="nc" id="L362">        cache.clear();</span>
+<span class="nc" id="L363">        evictionCount.add(size);</span>
+<span class="nc" id="L364">        LOGGER.info(&quot;Cache cleared: &quot; + size + &quot; entries invalidated&quot;);</span>
+<span class="nc" id="L365">    }</span>
+    
+    /**
+     * Invalidates entries matching a predicate.
+     * 
+     * @param predicate the predicate to test keys
+     * @return number of entries invalidated
+     */
+    public int invalidateIf(java.util.function.Predicate&lt;String&gt; predicate) {
+<span class="nc" id="L374">        ensureNotClosed();</span>
+<span class="nc" id="L375">        int removed = 0;</span>
+        
+<span class="nc" id="L377">        Iterator&lt;String&gt; iterator = cache.keySet().iterator();</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">        while (iterator.hasNext()) {</span>
+<span class="nc bnc" id="L379" title="All 2 branches missed.">            if (predicate.test(iterator.next())) {</span>
+<span class="nc" id="L380">                iterator.remove();</span>
+<span class="nc" id="L381">                evictionCount.increment();</span>
+<span class="nc" id="L382">                removed++;</span>
+            }
+        }
+        
+<span class="nc" id="L386">        return removed;</span>
+    }
+    
+    /**
+     * Refreshes a cache entry asynchronously.
+     * 
+     * @param key the key to refresh
+     * @param loader the loader function
+     * @return CompletableFuture with the refreshed value
+     */
+    public CompletableFuture&lt;List&lt;Material&gt;&gt; refresh(
+            String key, 
+            Function&lt;String, List&lt;Material&gt;&gt; loader) {
+        
+<span class="nc" id="L400">        return CompletableFuture.supplyAsync(() -&gt; {</span>
+<span class="nc" id="L401">            invalidate(key);</span>
+<span class="nc" id="L402">            return get(key, loader);</span>
+        }, loadingExecutor);
+    }
+    
+    /**
+     * Warms up the cache with predefined keys.
+     * 
+     * @param keys keys to warm up
+     * @param loader the loader function
+     * @return CompletableFuture that completes when warm-up is done
+     */
+    public CompletableFuture&lt;Void&gt; warmUp(
+            Collection&lt;String&gt; keys,
+            Function&lt;String, List&lt;Material&gt;&gt; loader) {
+        
+<span class="nc" id="L417">        List&lt;CompletableFuture&lt;Void&gt;&gt; futures = keys.stream()</span>
+<span class="nc" id="L418">            .map(key -&gt; CompletableFuture.runAsync(</span>
+<span class="nc" id="L419">                () -&gt; get(key, loader), </span>
+                loadingExecutor
+            ))
+<span class="nc" id="L422">            .toList();</span>
+        
+<span class="nc" id="L424">        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));</span>
+    }
+    
+    /**
+     * Gets the current cache size.
+     * 
+     * @return number of cached entries
+     */
+    public int size() {
+<span class="nc" id="L433">        return cache.size();</span>
+    }
+    
+    /**
+     * Checks if the cache is empty.
+     * 
+     * @return true if no entries are cached
+     */
+    public boolean isEmpty() {
+<span class="nc" id="L442">        return cache.isEmpty();</span>
+    }
+    
+    /**
+     * Checks if a key is cached.
+     * 
+     * @param key the key to check
+     * @return true if the key is cached and not expired
+     */
+    public boolean containsKey(String key) {
+<span class="nc" id="L452">        CacheEntry entry = cache.get(key);</span>
+<span class="nc bnc" id="L453" title="All 4 branches missed.">        return entry != null &amp;&amp; !entry.isExpired(ttl);</span>
+    }
+    
+    /**
+     * Gets cache statistics.
+     * 
+     * @return current cache statistics
+     */
+    public CacheStats getStats() {
+<span class="nc" id="L462">        long hits = hitCount.sum();</span>
+<span class="nc" id="L463">        long misses = missCount.sum();</span>
+<span class="nc" id="L464">        long total = hits + misses;</span>
+<span class="nc bnc" id="L465" title="All 2 branches missed.">        double hitRate = total &gt; 0 ? (double) hits / total : 0.0;</span>
+<span class="nc bnc" id="L466" title="All 2 branches missed.">        double avgLoadTime = loadCount.sum() &gt; 0 </span>
+<span class="nc" id="L467">            ? (double) totalLoadTime.sum() / loadCount.sum() </span>
+<span class="nc" id="L468">            : 0.0;</span>
+        
+<span class="nc" id="L470">        return new CacheStats(</span>
+            hits,
+            misses,
+<span class="nc" id="L473">            evictionCount.sum(),</span>
+<span class="nc" id="L474">            loadCount.sum(),</span>
+            hitRate,
+            avgLoadTime,
+<span class="nc" id="L477">            cache.size(),</span>
+            total
+        );
+    }
+    
+    /**
+     * Resets cache statistics.
+     */
+    public void resetStats() {
+<span class="nc" id="L486">        hitCount.reset();</span>
+<span class="nc" id="L487">        missCount.reset();</span>
+<span class="nc" id="L488">        evictionCount.reset();</span>
+<span class="nc" id="L489">        loadCount.reset();</span>
+<span class="nc" id="L490">        totalLoadTime.reset();</span>
+<span class="nc" id="L491">        LOGGER.info(&quot;Cache statistics reset&quot;);</span>
+<span class="nc" id="L492">    }</span>
+    
+    private void ensureNotClosed() {
+<span class="nc bnc" id="L495" title="All 2 branches missed.">        if (closed) {</span>
+<span class="nc" id="L496">            throw new IllegalStateException(&quot;Cache has been closed&quot;);</span>
+        }
+<span class="nc" id="L498">    }</span>
+    
+    @Override
+    public void close() {
+<span class="nc bnc" id="L502" title="All 2 branches missed.">        if (!closed) {</span>
+<span class="nc" id="L503">            closed = true;</span>
+            
+            // Log final statistics
+<span class="nc" id="L506">            LOGGER.info(&quot;Closing cache. Final stats: &quot; + getStats().getSummary());</span>
+            
+            // Clear cache
+<span class="nc" id="L509">            cache.clear();</span>
+            
+            // Shutdown executors
+<span class="nc" id="L512">            loadingExecutor.shutdown();</span>
+<span class="nc" id="L513">            maintenanceExecutor.shutdown();</span>
+            
+            try {
+<span class="nc bnc" id="L516" title="All 2 branches missed.">                if (!loadingExecutor.awaitTermination(5, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L517">                    loadingExecutor.shutdownNow();</span>
+                }
+<span class="nc bnc" id="L519" title="All 2 branches missed.">                if (!maintenanceExecutor.awaitTermination(5, TimeUnit.SECONDS)) {</span>
+<span class="nc" id="L520">                    maintenanceExecutor.shutdownNow();</span>
+                }
+<span class="nc" id="L522">            } catch (InterruptedException e) {</span>
+<span class="nc" id="L523">                loadingExecutor.shutdownNow();</span>
+<span class="nc" id="L524">                maintenanceExecutor.shutdownNow();</span>
+<span class="nc" id="L525">                Thread.currentThread().interrupt();</span>
+<span class="nc" id="L526">            }</span>
+        }
+<span class="nc" id="L528">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

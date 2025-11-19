@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialAddedEvent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">MaterialAddedEvent.java</span></div><h1>MaterialAddedEvent.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Event that occurs when a material is added to the system.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class MaterialAddedEvent implements MaterialEvent {
+    
+    private final Material material;
+    private final long timestamp;
+    
+    /**
+     * Creates a new material added event.
+     * 
+     * @param material the material that was added
+     * @throws IllegalArgumentException if material is null
+     */
+<span class="fc" id="L25">    public MaterialAddedEvent(Material material) {</span>
+<span class="fc" id="L26">        this.material = Objects.requireNonNull(material, &quot;Material cannot be null&quot;);</span>
+<span class="fc" id="L27">        this.timestamp = System.currentTimeMillis();</span>
+<span class="fc" id="L28">    }</span>
+    
+    @Override
+    public Material getMaterial() {
+<span class="fc" id="L32">        return material;</span>
+    }
+    
+    @Override
+    public long getTimestamp() {
+<span class="fc" id="L37">        return timestamp;</span>
+    }
+    
+    @Override
+    public String getEventType() {
+<span class="fc" id="L42">        return &quot;MATERIAL_ADDED&quot;;</span>
+    }
+    
+    @Override
+    public String getDescription() {
+<span class="fc" id="L47">        return String.format(&quot;Material added: %s (ID: %s, Price: $%.2f)&quot;,</span>
+<span class="fc" id="L48">            material.getTitle(), material.getId(), material.getPrice());</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (this == obj) return true;</span>
+<span class="nc bnc" id="L54" title="All 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="nc" id="L56">        MaterialAddedEvent that = (MaterialAddedEvent) obj;</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        return timestamp == that.timestamp &amp;&amp;</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">               Objects.equals(material, that.material);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="nc" id="L63">        return Objects.hash(material, timestamp);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L68">        return String.format(&quot;MaterialAddedEvent[%s at %d]&quot;, material.getTitle(), timestamp);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- PIT Mutation Testing Configuration for Lab 3 -->
+    
+    <!-- Target classes to mutate -->
+    <targetClasses>
+        <param>com.university.bookstore.model.*</param>
+        <param>com.university.bookstore.factory.*</param>
+        <param>com.university.bookstore.builder.*</param>
+        <param>com.university.bookstore.composite.*</param>
+        <param>com.university.bookstore.decorator.*</param>
+        <param>com.university.bookstore.observer.*</param>
+        <param>com.university.bookstore.chain.*</param>
+        <param>com.university.bookstore.iterator.*</param>
+        <param>com.university.bookstore.search.*</param>
+        <param>com.university.bookstore.repository.*</param>
+        <param>com.university.bookstore.service.*</param>
+        <param>com.university.bookstore.impl.*</param>
+    </targetClasses>
+    
+    <!-- Test classes to run -->
+    <targetTests>
+        <param>com.university.bookstore.*Test</param>
+        <param>com.university.bookstore.quality.*</param>
+    </targetTests>
+    
+    <!-- Mutation operators to use -->
+    <mutators>
+        <param>ALL</param>
+    </mutators>
+    
+    <!-- Output formats -->
+    <outputFormats>
+        <param>HTML</param>
+        <param>XML</param>
+        <param>CSV</param>
+    </outputFormats>
+    
+    <!-- Mutation score threshold -->
+    <mutationThreshold>70</mutationThreshold>
+    <coverageThreshold>80</coverageThreshold>
+    
+    <!-- Timeout settings -->
+    <timeoutFactor>1.25</timeoutFactor>
+    <timeoutConstant>3000</timeoutConstant>
+    
+    <!-- Thread settings -->
+    <threads>4</threads>
+    
+    <!-- Verbose output -->
+    <verbose>true</verbose>
+    
+    <!-- Include launch classpath -->
+    <includeLaunchClasspath>true</includeLaunchClasspath>
+    
+    <!-- Exclude classes from mutation -->
+    <excludedClasses>
+        <param>com.university.bookstore.demo.*</param>
+        <param>com.university.bookstore.quality.MockMaterialRepository</param>
+    </excludedClasses>
+    
+    <!-- Exclude methods from mutation -->
+    <excludedMethods>
+        <param>toString</param>
+        <param>hashCode</param>
+        <param>equals</param>
+        <param>getClass</param>
+        <param>clone</param>
+        <param>finalize</param>
+    </excludedMethods>
+    
+    <!-- Additional classpath elements -->
+    <classPath>
+        <param>${project.build.outputDirectory}</param>
+        <param>${project.build.testOutputDirectory}</param>
+    </classPath>
+    
+    <!-- Source directories -->
+    <sourceDirs>
+        <param>${project.build.sourceDirectory}</param>
+    </sourceDirs>
+    
+    <!-- Report directory -->
+    <reportDir>${project.build.directory}/pit-reports</reportDir>
+    
+    <!-- History input/output -->
+    <historyInputLocation>${project.build.directory}/pit-history</historyInputLocation>
+    <historyOutputLocation>${project.build.directory}/pit-history</historyOutputLocation>
+    
+    <!-- Enable/disable features -->
+    <enableDefaultIncrementalAnalysis>true</enableDefaultIncrementalAnalysis>
+    <enableDefaultExcludes>true</enableDefaultExcludes>
+    <enableDefaultMutators>true</enableDefaultMutators>
+    <enableDefaultOutputFormats>true</enableDefaultOutputFormats>
+    
+    <!-- JVM arguments -->
+    <jvmArgs>
+        <param>-Xmx1024m</param>
+        <param>-XX:MaxPermSize=256m</param>
+    </jvmArgs>
+    
+    <!-- Additional properties -->
+    <properties>
+        <property>
+            <name>pitest.mutation.engine</name>
+            <value>gregor</value>
+        </property>
+        <property>
+            <name>pitest.export</name>
+            <value>true</value>
+        </property>
+        <property>
+            <name>pitest.verbose</name>
+            <value>true</value>
+        </property>
+    </properties>
+</configuration>

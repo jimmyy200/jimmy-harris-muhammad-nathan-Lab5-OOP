@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookstoreArrayList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.impl</a> &gt; <span class="el_source">BookstoreArrayList.java</span></div><h1>BookstoreArrayList.java</h1><pre class="source lang-java linenums">package com.university.bookstore.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.university.bookstore.api.BookstoreAPI;
+import com.university.bookstore.model.Book;
+
+/**
+ * ArrayList-based implementation of the BookstoreAPI.
+ * 
+ * &lt;p&gt;This implementation uses an ArrayList for storage and enforces
+ * ISBN uniqueness. All collection returns are defensive copies to
+ * maintain encapsulation.&lt;/p&gt;
+ * 
+ * &lt;p&gt;Performance characteristics:&lt;/p&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;add: O(n) - due to uniqueness check&lt;/li&gt;
+ *   &lt;li&gt;removeByIsbn: O(n) - linear search required&lt;/li&gt;
+ *   &lt;li&gt;findByIsbn: O(n) - linear search required&lt;/li&gt;
+ *   &lt;li&gt;size: O(1) - ArrayList maintains size&lt;/li&gt;
+ * &lt;/ul&gt;
+ * 
+ * &lt;p&gt;Note: This implementation is NOT thread-safe. For concurrent access,
+ * consider using synchronization or ConcurrentHashMap.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 1.0
+ * @since 2024-09-15
+ */
+public class BookstoreArrayList implements BookstoreAPI {
+    
+    private final List&lt;Book&gt; inventory;
+    
+    /**
+     * Creates a new empty bookstore.
+     */
+<span class="fc" id="L44">    public BookstoreArrayList() {</span>
+<span class="fc" id="L45">        this.inventory = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L46">    }</span>
+    
+    /**
+     * Creates a bookstore with initial books.
+     * 
+     * @param initialBooks books to add initially (may be null or empty)
+     */
+<span class="fc" id="L53">    public BookstoreArrayList(Collection&lt;Book&gt; initialBooks) {</span>
+<span class="fc" id="L54">        this.inventory = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if (initialBooks != null) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            for (Book book : initialBooks) {</span>
+<span class="fc" id="L57">                add(book);</span>
+<span class="fc" id="L58">            }</span>
+        }
+<span class="fc" id="L60">    }</span>
+    
+    @Override
+    public boolean add(Book book) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (book == null) {</span>
+<span class="fc" id="L65">            return false;</span>
+        }
+        
+        // Check for duplicate ISBN
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (findByIsbn(book.getIsbn()) != null) {</span>
+<span class="fc" id="L70">            return false;</span>
+        }
+        
+<span class="fc" id="L73">        return inventory.add(book);</span>
+    }
+    
+    @Override
+    public boolean removeByIsbn(String isbn) {
+<span class="fc bfc" id="L78" title="All 4 branches covered.">        if (isbn == null || isbn.trim().isEmpty()) {</span>
+<span class="fc" id="L79">            return false;</span>
+        }
+        
+<span class="fc" id="L82">        return inventory.removeIf(book -&gt; book.getIsbn().equals(isbn));</span>
+    }
+    
+    @Override
+    public Book findByIsbn(String isbn) {
+<span class="fc bfc" id="L87" title="All 4 branches covered.">        if (isbn == null || isbn.trim().isEmpty()) {</span>
+<span class="fc" id="L88">            return null;</span>
+        }
+        
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (Book book : inventory) {</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (book.getIsbn().equals(isbn)) {</span>
+<span class="fc" id="L93">                return book;</span>
+            }
+<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">        return null;</span>
+    }
+    
+    @Override
+    public List&lt;Book&gt; findByTitle(String titleQuery) {
+<span class="fc bfc" id="L101" title="All 4 branches covered.">        if (titleQuery == null || titleQuery.trim().isEmpty()) {</span>
+<span class="fc" id="L102">            return Collections.emptyList();</span>
+        }
+        
+<span class="fc" id="L105">        String query = titleQuery.toLowerCase().trim();</span>
+<span class="fc" id="L106">        return inventory.stream()</span>
+<span class="fc" id="L107">            .filter(book -&gt; book.getTitle().toLowerCase().contains(query))</span>
+<span class="fc" id="L108">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Book&gt; findByAuthor(String authorQuery) {
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        if (authorQuery == null || authorQuery.trim().isEmpty()) {</span>
+<span class="fc" id="L114">            return Collections.emptyList();</span>
+        }
+        
+<span class="fc" id="L117">        String query = authorQuery.toLowerCase().trim();</span>
+<span class="fc" id="L118">        return inventory.stream()</span>
+<span class="fc" id="L119">            .filter(book -&gt; book.getAuthor().toLowerCase().contains(query))</span>
+<span class="fc" id="L120">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Book&gt; findByPriceRange(double minPrice, double maxPrice) {
+<span class="fc bfc" id="L125" title="All 4 branches covered.">        if (minPrice &lt; 0 || maxPrice &lt; 0) {</span>
+<span class="fc" id="L126">            throw new IllegalArgumentException(&quot;Prices cannot be negative&quot;);</span>
+        }
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (minPrice &gt; maxPrice) {</span>
+<span class="fc" id="L129">            throw new IllegalArgumentException(</span>
+                &quot;Minimum price cannot be greater than maximum price&quot;);
+        }
+        
+<span class="fc" id="L133">        return inventory.stream()</span>
+<span class="fc bfc" id="L134" title="All 4 branches covered.">            .filter(book -&gt; book.getPrice() &gt;= minPrice &amp;&amp; book.getPrice() &lt;= maxPrice)</span>
+<span class="fc" id="L135">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Book&gt; findByYear(int year) {
+<span class="fc" id="L140">        return inventory.stream()</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">            .filter(book -&gt; book.getYear() == year)</span>
+<span class="fc" id="L142">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public int size() {
+<span class="fc" id="L147">        return inventory.size();</span>
+    }
+    
+    @Override
+    public double inventoryValue() {
+<span class="fc" id="L152">        return inventory.stream()</span>
+<span class="fc" id="L153">            .mapToDouble(Book::getPrice)</span>
+<span class="fc" id="L154">            .sum();</span>
+    }
+    
+    @Override
+    public Book getMostExpensive() {
+<span class="fc" id="L159">        return inventory.stream()</span>
+<span class="fc" id="L160">            .max(Comparator.comparingDouble(Book::getPrice))</span>
+<span class="fc" id="L161">            .orElse(null);</span>
+    }
+    
+    @Override
+    public Book getMostRecent() {
+<span class="fc" id="L166">        return inventory.stream()</span>
+<span class="fc" id="L167">            .max(Comparator.comparingInt(Book::getYear))</span>
+<span class="fc" id="L168">            .orElse(null);</span>
+    }
+    
+    @Override
+    public Book[] snapshotArray() {
+<span class="fc" id="L173">        return inventory.toArray(new Book[0]);</span>
+    }
+    
+    @Override
+    public List&lt;Book&gt; getAllBooks() {
+<span class="fc" id="L178">        return new ArrayList&lt;&gt;(inventory);</span>
+    }
+    
+    /**
+     * Clears all books from the inventory.
+     * Useful for testing and bulk operations.
+     */
+    public void clear() {
+<span class="fc" id="L186">        inventory.clear();</span>
+<span class="fc" id="L187">    }</span>
+    
+    /**
+     * Sorts the inventory by title (alphabetical order).
+     */
+    public void sortByTitle() {
+<span class="fc" id="L193">        Collections.sort(inventory);</span>
+<span class="fc" id="L194">    }</span>
+    
+    /**
+     * Sorts the inventory by price (ascending).
+     */
+    public void sortByPrice() {
+<span class="fc" id="L200">        inventory.sort(Comparator.comparingDouble(Book::getPrice));</span>
+<span class="fc" id="L201">    }</span>
+    
+    /**
+     * Sorts the inventory by year (ascending).
+     */
+    public void sortByYear() {
+<span class="fc" id="L207">        inventory.sort(Comparator.comparingInt(Book::getYear));</span>
+<span class="fc" id="L208">    }</span>
+    
+    /**
+     * Gets statistics about the inventory.
+     * 
+     * @return map with statistics (size, total_value, avg_price, etc.)
+     */
+    public Map&lt;String, Object&gt; getStatistics() {
+<span class="fc" id="L216">        Map&lt;String, Object&gt; stats = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L217">        stats.put(&quot;size&quot;, size());</span>
+<span class="fc" id="L218">        stats.put(&quot;total_value&quot;, inventoryValue());</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">        stats.put(&quot;average_price&quot;, inventory.isEmpty() ? 0.0 : inventoryValue() / size());</span>
+        
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">        if (!inventory.isEmpty()) {</span>
+<span class="fc" id="L222">            stats.put(&quot;min_year&quot;, inventory.stream()</span>
+<span class="fc" id="L223">                .mapToInt(Book::getYear).min().orElse(0));</span>
+<span class="fc" id="L224">            stats.put(&quot;max_year&quot;, inventory.stream()</span>
+<span class="fc" id="L225">                .mapToInt(Book::getYear).max().orElse(0));</span>
+<span class="fc" id="L226">            stats.put(&quot;unique_authors&quot;, inventory.stream()</span>
+<span class="fc" id="L227">                .map(Book::getAuthor).distinct().count());</span>
+        }
+        
+<span class="fc" id="L230">        return stats;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L235">        return String.format(&quot;BookstoreArrayList[size=%d, value=$%.2f]&quot;, </span>
+<span class="fc" id="L236">            size(), inventoryValue());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

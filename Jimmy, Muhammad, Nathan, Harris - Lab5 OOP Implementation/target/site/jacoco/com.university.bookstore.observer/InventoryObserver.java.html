@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InventoryObserver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">InventoryObserver.java</span></div><h1>InventoryObserver.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Observer that tracks inventory changes for materials.
+ * Maintains counts and statistics for materials in the system.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class InventoryObserver implements MaterialObserver {
+    
+<span class="fc" id="L21">    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryObserver.class);</span>
+    
+    private final Map&lt;String, Integer&gt; inventoryCounts;
+    private final Map&lt;String, Double&gt; totalValue;
+    private int totalEvents;
+    
+    /**
+     * Creates a new inventory observer.
+     */
+<span class="fc" id="L30">    public InventoryObserver() {</span>
+<span class="fc" id="L31">        this.inventoryCounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L32">        this.totalValue = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L33">        this.totalEvents = 0;</span>
+<span class="fc" id="L34">    }</span>
+    
+    @Override
+    public void onEvent(MaterialEvent event) {
+<span class="fc" id="L38">        totalEvents++;</span>
+        
+<span class="pc bpc" id="L40" title="1 of 3 branches missed.">        switch (event.getEventType()) {</span>
+            case &quot;MATERIAL_ADDED&quot;:
+<span class="fc" id="L42">                handleMaterialAdded(event);</span>
+<span class="fc" id="L43">                break;</span>
+            case &quot;PRICE_CHANGED&quot;:
+<span class="fc" id="L45">                handlePriceChanged(event);</span>
+<span class="fc" id="L46">                break;</span>
+            default:
+                // Handle other event types if needed
+                break;
+        }
+<span class="fc" id="L51">    }</span>
+    
+    /**
+     * Handles material added events.
+     */
+    private void handleMaterialAdded(MaterialEvent event) {
+<span class="fc" id="L57">        Material material = event.getMaterial();</span>
+<span class="fc" id="L58">        String materialId = material.getId();</span>
+        
+        // Update inventory count
+<span class="fc" id="L61">        inventoryCounts.merge(materialId, 1, Integer::sum);</span>
+        
+        // Update total value
+<span class="fc" id="L64">        totalValue.merge(materialId, material.getPrice(), Double::sum);</span>
+        
+<span class="fc" id="L66">        LOGGER.info(&quot;Inventory updated: {} count: {}&quot;, </span>
+<span class="fc" id="L67">            materialId, inventoryCounts.get(materialId));</span>
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * Handles price changed events.
+     */
+    private void handlePriceChanged(MaterialEvent event) {
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (event instanceof PriceChangedEvent) {</span>
+<span class="fc" id="L75">            PriceChangedEvent priceEvent = (PriceChangedEvent) event;</span>
+<span class="fc" id="L76">            Material material = event.getMaterial();</span>
+<span class="fc" id="L77">            String materialId = material.getId();</span>
+            
+            // Update total value with the price change
+<span class="fc" id="L80">            double priceChange = priceEvent.getPriceChange();</span>
+<span class="fc" id="L81">            totalValue.merge(materialId, priceChange, Double::sum);</span>
+            
+<span class="fc" id="L83">            LOGGER.info(&quot;Price changed for {}: ${} -&gt; ${}&quot;, </span>
+<span class="fc" id="L84">                material.getTitle(), priceEvent.getOldPrice(), priceEvent.getNewPrice());</span>
+        }
+<span class="fc" id="L86">    }</span>
+    
+    /**
+     * Gets the inventory count for a specific material.
+     * 
+     * @param materialId the material ID
+     * @return the inventory count
+     */
+    public int getInventoryCount(String materialId) {
+<span class="fc" id="L95">        return inventoryCounts.getOrDefault(materialId, 0);</span>
+    }
+    
+    /**
+     * Gets the total value for a specific material.
+     * 
+     * @param materialId the material ID
+     * @return the total value
+     */
+    public double getTotalValue(String materialId) {
+<span class="fc" id="L105">        return totalValue.getOrDefault(materialId, 0.0);</span>
+    }
+    
+    /**
+     * Gets the total number of materials in inventory.
+     * 
+     * @return the total count
+     */
+    public int getTotalInventoryCount() {
+<span class="fc" id="L114">        return inventoryCounts.values().stream()</span>
+<span class="fc" id="L115">            .mapToInt(Integer::intValue)</span>
+<span class="fc" id="L116">            .sum();</span>
+    }
+    
+    /**
+     * Gets the total value of all materials in inventory.
+     * 
+     * @return the total value
+     */
+    public double getTotalInventoryValue() {
+<span class="fc" id="L125">        return totalValue.values().stream()</span>
+<span class="fc" id="L126">            .mapToDouble(Double::doubleValue)</span>
+<span class="fc" id="L127">            .sum();</span>
+    }
+    
+    /**
+     * Gets the number of unique materials in inventory.
+     * 
+     * @return the unique material count
+     */
+    public int getUniqueMaterialCount() {
+<span class="fc" id="L136">        return inventoryCounts.size();</span>
+    }
+    
+    /**
+     * Gets the total number of events processed.
+     * 
+     * @return the event count
+     */
+    public int getTotalEvents() {
+<span class="fc" id="L145">        return totalEvents;</span>
+    }
+    
+    /**
+     * Gets all inventory counts.
+     * 
+     * @return map of material ID to count
+     */
+    public Map&lt;String, Integer&gt; getAllInventoryCounts() {
+<span class="fc" id="L154">        return new HashMap&lt;&gt;(inventoryCounts);</span>
+    }
+    
+    /**
+     * Gets all total values.
+     * 
+     * @return map of material ID to total value
+     */
+    public Map&lt;String, Double&gt; getAllTotalValues() {
+<span class="fc" id="L163">        return new HashMap&lt;&gt;(totalValue);</span>
+    }
+    
+    /**
+     * Clears all inventory data.
+     */
+    public void clear() {
+<span class="fc" id="L170">        inventoryCounts.clear();</span>
+<span class="fc" id="L171">        totalValue.clear();</span>
+<span class="fc" id="L172">        totalEvents = 0;</span>
+<span class="fc" id="L173">    }</span>
+    
+    @Override
+    public String getObserverName() {
+<span class="nc" id="L177">        return &quot;InventoryObserver&quot;;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L182">        return String.format(&quot;InventoryObserver[Materials=%d, TotalCount=%d, TotalValue=$%.2f, Events=%d]&quot;,</span>
+<span class="fc" id="L183">            getUniqueMaterialCount(), getTotalInventoryCount(), getTotalInventoryValue(), getTotalEvents());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

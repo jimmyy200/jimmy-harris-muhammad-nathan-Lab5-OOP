@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Magazine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">Magazine.java</span></div><h1>Magazine.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+/**
+ * Represents a magazine in the store inventory.
+ * Demonstrates inheritance from Material base class.
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+public class Magazine extends Material {
+    
+    private final String issn;
+    private final String publisher;
+    private final int issueNumber;
+    private final String frequency;
+    private final String category;
+    
+    /**
+     * Frequency of magazine publication.
+     */
+<span class="nc" id="L22">    public enum PublicationFrequency {</span>
+<span class="nc" id="L23">        DAILY(&quot;Daily&quot;),</span>
+<span class="nc" id="L24">        WEEKLY(&quot;Weekly&quot;),</span>
+<span class="nc" id="L25">        BIWEEKLY(&quot;Bi-weekly&quot;),</span>
+<span class="nc" id="L26">        MONTHLY(&quot;Monthly&quot;),</span>
+<span class="nc" id="L27">        QUARTERLY(&quot;Quarterly&quot;),</span>
+<span class="nc" id="L28">        ANNUAL(&quot;Annual&quot;);</span>
+        
+        private final String label;
+        
+<span class="nc" id="L32">        PublicationFrequency(String label) {</span>
+<span class="nc" id="L33">            this.label = label;</span>
+<span class="nc" id="L34">        }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L38">            return label;</span>
+        }
+    }
+    
+    /**
+     * Creates a new Magazine.
+     * 
+     * @param issn International Standard Serial Number
+     * @param title magazine title
+     * @param publisher publishing company
+     * @param price price per issue
+     * @param year publication year
+     * @param issueNumber issue number
+     * @param frequency publication frequency
+     * @param category magazine category/genre
+     */
+    public Magazine(String issn, String title, String publisher, double price,
+                    int year, int issueNumber, String frequency, String category) {
+<span class="fc" id="L56">        super(validateIssn(issn), title, price, year, MaterialType.MAGAZINE);</span>
+<span class="fc" id="L57">        this.issn = this.id;</span>
+<span class="fc" id="L58">        this.publisher = validateStringField(publisher, &quot;Publisher&quot;);</span>
+<span class="fc" id="L59">        this.issueNumber = validateIssueNumber(issueNumber);</span>
+<span class="fc" id="L60">        this.frequency = validateStringField(frequency, &quot;Frequency&quot;);</span>
+<span class="fc" id="L61">        this.category = validateStringField(category, &quot;Category&quot;);</span>
+<span class="fc" id="L62">    }</span>
+    
+    private static String validateIssn(String issn) {
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (issn == null) {</span>
+<span class="fc" id="L66">            throw new NullPointerException(&quot;ISSN cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L69">        String cleaned = issn.replaceAll(&quot;-&quot;, &quot;&quot;).trim();</span>
+        
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (cleaned.length() != 8) {</span>
+<span class="fc" id="L72">            throw new IllegalArgumentException(</span>
+                &quot;ISSN must be 8 characters. Provided: &quot; + issn);
+        }
+        
+<span class="fc" id="L76">        return cleaned;</span>
+    }
+    
+    private int validateIssueNumber(int issueNumber) {
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (issueNumber &lt;= 0) {</span>
+<span class="fc" id="L81">            throw new IllegalArgumentException(</span>
+                &quot;Issue number must be positive. Provided: &quot; + issueNumber);
+        }
+<span class="fc" id="L84">        return issueNumber;</span>
+    }
+    
+    @Override
+    public String getCreator() {
+<span class="fc" id="L89">        return publisher;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L94">        return String.format(&quot;%s - Issue #%d (%s %d) - %s, $%.2f&quot;,</span>
+<span class="fc" id="L95">            title, issueNumber, frequency, year, category, price);</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L100">        int currentYear = java.time.Year.now().getValue();</span>
+<span class="fc" id="L101">        int currentMonth = java.time.LocalDate.now().getMonthValue();</span>
+        
+<span class="pc bpc" id="L103" title="5 of 6 branches missed.">        if (year &lt; currentYear || (year == currentYear &amp;&amp; issueNumber &lt; currentMonth - 2)) {</span>
+<span class="fc" id="L104">            return 0.25;</span>
+        }
+<span class="nc" id="L106">        return 0.0;</span>
+    }
+    
+    /**
+     * Calculates annual subscription cost with discount.
+     * 
+     * @return annual subscription price
+     */
+    public double calculateAnnualSubscription() {
+<span class="fc" id="L115">        int issuesPerYear = getIssuesPerYear();</span>
+<span class="fc" id="L116">        double fullPrice = price * issuesPerYear;</span>
+<span class="fc" id="L117">        return fullPrice * 0.85;</span>
+    }
+    
+    private int getIssuesPerYear() {
+<span class="pc bpc" id="L121" title="6 of 7 branches missed.">        switch (frequency.toUpperCase()) {</span>
+<span class="nc" id="L122">            case &quot;DAILY&quot;: return 365;</span>
+<span class="nc" id="L123">            case &quot;WEEKLY&quot;: return 52;</span>
+<span class="nc" id="L124">            case &quot;BI-WEEKLY&quot;: return 26;</span>
+<span class="fc" id="L125">            case &quot;MONTHLY&quot;: return 12;</span>
+<span class="nc" id="L126">            case &quot;QUARTERLY&quot;: return 4;</span>
+<span class="nc" id="L127">            case &quot;ANNUAL&quot;: return 1;</span>
+<span class="nc" id="L128">            default: return 12;</span>
+        }
+    }
+    
+    public String getIssn() {
+<span class="fc" id="L133">        return issn;</span>
+    }
+    
+    public String getPublisher() {
+<span class="fc" id="L137">        return publisher;</span>
+    }
+    
+    public int getIssueNumber() {
+<span class="fc" id="L141">        return issueNumber;</span>
+    }
+    
+    public String getFrequency() {
+<span class="fc" id="L145">        return frequency;</span>
+    }
+    
+    public String getCategory() {
+<span class="fc" id="L149">        return category;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L154">        return String.format(&quot;Magazine[ISSN=%s, Title='%s', Publisher='%s', Issue=%d, %s, Category='%s', Price=$%.2f, Year=%d]&quot;,</span>
+<span class="fc" id="L155">            issn, title, publisher, issueNumber, frequency, category, price, year);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

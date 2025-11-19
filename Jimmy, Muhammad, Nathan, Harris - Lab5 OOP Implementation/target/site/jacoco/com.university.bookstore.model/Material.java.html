@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Material.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">Material.java</span></div><h1>Material.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+import java.time.Year;
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
+/**
+ * Abstract base class representing any material in the store inventory.
+ * Demonstrates abstraction and inheritance in OOP design.
+ * 
+ * &lt;p&gt;This class provides common properties and behavior for all materials
+ * including books, magazines, audio, and video content.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = &quot;@class&quot;,
+    visible = true
+)
+@JsonSubTypes({
+    @Type(value = PrintedBook.class, name = &quot;PrintedBook&quot;),
+    @Type(value = EBook.class, name = &quot;EBook&quot;),
+    @Type(value = AudioBook.class, name = &quot;AudioBook&quot;),
+    @Type(value = VideoMaterial.class, name = &quot;VideoMaterial&quot;),
+    @Type(value = Magazine.class, name = &quot;Magazine&quot;)
+})
+public abstract class Material implements Comparable&lt;Material&gt; {
+    
+    protected static final int MIN_YEAR = 1450;
+    
+    protected final String id;
+    protected final String title;
+    protected final double price;
+    protected final int year;
+    protected final MaterialType type;
+    
+    /**
+     * Enumeration of material types for polymorphic behavior.
+     */
+<span class="fc" id="L46">    public enum MaterialType {</span>
+<span class="fc" id="L47">        BOOK(&quot;Book&quot;),</span>
+<span class="fc" id="L48">        MAGAZINE(&quot;Magazine&quot;),</span>
+<span class="fc" id="L49">        AUDIO_BOOK(&quot;Audio Book&quot;),</span>
+<span class="fc" id="L50">        VIDEO(&quot;Video&quot;),</span>
+<span class="fc" id="L51">        MUSIC_ALBUM(&quot;Music Album&quot;),</span>
+<span class="fc" id="L52">        PODCAST(&quot;Podcast&quot;),</span>
+<span class="fc" id="L53">        DOCUMENTARY(&quot;Documentary&quot;),</span>
+<span class="fc" id="L54">        E_BOOK(&quot;E-Book&quot;),</span>
+<span class="fc" id="L55">        EBOOK(&quot;EBook&quot;);</span>
+        
+        private final String displayName;
+        
+<span class="fc" id="L59">        MaterialType(String displayName) {</span>
+<span class="fc" id="L60">            this.displayName = displayName;</span>
+<span class="fc" id="L61">        }</span>
+        
+        public String getDisplayName() {
+<span class="nc" id="L64">            return displayName;</span>
+        }
+    }
+    
+    /**
+     * Protected constructor for subclasses.
+     * 
+     * @param id unique identifier for the material
+     * @param title the material title
+     * @param price the price in dollars
+     * @param year the publication/release year
+     * @param type the type of material
+     */
+<span class="fc" id="L77">    protected Material(String id, String title, double price, int year, MaterialType type) {</span>
+<span class="fc" id="L78">        this.id = validateId(id);</span>
+<span class="fc" id="L79">        this.title = validateStringField(title, &quot;Title&quot;);</span>
+<span class="fc" id="L80">        this.price = validatePrice(price);</span>
+<span class="fc" id="L81">        this.year = validateYear(year);</span>
+<span class="fc" id="L82">        this.type = Objects.requireNonNull(type, &quot;Material type cannot be null&quot;);</span>
+<span class="fc" id="L83">    }</span>
+    
+    /**
+     * Abstract method to get the creator/author/artist of the material.
+     * Implementation varies by material type.
+     * 
+     * @return the creator's name
+     */
+    public abstract String getCreator();
+    
+    /**
+     * Abstract method to get a formatted display string.
+     * Each material type should provide its own formatting.
+     * 
+     * @return formatted display string
+     */
+    public abstract String getDisplayInfo();
+    
+    /**
+     * Template method for calculating discounted price.
+     * Subclasses can override getDiscountRate() to customize.
+     * 
+     * @return discounted price
+     */
+    public final double getDiscountedPrice() {
+<span class="fc" id="L108">        return price * (1.0 - getDiscountRate());</span>
+    }
+    
+    /**
+     * Hook method for discount rate. Default is no discount.
+     * Subclasses can override to provide type-specific discounts.
+     * 
+     * @return discount rate between 0.0 and 1.0
+     */
+    public double getDiscountRate() {
+<span class="nc" id="L118">        return 0.0;</span>
+    }
+    
+    protected String validateId(String id) {
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (id == null) {</span>
+<span class="fc" id="L123">            throw new NullPointerException(&quot;ID cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (id.trim().isEmpty()) {</span>
+<span class="nc" id="L126">            throw new IllegalArgumentException(&quot;ID cannot be blank&quot;);</span>
+        }
+<span class="fc" id="L128">        return id.trim();</span>
+    }
+    
+    protected String validateStringField(String value, String fieldName) {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L133">            throw new NullPointerException(fieldName + &quot; cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (value.trim().isEmpty()) {</span>
+<span class="nc" id="L136">            throw new IllegalArgumentException(fieldName + &quot; cannot be blank&quot;);</span>
+        }
+<span class="fc" id="L138">        return value.trim();</span>
+    }
+    
+    protected double validatePrice(double price) {
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">        if (price &lt; 0.0) {</span>
+<span class="nc" id="L143">            throw new IllegalArgumentException(</span>
+                &quot;Price cannot be negative. Provided: &quot; + price);
+        }
+<span class="pc bpc" id="L146" title="2 of 4 branches missed.">        if (Double.isNaN(price) || Double.isInfinite(price)) {</span>
+<span class="nc" id="L147">            throw new IllegalArgumentException(</span>
+                &quot;Price must be a valid number. Provided: &quot; + price);
+        }
+<span class="fc" id="L150">        return price;</span>
+    }
+    
+    protected int validateYear(int year) {
+<span class="fc" id="L154">        int currentYear = Year.now().getValue();</span>
+<span class="pc bpc" id="L155" title="1 of 4 branches missed.">        if (year &lt; MIN_YEAR || year &gt; currentYear + 1) {</span>
+<span class="fc" id="L156">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L157">                String.format(&quot;Year must be between %d and %d. Provided: %d&quot;,</span>
+<span class="fc" id="L158">                    MIN_YEAR, currentYear + 1, year));</span>
+        }
+<span class="fc" id="L160">        return year;</span>
+    }
+    
+    public String getId() {
+<span class="fc" id="L164">        return id;</span>
+    }
+    
+    public String getTitle() {
+<span class="fc" id="L168">        return title;</span>
+    }
+    
+    public double getPrice() {
+<span class="fc" id="L172">        return price;</span>
+    }
+    
+    public int getYear() {
+<span class="fc" id="L176">        return year;</span>
+    }
+    
+    public MaterialType getType() {
+<span class="fc" id="L180">        return type;</span>
+    }
+    
+    /**
+     * Compares materials by title for natural ordering.
+     */
+    @Override
+    public int compareTo(Material other) {
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (other == null) {</span>
+<span class="nc" id="L189">            throw new NullPointerException(&quot;Cannot compare to null Material&quot;);</span>
+        }
+<span class="fc" id="L191">        int titleComparison = this.title.compareToIgnoreCase(other.title);</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        if (titleComparison != 0) {</span>
+<span class="fc" id="L193">            return titleComparison;</span>
+        }
+<span class="fc" id="L195">        return this.id.compareTo(other.id);</span>
+    }
+    
+    /**
+     * Materials are equal if they have the same ID.
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (!(obj instanceof Material)) return false;</span>
+<span class="fc" id="L205">        Material other = (Material) obj;</span>
+<span class="fc" id="L206">        return id.equals(other.id);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L211">        return Objects.hash(id);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L216">        return String.format(&quot;%s[ID=%s, Title='%s', Price=$%.2f, Year=%d]&quot;,</span>
+<span class="nc" id="L217">            type.getDisplayName(), id, title, price, year);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModernJsonMaterialRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.repository</a> &gt; <span class="el_source">ModernJsonMaterialRepository.java</span></div><h1>ModernJsonMaterialRepository.java</h1><pre class="source lang-java linenums">package com.university.bookstore.repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.university.bookstore.model.Material;
+
+/**
+ * Modern JSON-based implementation of MaterialRepository using best practices.
+ * Features:
+ * - Try-with-resources for automatic resource management
+ * - NIO.2 for better file operations
+ * - Thread-safe file operations with ReadWriteLock
+ * - Better error handling and logging
+ * - Atomic file operations to prevent corruption
+ * 
+ * @author Navid Mohaghegh
+ * @version 4.0
+ * @since 2024-09-15
+ */
+public class ModernJsonMaterialRepository implements MaterialRepository, AutoCloseable {
+    
+<span class="fc" id="L33">    private static final Logger LOGGER = Logger.getLogger(ModernJsonMaterialRepository.class.getName());</span>
+<span class="fc" id="L34">    private static final String SAFE_BASE_DIR = System.getProperty(&quot;user.dir&quot;) + &quot;/data&quot;;</span>
+    private static final int MAX_PATH_LENGTH = 255;
+    
+    private final Path dataFile;
+    private final Path backupFile;
+    private final ObjectMapper objectMapper;
+    private final ReadWriteLock fileLock;
+<span class="fc" id="L41">    private volatile boolean closed = false;</span>
+    
+    /**
+     * Creates a new modern JSON material repository.
+     * 
+     * @param filePath the path to the JSON file for persistence
+     */
+<span class="fc" id="L48">    public ModernJsonMaterialRepository(String filePath) {</span>
+<span class="fc" id="L49">        Path validatedPath = validateAndSanitizePath(filePath);</span>
+<span class="fc" id="L50">        this.dataFile = validatedPath;</span>
+<span class="fc" id="L51">        this.backupFile = Paths.get(validatedPath.toString() + &quot;.backup&quot;);</span>
+<span class="fc" id="L52">        this.fileLock = new ReentrantReadWriteLock();</span>
+        
+<span class="fc" id="L54">        this.objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L55">        this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);</span>
+<span class="fc" id="L56">        this.objectMapper.findAndRegisterModules(); // For Java 8 time support</span>
+        
+<span class="fc" id="L58">        initializeStorage();</span>
+<span class="fc" id="L59">    }</span>
+    
+    private void initializeStorage() {
+        try {
+            // Ensure the directory exists
+<span class="fc" id="L64">            Path parentDir = dataFile.getParent();</span>
+<span class="pc bpc" id="L65" title="1 of 4 branches missed.">            if (parentDir != null &amp;&amp; !Files.exists(parentDir)) {</span>
+<span class="fc" id="L66">                Files.createDirectories(parentDir);</span>
+<span class="fc" id="L67">                LOGGER.info(&quot;Created directory: &quot; + parentDir);</span>
+            }
+            
+            // Create empty file if it doesn't exist
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">            if (!Files.exists(dataFile)) {</span>
+<span class="fc" id="L72">                saveAtomic(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L73">                LOGGER.info(&quot;Created new data file: &quot; + dataFile);</span>
+            }
+<span class="nc" id="L75">        } catch (IOException e) {</span>
+<span class="nc" id="L76">            throw new RepositoryException(&quot;Failed to initialize storage&quot;, e);</span>
+<span class="fc" id="L77">        }</span>
+<span class="fc" id="L78">    }</span>
+    
+    /**
+     * Validates and sanitizes the file path to prevent path traversal attacks.
+     * 
+     * @param filePath the file path to validate
+     * @return the validated and sanitized Path
+     * @throws SecurityException if the path is invalid or attempts path traversal
+     */
+    private Path validateAndSanitizePath(String filePath) {
+<span class="fc bfc" id="L88" title="All 4 branches covered.">        if (filePath == null || filePath.trim().isEmpty()) {</span>
+<span class="fc" id="L89">            throw new IllegalArgumentException(&quot;File path cannot be null or empty&quot;);</span>
+        }
+        
+        // Remove any path traversal attempts
+<span class="fc" id="L93">        String cleanPath = filePath.replaceAll(&quot;\\.\\./&quot;, &quot;&quot;).replaceAll(&quot;\\.\\.&quot;, &quot;&quot;);</span>
+        
+        // Check for suspicious patterns
+<span class="pc bpc" id="L96" title="2 of 4 branches missed.">        if (cleanPath.contains(&quot;../&quot;) || cleanPath.contains(&quot;..\\&quot;) || </span>
+<span class="pc bpc" id="L97" title="2 of 4 branches missed.">            cleanPath.contains(&quot;%2e%2e&quot;) || cleanPath.contains(&quot;%252e&quot;)) {</span>
+<span class="nc" id="L98">            throw new SecurityException(&quot;Invalid file path: potential path traversal detected&quot;);</span>
+        }
+        
+        // Validate path length
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (cleanPath.length() &gt; MAX_PATH_LENGTH) {</span>
+<span class="nc" id="L103">            throw new IllegalArgumentException(&quot;File path exceeds maximum length&quot;);</span>
+        }
+        
+        try {
+            // Normalize the path
+<span class="fc" id="L108">            Path normalizedPath = Paths.get(cleanPath).normalize();</span>
+<span class="fc" id="L109">            Path safePath = Paths.get(SAFE_BASE_DIR).normalize();</span>
+            
+            // If the path is not absolute, make it relative to safe directory
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if (!normalizedPath.isAbsolute()) {</span>
+<span class="fc" id="L113">                normalizedPath = safePath.resolve(normalizedPath).normalize();</span>
+            }
+            
+            // Ensure the normalized path is within the safe directory
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            if (!normalizedPath.startsWith(safePath)) {</span>
+<span class="nc" id="L118">                throw new SecurityException(&quot;File path must be within the safe directory: &quot; + SAFE_BASE_DIR);</span>
+            }
+            
+<span class="fc" id="L121">            return normalizedPath;</span>
+<span class="nc" id="L122">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            if (e instanceof SecurityException) {</span>
+<span class="nc" id="L124">                throw (SecurityException) e;</span>
+            }
+<span class="nc" id="L126">            throw new IllegalArgumentException(&quot;Invalid file path: &quot; + e.getMessage(), e);</span>
+        }
+    }
+    
+    @Override
+    public void save(Material material) {
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L133">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+<span class="fc" id="L135">        ensureNotClosed();</span>
+        
+<span class="fc" id="L137">        fileLock.writeLock().lock();</span>
+        try {
+<span class="fc" id="L139">            List&lt;Material&gt; materials = loadAllInternal();</span>
+            
+            // Remove existing material with same ID if it exists
+<span class="fc" id="L142">            materials.removeIf(m -&gt; m.getId().equals(material.getId()));</span>
+            
+            // Add the new/updated material
+<span class="fc" id="L145">            materials.add(material);</span>
+            
+            // Save atomically using wrapper
+<span class="fc" id="L148">            saveAtomic(materials);</span>
+            
+<span class="fc" id="L150">            LOGGER.fine(&quot;Saved material: &quot; + material.getId());</span>
+<span class="nc" id="L151">        } catch (IOException e) {</span>
+<span class="nc" id="L152">            throw new RepositoryException(&quot;Failed to save material: &quot; + material.getId(), e);</span>
+        } finally {
+<span class="fc" id="L154">            fileLock.writeLock().unlock();</span>
+        }
+<span class="fc" id="L156">    }</span>
+    
+    /**
+     * Saves multiple materials in batch for better performance.
+     * 
+     * @param materialsToSave collection of materials to save
+     */
+    public void saveAll(Collection&lt;Material&gt; materialsToSave) {
+<span class="nc" id="L164">        Objects.requireNonNull(materialsToSave, &quot;Materials collection cannot be null&quot;);</span>
+<span class="nc" id="L165">        ensureNotClosed();</span>
+        
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if (materialsToSave.isEmpty()) {</span>
+<span class="nc" id="L168">            return;</span>
+        }
+        
+<span class="nc" id="L171">        fileLock.writeLock().lock();</span>
+        try {
+<span class="nc" id="L173">            List&lt;Material&gt; materials = loadAllInternal();</span>
+            
+            // Create a map for efficient lookup
+<span class="nc" id="L176">            Map&lt;String, Material&gt; materialMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            for (Material m : materials) {</span>
+<span class="nc" id="L178">                materialMap.put(m.getId(), m);</span>
+<span class="nc" id="L179">            }</span>
+            
+            // Update or add new materials
+<span class="nc bnc" id="L182" title="All 2 branches missed.">            for (Material material : materialsToSave) {</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                if (material != null) {</span>
+<span class="nc" id="L184">                    materialMap.put(material.getId(), material);</span>
+                }
+<span class="nc" id="L186">            }</span>
+            
+            // Save atomically
+<span class="nc" id="L189">            saveAtomic(new ArrayList&lt;&gt;(materialMap.values()));</span>
+            
+<span class="nc" id="L191">            LOGGER.fine(&quot;Saved &quot; + materialsToSave.size() + &quot; materials in batch&quot;);</span>
+<span class="nc" id="L192">        } catch (IOException e) {</span>
+<span class="nc" id="L193">            throw new RepositoryException(&quot;Failed to save materials batch&quot;, e);</span>
+        } finally {
+<span class="nc" id="L195">            fileLock.writeLock().unlock();</span>
+        }
+<span class="nc" id="L197">    }</span>
+    
+    @Override
+    public Optional&lt;Material&gt; findById(String id) {
+<span class="fc bfc" id="L201" title="All 4 branches covered.">        if (id == null || id.trim().isEmpty()) {</span>
+<span class="fc" id="L202">            return Optional.empty();</span>
+        }
+<span class="fc" id="L204">        ensureNotClosed();</span>
+        
+<span class="fc" id="L206">        fileLock.readLock().lock();</span>
+        try {
+<span class="fc" id="L208">            List&lt;Material&gt; materials = loadAllInternal();</span>
+<span class="fc" id="L209">            return materials.stream()</span>
+<span class="fc" id="L210">                .filter(m -&gt; id.equals(m.getId()))</span>
+<span class="fc" id="L211">                .findFirst();</span>
+<span class="nc" id="L212">        } catch (IOException e) {</span>
+<span class="nc" id="L213">            LOGGER.log(Level.WARNING, &quot;Failed to find material by ID: &quot; + id, e);</span>
+<span class="nc" id="L214">            return Optional.empty();</span>
+        } finally {
+<span class="fc" id="L216">            fileLock.readLock().unlock();</span>
+        }
+    }
+    
+    @Override
+    public List&lt;Material&gt; findAll() {
+<span class="fc" id="L222">        ensureNotClosed();</span>
+        
+<span class="fc" id="L224">        fileLock.readLock().lock();</span>
+        try {
+<span class="fc" id="L226">            return new ArrayList&lt;&gt;(loadAllInternal());</span>
+<span class="nc" id="L227">        } catch (IOException e) {</span>
+<span class="nc" id="L228">            LOGGER.log(Level.WARNING, &quot;Failed to load all materials&quot;, e);</span>
+<span class="nc" id="L229">            return new ArrayList&lt;&gt;();</span>
+        } finally {
+<span class="fc" id="L231">            fileLock.readLock().unlock();</span>
+        }
+    }
+    
+    @Override
+    public boolean delete(String id) {
+<span class="pc bpc" id="L237" title="1 of 4 branches missed.">        if (id == null || id.trim().isEmpty()) {</span>
+<span class="fc" id="L238">            return false;</span>
+        }
+<span class="fc" id="L240">        ensureNotClosed();</span>
+        
+<span class="fc" id="L242">        fileLock.writeLock().lock();</span>
+        try {
+<span class="fc" id="L244">            List&lt;Material&gt; materials = loadAllInternal();</span>
+<span class="fc" id="L245">            boolean removed = materials.removeIf(m -&gt; id.equals(m.getId()));</span>
+            
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">            if (removed) {</span>
+<span class="fc" id="L248">                saveAtomic(materials);</span>
+<span class="fc" id="L249">                LOGGER.fine(&quot;Deleted material: &quot; + id);</span>
+            }
+            
+<span class="fc" id="L252">            return removed;</span>
+<span class="nc" id="L253">        } catch (IOException e) {</span>
+<span class="nc" id="L254">            throw new RepositoryException(&quot;Failed to delete material: &quot; + id, e);</span>
+        } finally {
+<span class="fc" id="L256">            fileLock.writeLock().unlock();</span>
+        }
+    }
+    
+    /**
+     * Deletes multiple materials in batch.
+     * 
+     * @param ids collection of IDs to delete
+     * @return number of materials deleted
+     */
+    public int deleteAll(Collection&lt;String&gt; ids) {
+<span class="nc bnc" id="L267" title="All 4 branches missed.">        if (ids == null || ids.isEmpty()) {</span>
+<span class="nc" id="L268">            return 0;</span>
+        }
+<span class="nc" id="L270">        ensureNotClosed();</span>
+        
+<span class="nc" id="L272">        fileLock.writeLock().lock();</span>
+        try {
+<span class="nc" id="L274">            List&lt;Material&gt; materials = loadAllInternal();</span>
+<span class="nc" id="L275">            Set&lt;String&gt; idSet = new HashSet&lt;&gt;(ids);</span>
+<span class="nc" id="L276">            int originalSize = materials.size();</span>
+            
+<span class="nc" id="L278">            materials.removeIf(m -&gt; idSet.contains(m.getId()));</span>
+<span class="nc" id="L279">            int deleted = originalSize - materials.size();</span>
+            
+<span class="nc bnc" id="L281" title="All 2 branches missed.">            if (deleted &gt; 0) {</span>
+<span class="nc" id="L282">                saveAtomic(materials);</span>
+<span class="nc" id="L283">                LOGGER.fine(&quot;Deleted &quot; + deleted + &quot; materials in batch&quot;);</span>
+            }
+            
+<span class="nc" id="L286">            return deleted;</span>
+<span class="nc" id="L287">        } catch (IOException e) {</span>
+<span class="nc" id="L288">            throw new RepositoryException(&quot;Failed to delete materials batch&quot;, e);</span>
+        } finally {
+<span class="nc" id="L290">            fileLock.writeLock().unlock();</span>
+        }
+    }
+    
+    @Override
+    public boolean exists(String id) {
+<span class="fc" id="L296">        return findById(id).isPresent();</span>
+    }
+    
+    @Override
+    public long count() {
+<span class="fc" id="L301">        ensureNotClosed();</span>
+        
+<span class="fc" id="L303">        fileLock.readLock().lock();</span>
+        try {
+<span class="fc" id="L305">            return loadAllInternal().size();</span>
+<span class="nc" id="L306">        } catch (IOException e) {</span>
+<span class="nc" id="L307">            LOGGER.log(Level.WARNING, &quot;Failed to count materials&quot;, e);</span>
+<span class="nc" id="L308">            return 0;</span>
+        } finally {
+<span class="fc" id="L310">            fileLock.readLock().unlock();</span>
+        }
+    }
+    
+    @Override
+    public void deleteAll() {
+<span class="fc" id="L316">        ensureNotClosed();</span>
+        
+<span class="fc" id="L318">        fileLock.writeLock().lock();</span>
+        try {
+<span class="fc" id="L320">            saveAtomic(new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L321">            LOGGER.info(&quot;Cleared all materials from repository&quot;);</span>
+<span class="nc" id="L322">        } catch (IOException e) {</span>
+<span class="nc" id="L323">            throw new RepositoryException(&quot;Failed to clear all materials&quot;, e);</span>
+        } finally {
+<span class="fc" id="L325">            fileLock.writeLock().unlock();</span>
+        }
+<span class="fc" id="L327">    }</span>
+    
+    /**
+     * Loads all materials from the JSON file using try-with-resources.
+     * 
+     * @return list of materials
+     * @throws IOException if file reading fails
+     */
+    private List&lt;Material&gt; loadAllInternal() throws IOException {
+<span class="pc bpc" id="L336" title="2 of 4 branches missed.">        if (!Files.exists(dataFile) || Files.size(dataFile) == 0) {</span>
+<span class="nc" id="L337">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+        // Use try-with-resources for automatic resource management
+<span class="fc" id="L341">        try (BufferedReader reader = Files.newBufferedReader(dataFile)) {</span>
+<span class="fc" id="L342">            MaterialsWrapper wrapper = objectMapper.readValue(reader, MaterialsWrapper.class);</span>
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">            return wrapper.getMaterials() != null ? wrapper.getMaterials() : new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L344">        } catch (IOException e) {</span>
+            // Try to restore from backup if main file is corrupted
+<span class="nc bnc" id="L346" title="All 2 branches missed.">            if (Files.exists(backupFile)) {</span>
+<span class="nc" id="L347">                LOGGER.warning(&quot;Main file corrupted, attempting to restore from backup&quot;);</span>
+<span class="nc" id="L348">                try (BufferedReader backupReader = Files.newBufferedReader(backupFile)) {</span>
+<span class="nc" id="L349">                    MaterialsWrapper wrapper = objectMapper.readValue(backupReader, MaterialsWrapper.class);</span>
+                    // Restore the main file from backup
+<span class="nc" id="L351">                    Files.copy(backupFile, dataFile, </span>
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+<span class="nc bnc" id="L353" title="All 2 branches missed.">                    return wrapper.getMaterials() != null ? wrapper.getMaterials() : new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L354">                } catch (IOException backupError) {</span>
+<span class="nc" id="L355">                    LOGGER.log(Level.SEVERE, &quot;Failed to restore from backup&quot;, backupError);</span>
+<span class="nc" id="L356">                    return new ArrayList&lt;&gt;();</span>
+                }
+            }
+<span class="nc" id="L359">            LOGGER.log(Level.WARNING, &quot;Failed to parse JSON, returning empty list&quot;, e);</span>
+<span class="nc" id="L360">            return new ArrayList&lt;&gt;();</span>
+        }
+    }
+    
+    /**
+     * Saves materials atomically to prevent corruption.
+     * 
+     * @param materials list of materials to save
+     * @throws IOException if saving fails
+     */
+    private void saveAtomic(List&lt;Material&gt; materials) throws IOException {
+        // Create backup of current file if it exists
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        if (Files.exists(dataFile)) {</span>
+<span class="fc" id="L373">            Files.copy(dataFile, backupFile, </span>
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        // Write to temporary file first
+<span class="fc" id="L378">        Path tempFile = Files.createTempFile(dataFile.getParent(), &quot;temp&quot;, &quot;.json&quot;);</span>
+        
+        try {
+            // Use try-with-resources for writing with wrapper
+<span class="fc" id="L382">            try (BufferedWriter writer = Files.newBufferedWriter(tempFile, </span>
+                    StandardOpenOption.CREATE, 
+                    StandardOpenOption.TRUNCATE_EXISTING)) {
+<span class="fc" id="L385">                MaterialsWrapper wrapper = new MaterialsWrapper(materials);</span>
+<span class="fc" id="L386">                objectMapper.writerWithDefaultPrettyPrinter().writeValue(writer, wrapper);</span>
+            }
+            
+            // Atomic move (rename) - this is atomic on most file systems
+<span class="fc" id="L390">            Files.move(tempFile, dataFile, </span>
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            
+<span class="nc" id="L394">        } catch (IOException e) {</span>
+            // Clean up temp file if operation failed
+            try {
+<span class="nc" id="L397">                Files.deleteIfExists(tempFile);</span>
+<span class="nc" id="L398">            } catch (IOException deleteError) {</span>
+<span class="nc" id="L399">                LOGGER.log(Level.WARNING, &quot;Failed to delete temp file&quot;, deleteError);</span>
+<span class="nc" id="L400">            }</span>
+<span class="nc" id="L401">            throw e;</span>
+<span class="fc" id="L402">        }</span>
+<span class="fc" id="L403">    }</span>
+    
+    /**
+     * Creates a backup of the current data file.
+     * 
+     * @return true if backup was created successfully
+     */
+    public boolean createBackup() {
+<span class="nc" id="L411">        ensureNotClosed();</span>
+        
+<span class="nc" id="L413">        fileLock.readLock().lock();</span>
+        try {
+<span class="nc bnc" id="L415" title="All 2 branches missed.">            if (Files.exists(dataFile)) {</span>
+<span class="nc" id="L416">                Path backupPath = Paths.get(dataFile + &quot;.&quot; + System.currentTimeMillis() + &quot;.backup&quot;);</span>
+<span class="nc" id="L417">                Files.copy(dataFile, backupPath);</span>
+<span class="nc" id="L418">                LOGGER.info(&quot;Created backup: &quot; + backupPath);</span>
+<span class="nc" id="L419">                return true;</span>
+            }
+<span class="nc" id="L421">            return false;</span>
+<span class="nc" id="L422">        } catch (IOException e) {</span>
+<span class="nc" id="L423">            LOGGER.log(Level.WARNING, &quot;Failed to create backup&quot;, e);</span>
+<span class="nc" id="L424">            return false;</span>
+        } finally {
+<span class="nc" id="L426">            fileLock.readLock().unlock();</span>
+        }
+    }
+    
+    /**
+     * Restores data from a backup file.
+     * 
+     * @param backupPath path to the backup file
+     * @return true if restore was successful
+     */
+    public boolean restoreFromBackup(String backupPath) {
+<span class="nc" id="L437">        Objects.requireNonNull(backupPath, &quot;Backup path cannot be null&quot;);</span>
+<span class="nc" id="L438">        ensureNotClosed();</span>
+        
+<span class="nc" id="L440">        Path backup = Paths.get(backupPath);</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">        if (!Files.exists(backup)) {</span>
+<span class="nc" id="L442">            LOGGER.warning(&quot;Backup file does not exist: &quot; + backupPath);</span>
+<span class="nc" id="L443">            return false;</span>
+        }
+        
+<span class="nc" id="L446">        fileLock.writeLock().lock();</span>
+        try {
+            // Validate backup file can be read
+            MaterialsWrapper wrapper;
+<span class="nc" id="L450">            try (BufferedReader reader = Files.newBufferedReader(backup)) {</span>
+<span class="nc" id="L451">                wrapper = objectMapper.readValue(reader, MaterialsWrapper.class);</span>
+            }
+            
+            // If validation successful, replace current file
+<span class="nc" id="L455">            Files.copy(backup, dataFile, </span>
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+<span class="nc" id="L458">            LOGGER.info(&quot;Restored from backup: &quot; + backupPath);</span>
+<span class="nc" id="L459">            return true;</span>
+<span class="nc" id="L460">        } catch (IOException e) {</span>
+<span class="nc" id="L461">            LOGGER.log(Level.SEVERE, &quot;Failed to restore from backup: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L462">            e.printStackTrace();</span>
+<span class="nc" id="L463">            return false;</span>
+        } finally {
+<span class="nc" id="L465">            fileLock.writeLock().unlock();</span>
+        }
+    }
+    
+    /**
+     * Gets the file path used for persistence.
+     * 
+     * @return the file path
+     */
+    public String getFilePath() {
+<span class="fc" id="L475">        return dataFile.toString();</span>
+    }
+    
+    /**
+     * Checks if the data file exists.
+     * 
+     * @return true if the file exists
+     */
+    public boolean dataFileExists() {
+<span class="fc" id="L484">        return Files.exists(dataFile);</span>
+    }
+    
+    /**
+     * Gets the size of the data file in bytes.
+     * 
+     * @return file size in bytes
+     */
+    public long getDataFileSize() {
+        try {
+<span class="fc" id="L494">            return Files.size(dataFile);</span>
+<span class="nc" id="L495">        } catch (IOException e) {</span>
+<span class="nc" id="L496">            return 0;</span>
+        }
+    }
+    
+    /**
+     * Performs maintenance operations like cleanup and optimization.
+     */
+    public void performMaintenance() {
+<span class="nc" id="L504">        ensureNotClosed();</span>
+        
+<span class="nc" id="L506">        fileLock.writeLock().lock();</span>
+        try {
+            // Clean up old backup files
+<span class="nc" id="L509">            Path parent = dataFile.getParent();</span>
+<span class="nc bnc" id="L510" title="All 2 branches missed.">            if (parent != null) {</span>
+<span class="nc" id="L511">                long cutoffTime = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000); // 7 days</span>
+                
+<span class="nc" id="L513">                Files.list(parent)</span>
+<span class="nc" id="L514">                    .filter(path -&gt; path.toString().endsWith(&quot;.backup&quot;))</span>
+<span class="nc" id="L515">                    .filter(path -&gt; {</span>
+                        try {
+<span class="nc bnc" id="L517" title="All 2 branches missed.">                            return Files.getLastModifiedTime(path).toMillis() &lt; cutoffTime;</span>
+<span class="nc" id="L518">                        } catch (IOException e) {</span>
+<span class="nc" id="L519">                            return false;</span>
+                        }
+                    })
+<span class="nc" id="L522">                    .forEach(path -&gt; {</span>
+                        try {
+<span class="nc" id="L524">                            Files.delete(path);</span>
+<span class="nc" id="L525">                            LOGGER.fine(&quot;Deleted old backup: &quot; + path);</span>
+<span class="nc" id="L526">                        } catch (IOException e) {</span>
+<span class="nc" id="L527">                            LOGGER.warning(&quot;Failed to delete old backup: &quot; + path);</span>
+<span class="nc" id="L528">                        }</span>
+<span class="nc" id="L529">                    });</span>
+            }
+            
+            // Compact the JSON file by rewriting it
+<span class="nc" id="L533">            List&lt;Material&gt; materials = loadAllInternal();</span>
+<span class="nc" id="L534">            saveAtomic(materials);</span>
+            
+<span class="nc" id="L536">            LOGGER.info(&quot;Maintenance completed&quot;);</span>
+<span class="nc" id="L537">        } catch (IOException e) {</span>
+<span class="nc" id="L538">            LOGGER.log(Level.WARNING, &quot;Maintenance failed&quot;, e);</span>
+        } finally {
+<span class="nc" id="L540">            fileLock.writeLock().unlock();</span>
+        }
+<span class="nc" id="L542">    }</span>
+    
+    private void ensureNotClosed() {
+<span class="fc bfc" id="L545" title="All 2 branches covered.">        if (closed) {</span>
+<span class="fc" id="L546">            throw new IllegalStateException(&quot;Repository has been closed&quot;);</span>
+        }
+<span class="fc" id="L548">    }</span>
+    
+    @Override
+    public void close() {
+<span class="fc bfc" id="L552" title="All 2 branches covered.">        if (!closed) {</span>
+<span class="fc" id="L553">            closed = true;</span>
+<span class="fc" id="L554">            LOGGER.info(&quot;Repository closed&quot;);</span>
+        }
+<span class="fc" id="L556">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

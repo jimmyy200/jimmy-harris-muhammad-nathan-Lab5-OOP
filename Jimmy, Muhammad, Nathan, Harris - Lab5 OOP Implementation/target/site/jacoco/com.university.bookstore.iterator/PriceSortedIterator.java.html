@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PriceSortedIterator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.iterator</a> &gt; <span class="el_source">PriceSortedIterator.java</span></div><h1>PriceSortedIterator.java</h1><pre class="source lang-java linenums">package com.university.bookstore.iterator;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Iterator that returns materials sorted by price.
+ * Can sort in ascending or descending order.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class PriceSortedIterator implements MaterialIterator {
+    
+    private final List&lt;Material&gt; sortedMaterials;
+    private int currentIndex;
+    private final boolean ascending;
+    
+    /**
+     * Creates a new price sorted iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param ascending true for ascending order, false for descending
+     */
+<span class="fc" id="L30">    public PriceSortedIterator(List&lt;Material&gt; materials, boolean ascending) {</span>
+<span class="fc" id="L31">        this.sortedMaterials = new ArrayList&lt;&gt;(materials);</span>
+<span class="fc" id="L32">        this.ascending = ascending;</span>
+<span class="fc" id="L33">        this.currentIndex = 0;</span>
+        
+        // Sort materials by price
+<span class="fc" id="L36">        Comparator&lt;Material&gt; priceComparator = Comparator.comparing(Material::getPrice);</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (!ascending) {</span>
+<span class="nc" id="L38">            priceComparator = priceComparator.reversed();</span>
+        }
+<span class="fc" id="L40">        this.sortedMaterials.sort(priceComparator);</span>
+<span class="fc" id="L41">    }</span>
+    
+    @Override
+    public boolean hasNext() {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        return currentIndex &lt; sortedMaterials.size();</span>
+    }
+    
+    @Override
+    public Material next() {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (!hasNext()) {</span>
+<span class="nc" id="L51">            throw new NoSuchElementException(&quot;No more elements&quot;);</span>
+        }
+<span class="fc" id="L53">        return sortedMaterials.get(currentIndex++);</span>
+    }
+    
+    @Override
+    public void reset() {
+<span class="nc" id="L58">        currentIndex = 0;</span>
+<span class="nc" id="L59">    }</span>
+    
+    @Override
+    public int getCurrentPosition() {
+<span class="nc" id="L63">        return currentIndex;</span>
+    }
+    
+    @Override
+    public int getTotalCount() {
+<span class="nc" id="L68">        return sortedMaterials.size();</span>
+    }
+    
+    @Override
+    public int getRemainingCount() {
+<span class="nc" id="L73">        return sortedMaterials.size() - currentIndex;</span>
+    }
+    
+    @Override
+    public boolean isAtBeginning() {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        return currentIndex == 0;</span>
+    }
+    
+    @Override
+    public boolean isAtEnd() {
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        return currentIndex &gt;= sortedMaterials.size();</span>
+    }
+    
+    /**
+     * Gets the sort order.
+     * 
+     * @return true if ascending, false if descending
+     */
+    public boolean isAscending() {
+<span class="nc" id="L92">        return ascending;</span>
+    }
+    
+    /**
+     * Gets the current material without advancing the iterator.
+     * 
+     * @return the current material
+     * @throws NoSuchElementException if at the end
+     */
+    public Material peek() {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (currentIndex &gt;= sortedMaterials.size()) {</span>
+<span class="nc" id="L103">            throw new NoSuchElementException(&quot;No more elements&quot;);</span>
+        }
+<span class="nc" id="L105">        return sortedMaterials.get(currentIndex);</span>
+    }
+    
+    /**
+     * Gets the next material without advancing the iterator.
+     * 
+     * @return the next material
+     * @throws NoSuchElementException if no next element
+     */
+    public Material peekNext() {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (currentIndex + 1 &gt;= sortedMaterials.size()) {</span>
+<span class="nc" id="L116">            throw new NoSuchElementException(&quot;No next element&quot;);</span>
+        }
+<span class="nc" id="L118">        return sortedMaterials.get(currentIndex + 1);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L123">        return String.format(&quot;PriceSortedIterator[Order=%s, Position=%d/%d]&quot;,</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            ascending ? &quot;ASC&quot; : &quot;DESC&quot;, getCurrentPosition(), getTotalCount());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrintedBook.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">PrintedBook.java</span></div><h1>PrintedBook.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+import java.util.regex.Pattern;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+/**
+ * Represents a physical printed book in the bookstore inventory.
+ * Extends Material class to demonstrate inheritance.
+ * 
+ * &lt;p&gt;This class maintains backward compatibility with the original Book class
+ * while integrating into the new polymorphic material hierarchy.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class PrintedBook extends Material {
+    
+<span class="fc" id="L22">    private static final Pattern ISBN_13_PATTERN = Pattern.compile(&quot;^\\d{13}$&quot;);</span>
+<span class="fc" id="L23">    private static final Pattern ISBN_10_PATTERN = Pattern.compile(&quot;^\\d{9}[\\dX]$&quot;);</span>
+    
+    private final String isbn;
+    private final String author;
+    private final int pages;
+    private final String publisher;
+    private final boolean hardcover;
+    
+    /**
+     * Creates a new PrintedBook with validation.
+     * 
+     * @param isbn the International Standard Book Number
+     * @param title the book title
+     * @param author the primary author
+     * @param price the price in dollars
+     * @param year the publication year
+     * @param pages number of pages
+     * @param publisher the publishing company
+     * @param hardcover true if hardcover, false if paperback
+     */
+    @JsonCreator
+    public PrintedBook(@JsonProperty(&quot;id&quot;) String isbn, 
+                       @JsonProperty(&quot;title&quot;) String title, 
+                       @JsonProperty(&quot;author&quot;) String author, 
+                       @JsonProperty(&quot;price&quot;) double price, 
+                       @JsonProperty(&quot;year&quot;) int year, 
+                       @JsonProperty(&quot;pages&quot;) int pages, 
+                       @JsonProperty(&quot;publisher&quot;) String publisher, 
+                       @JsonProperty(&quot;hardcover&quot;) boolean hardcover) {
+<span class="fc" id="L52">        super(validateIsbn(isbn), title, price, year, MaterialType.BOOK);</span>
+<span class="fc" id="L53">        this.isbn = this.id;</span>
+<span class="fc" id="L54">        this.author = validateStringField(author, &quot;Author&quot;);</span>
+<span class="fc" id="L55">        this.pages = validatePages(pages);</span>
+<span class="fc" id="L56">        this.publisher = validateStringField(publisher, &quot;Publisher&quot;);</span>
+<span class="fc" id="L57">        this.hardcover = hardcover;</span>
+<span class="fc" id="L58">    }</span>
+    
+    /**
+     * Convenience constructor for backward compatibility.
+     */
+    public PrintedBook(String isbn, String title, String author, double price, int year) {
+<span class="fc" id="L64">        this(isbn, title, author, price, year, 0, &quot;Unknown&quot;, false);</span>
+<span class="fc" id="L65">    }</span>
+    
+    private static String validateIsbn(String isbn) {
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (isbn == null) {</span>
+<span class="fc" id="L69">            throw new NullPointerException(&quot;ISBN cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L72">        String cleaned = isbn.replaceAll(&quot;-&quot;, &quot;&quot;).trim();</span>
+        
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (!ISBN_10_PATTERN.matcher(cleaned).matches() &amp;&amp; </span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            !ISBN_13_PATTERN.matcher(cleaned).matches()) {</span>
+<span class="fc" id="L76">            throw new IllegalArgumentException(</span>
+                &quot;ISBN must be 10 or 13 digits. Provided: &quot; + isbn);
+        }
+        
+<span class="fc" id="L80">        return cleaned;</span>
+    }
+    
+    private int validatePages(int pages) {
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (pages &lt; 0) {</span>
+<span class="fc" id="L85">            throw new IllegalArgumentException(&quot;Pages cannot be negative&quot;);</span>
+        }
+<span class="fc" id="L87">        return pages;</span>
+    }
+    
+    @Override
+    public String getCreator() {
+<span class="fc" id="L92">        return author;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L97">        return String.format(&quot;%s by %s (%d, %s) - %d pages, $%.2f&quot;,</span>
+<span class="fc" id="L98">            title, author, year, </span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            hardcover ? &quot;Hardcover&quot; : &quot;Paperback&quot;,</span>
+<span class="fc" id="L100">            pages, price);</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L105">        int currentYear = java.time.Year.now().getValue();</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (year &lt; currentYear - 2) {</span>
+<span class="fc" id="L107">            return 0.15;</span>
+        }
+<span class="fc" id="L109">        return 0.0;</span>
+    }
+    
+    public String getIsbn() {
+<span class="fc" id="L113">        return isbn;</span>
+    }
+    
+    public String getAuthor() {
+<span class="fc" id="L117">        return author;</span>
+    }
+    
+    public int getPages() {
+<span class="fc" id="L121">        return pages;</span>
+    }
+    
+    public String getPublisher() {
+<span class="fc" id="L125">        return publisher;</span>
+    }
+    
+    public boolean isHardcover() {
+<span class="fc" id="L129">        return hardcover;</span>
+    }
+    
+    /**
+     * Calculates estimated reading time based on average reading speed.
+     * 
+     * @param wordsPerMinute reading speed (typical: 200-250)
+     * @return estimated hours to read
+     */
+    public double estimateReadingTime(int wordsPerMinute) {
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">        if (pages == 0 || wordsPerMinute &lt;= 0) {</span>
+<span class="nc" id="L140">            return 0;</span>
+        }
+<span class="fc" id="L142">        int avgWordsPerPage = 250;</span>
+<span class="fc" id="L143">        int totalWords = pages * avgWordsPerPage;</span>
+<span class="fc" id="L144">        return totalWords / (double)(wordsPerMinute * 60);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L149">        return String.format(&quot;PrintedBook[ISBN=%s, Title='%s', Author='%s', Price=$%.2f, Year=%d, Pages=%d, %s]&quot;,</span>
+<span class="fc" id="L150">            isbn, title, author, price, year, pages,</span>
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">            hardcover ? &quot;Hardcover&quot; : &quot;Paperback&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

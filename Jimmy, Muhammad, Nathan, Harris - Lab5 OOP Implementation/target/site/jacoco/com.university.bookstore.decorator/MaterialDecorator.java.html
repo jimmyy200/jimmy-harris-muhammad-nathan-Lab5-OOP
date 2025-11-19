@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.decorator</a> &gt; <span class="el_source">MaterialDecorator.java</span></div><h1>MaterialDecorator.java</h1><pre class="source lang-java linenums">package com.university.bookstore.decorator;
+
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Abstract base class for material decorators in the Decorator pattern.
+ * Provides a common interface for decorating materials with additional features.
+ * 
+ * &lt;p&gt;This class implements the Material interface and delegates all operations
+ * to the wrapped material, allowing subclasses to override specific methods
+ * to add new functionality without modifying the original material classes.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public abstract class MaterialDecorator extends Material {
+    
+    protected final Material decoratedMaterial;
+    
+    /**
+     * Creates a new material decorator wrapping the specified material.
+     * 
+     * @param material the material to decorate
+     * @throws IllegalArgumentException if material is null
+     */
+    public MaterialDecorator(Material material) {
+<span class="fc" id="L30">        super(material.getId(), material.getTitle(), material.getPrice(), material.getYear(), material.getType());</span>
+<span class="fc" id="L31">        this.decoratedMaterial = Objects.requireNonNull(material, &quot;Material cannot be null&quot;);</span>
+<span class="fc" id="L32">    }</span>
+    
+    // Implement abstract methods from Material by delegating to wrapped material
+    @Override
+    public String getCreator() {
+<span class="fc" id="L37">        return decoratedMaterial.getCreator();</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="nc" id="L42">        return decoratedMaterial.getDisplayInfo();</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L47">        return decoratedMaterial.getDiscountRate();</span>
+    }
+    
+    /**
+     * Gets the decorated material.
+     * 
+     * @return the wrapped material
+     */
+    public Material getDecoratedMaterial() {
+<span class="fc" id="L56">        return decoratedMaterial;</span>
+    }
+    
+    /**
+     * Gets the base material (unwraps all decorators).
+     * 
+     * @return the original material without any decorations
+     */
+    public Material getBaseMaterial() {
+<span class="fc" id="L65">        Material current = decoratedMaterial;</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc" id="L67">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+<span class="fc" id="L69">        return current;</span>
+    }
+    
+    /**
+     * Gets the number of decorators applied to this material.
+     * 
+     * @return the decorator count
+     */
+    public int getDecoratorCount() {
+<span class="fc" id="L78">        int count = 0;</span>
+<span class="fc" id="L79">        Material current = decoratedMaterial;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc" id="L81">            count++;</span>
+<span class="fc" id="L82">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+<span class="fc" id="L84">        return count;</span>
+    }
+    
+    /**
+     * Checks if this material has any decorators applied.
+     * 
+     * @return true if decorators are applied
+     */
+    public boolean hasDecorators() {
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        return getDecoratorCount() &gt; 0;</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (this == obj) return true;</span>
+<span class="pc bpc" id="L99" title="2 of 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="fc" id="L101">        MaterialDecorator that = (MaterialDecorator) obj;</span>
+<span class="fc" id="L102">        return Objects.equals(decoratedMaterial, that.decoratedMaterial);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L107">        return Objects.hash(decoratedMaterial);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L112">        return String.format(&quot;%s[%s]&quot;, getClass().getSimpleName(), decoratedMaterial.getTitle());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

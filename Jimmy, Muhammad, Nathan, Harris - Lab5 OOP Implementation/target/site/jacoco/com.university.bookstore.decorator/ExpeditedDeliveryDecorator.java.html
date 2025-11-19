@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpeditedDeliveryDecorator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.decorator</a> &gt; <span class="el_source">ExpeditedDeliveryDecorator.java</span></div><h1>ExpeditedDeliveryDecorator.java</h1><pre class="source lang-java linenums">package com.university.bookstore.decorator;
+
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Decorator that adds expedited delivery functionality to materials.
+ * Increases the price and provides delivery time information.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class ExpeditedDeliveryDecorator extends MaterialDecorator {
+    
+    private static final double EXPEDITED_COST = 12.99;
+    private final int deliveryDays;
+    
+    /**
+     * Creates a new expedited delivery decorator.
+     * 
+     * @param material the material to add expedited delivery to
+     * @param deliveryDays the number of days for delivery (minimum 1)
+     * @throws IllegalArgumentException if deliveryDays is less than 1
+     */
+    public ExpeditedDeliveryDecorator(Material material, int deliveryDays) {
+<span class="fc" id="L28">        super(material);</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (deliveryDays &lt; 1) {</span>
+<span class="fc" id="L30">            throw new IllegalArgumentException(&quot;Delivery days must be at least 1: &quot; + deliveryDays);</span>
+        }
+<span class="fc" id="L32">        this.deliveryDays = deliveryDays;</span>
+<span class="fc" id="L33">    }</span>
+    
+    @Override
+    public double getPrice() {
+<span class="fc" id="L37">        return decoratedMaterial.getPrice() + EXPEDITED_COST;</span>
+    }
+    
+    @Override
+    public String getDisplayInfo() {
+<span class="fc" id="L42">        return decoratedMaterial.getDisplayInfo() + </span>
+<span class="fc" id="L43">               String.format(&quot; [Expedited Delivery: %d days (+$%.2f)]&quot;, </span>
+<span class="fc" id="L44">                           deliveryDays, EXPEDITED_COST);</span>
+    }
+    
+    /**
+     * Gets the delivery time in days.
+     * 
+     * @return the delivery days
+     */
+    public int getDeliveryDays() {
+<span class="fc" id="L53">        return deliveryDays;</span>
+    }
+    
+    /**
+     * Gets the expedited delivery cost.
+     * 
+     * @return the expedited delivery cost
+     */
+    public double getExpeditedDeliveryCost() {
+<span class="fc" id="L62">        return EXPEDITED_COST;</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="pc bpc" id="L68" title="2 of 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (!super.equals(obj)) return false;</span>
+        
+<span class="fc" id="L71">        ExpeditedDeliveryDecorator that = (ExpeditedDeliveryDecorator) obj;</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        return deliveryDays == that.deliveryDays;</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L77">        return Objects.hash(super.hashCode(), deliveryDays);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

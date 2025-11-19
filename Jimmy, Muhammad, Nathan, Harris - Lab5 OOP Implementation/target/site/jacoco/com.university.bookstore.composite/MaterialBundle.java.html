@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialBundle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.composite</a> &gt; <span class="el_source">MaterialBundle.java</span></div><h1>MaterialBundle.java</h1><pre class="source lang-java linenums">package com.university.bookstore.composite;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Composite component in the Composite pattern.
+ * Represents a bundle of materials that can contain other components (both leaves and other bundles).
+ * 
+ * &lt;p&gt;This class implements the MaterialComponent interface and can contain other MaterialComponent
+ * objects, enabling recursive composition and unified treatment of individual materials and bundles.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class MaterialBundle implements MaterialComponent {
+    
+    private final String bundleName;
+    private final List&lt;MaterialComponent&gt; components;
+    private final double bundleDiscount;
+    
+    /**
+     * Creates a new material bundle with the specified name and discount.
+     * 
+     * @param bundleName the name of the bundle
+     * @param bundleDiscount the discount rate (0.0 to 1.0)
+     * @throws IllegalArgumentException if bundleName is null or empty, or discount is invalid
+     */
+<span class="fc" id="L34">    public MaterialBundle(String bundleName, double bundleDiscount) {</span>
+<span class="pc bpc" id="L35" title="2 of 4 branches missed.">        if (bundleName == null || bundleName.trim().isEmpty()) {</span>
+<span class="nc" id="L36">            throw new IllegalArgumentException(&quot;Bundle name cannot be null or empty&quot;);</span>
+        }
+        
+<span class="fc" id="L39">        this.bundleName = bundleName.trim();</span>
+<span class="fc" id="L40">        this.components = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L41">        this.bundleDiscount = Math.max(0.0, Math.min(1.0, bundleDiscount));</span>
+<span class="fc" id="L42">    }</span>
+    
+    /**
+     * Adds a component to this bundle.
+     * 
+     * @param component the component to add
+     * @throws IllegalArgumentException if component is null
+     */
+    public void addComponent(MaterialComponent component) {
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (component == null) {</span>
+<span class="nc" id="L52">            throw new IllegalArgumentException(&quot;Component cannot be null&quot;);</span>
+        }
+        
+        // Prevent adding a bundle to itself (directly or indirectly)
+<span class="pc bpc" id="L56" title="2 of 6 branches missed.">        if (component == this || (component instanceof MaterialBundle &amp;&amp; containsBundle((MaterialBundle) component))) {</span>
+<span class="nc" id="L57">            throw new IllegalArgumentException(&quot;Cannot add bundle to itself or create circular references&quot;);</span>
+        }
+        
+<span class="fc" id="L60">        components.add(component);</span>
+<span class="fc" id="L61">    }</span>
+    
+    /**
+     * Removes a component from this bundle.
+     * 
+     * @param component the component to remove
+     * @return true if the component was removed, false if not found
+     */
+    public boolean removeComponent(MaterialComponent component) {
+<span class="fc" id="L70">        return components.remove(component);</span>
+    }
+    
+    /**
+     * Gets all components in this bundle.
+     * 
+     * @return list of components (defensive copy)
+     */
+    public List&lt;MaterialComponent&gt; getComponents() {
+<span class="nc" id="L79">        return new ArrayList&lt;&gt;(components);</span>
+    }
+    
+    /**
+     * Gets the number of components in this bundle.
+     * 
+     * @return the component count
+     */
+    public int getComponentCount() {
+<span class="nc" id="L88">        return components.size();</span>
+    }
+    
+    @Override
+    public String getTitle() {
+<span class="fc" id="L93">        return bundleName;</span>
+    }
+    
+    @Override
+    public double getPrice() {
+<span class="fc" id="L98">        return components.stream()</span>
+<span class="fc" id="L99">            .mapToDouble(MaterialComponent::getPrice)</span>
+<span class="fc" id="L100">            .sum();</span>
+    }
+    
+    @Override
+    public double getDiscountedPrice() {
+<span class="fc" id="L105">        double totalPrice = getPrice();</span>
+<span class="fc" id="L106">        return totalPrice * (1.0 - bundleDiscount);</span>
+    }
+    
+    @Override
+    public String getDescription() {
+<span class="nc" id="L111">        StringBuilder desc = new StringBuilder();</span>
+<span class="nc" id="L112">        desc.append(&quot;Bundle: &quot;).append(bundleName)</span>
+<span class="nc" id="L113">            .append(&quot; (&quot;).append(getItemCount()).append(&quot; items, &quot;)</span>
+<span class="nc" id="L114">            .append(String.format(&quot;%.1f%% discount&quot;, bundleDiscount * 100))</span>
+<span class="nc" id="L115">            .append(&quot;)\n&quot;);</span>
+        
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        for (MaterialComponent component : components) {</span>
+<span class="nc" id="L118">            desc.append(&quot;  - &quot;).append(component.getDescription()).append(&quot;\n&quot;);</span>
+<span class="nc" id="L119">        }</span>
+        
+<span class="nc" id="L121">        return desc.toString();</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterials() {
+<span class="fc" id="L126">        return components.stream()</span>
+<span class="fc" id="L127">            .flatMap(component -&gt; component.getMaterials().stream())</span>
+<span class="fc" id="L128">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public int getItemCount() {
+<span class="fc" id="L133">        return components.stream()</span>
+<span class="fc" id="L134">            .mapToInt(MaterialComponent::getItemCount)</span>
+<span class="fc" id="L135">            .sum();</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L140">        return bundleDiscount;</span>
+    }
+    
+    @Override
+    public boolean isLeaf() {
+<span class="nc" id="L145">        return false;</span>
+    }
+    
+    /**
+     * Gets the bundle name.
+     * 
+     * @return the bundle name
+     */
+    public String getBundleName() {
+<span class="fc" id="L154">        return bundleName;</span>
+    }
+    
+    /**
+     * Gets the bundle discount rate.
+     * 
+     * @return the discount rate
+     */
+    public double getBundleDiscount() {
+<span class="fc" id="L163">        return bundleDiscount;</span>
+    }
+    
+    /**
+     * Calculates the total savings from the bundle discount.
+     * 
+     * @return the total savings amount
+     */
+    public double getTotalSavings() {
+<span class="fc" id="L172">        return getPrice() - getDiscountedPrice();</span>
+    }
+    
+    /**
+     * Checks if this bundle contains any materials of the specified type.
+     * 
+     * @param type the material type to check for
+     * @return true if the bundle contains materials of the specified type
+     */
+    public boolean containsType(Material.MaterialType type) {
+<span class="fc" id="L182">        return getMaterials().stream()</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">            .anyMatch(material -&gt; material.getType() == type);</span>
+    }
+    
+    /**
+     * Gets all materials of the specified type in this bundle.
+     * 
+     * @param type the material type to filter by
+     * @return list of materials of the specified type
+     */
+    public List&lt;Material&gt; getMaterialsByType(Material.MaterialType type) {
+<span class="nc" id="L193">        return getMaterials().stream()</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            .filter(material -&gt; material.getType() == type)</span>
+<span class="nc" id="L195">            .collect(Collectors.toList());</span>
+    }
+    
+    /**
+     * Checks if this bundle contains the specified material.
+     * 
+     * @param material the material to check for
+     * @return true if the bundle contains the material
+     */
+    public boolean containsMaterial(Material material) {
+<span class="fc" id="L205">        return getMaterials().contains(material);</span>
+    }
+    
+    /**
+     * Checks if this bundle contains the specified bundle (recursively).
+     * 
+     * @param bundle the bundle to check for
+     * @return true if this bundle contains the specified bundle
+     */
+    private boolean containsBundle(MaterialBundle bundle) {
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        for (MaterialComponent component : components) {</span>
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">            if (component == bundle) {</span>
+<span class="nc" id="L217">                return true;</span>
+            }
+<span class="fc bfc" id="L219" title="All 2 branches covered.">            if (component instanceof MaterialBundle) {</span>
+<span class="fc" id="L220">                MaterialBundle childBundle = (MaterialBundle) component;</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">                if (childBundle.containsBundle(bundle)) {</span>
+<span class="nc" id="L222">                    return true;</span>
+                }
+            }
+<span class="fc" id="L225">        }</span>
+<span class="fc" id="L226">        return false;</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (this == obj) return true;</span>
+<span class="nc bnc" id="L232" title="All 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="nc" id="L234">        MaterialBundle that = (MaterialBundle) obj;</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        return Objects.equals(bundleName, that.bundleName) &amp;&amp;</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">               Double.compare(that.bundleDiscount, bundleDiscount) == 0 &amp;&amp;</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">               Objects.equals(components, that.components);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="nc" id="L242">        return Objects.hash(bundleName, bundleDiscount, components);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L247">        return String.format(&quot;MaterialBundle[%s, %d items, %.1f%% discount, $%.2f]&quot;,</span>
+<span class="nc" id="L248">            bundleName, getItemCount(), bundleDiscount * 100, getDiscountedPrice());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PriceRangeIterator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.iterator</a> &gt; <span class="el_source">PriceRangeIterator.java</span></div><h1>PriceRangeIterator.java</h1><pre class="source lang-java linenums">package com.university.bookstore.iterator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Iterator that filters materials by price range.
+ * Only returns materials within the specified price range.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class PriceRangeIterator implements MaterialIterator {
+    
+    private final List&lt;Material&gt; materials;
+    private final double minPrice;
+    private final double maxPrice;
+    private int currentIndex;
+    private final int totalCount;
+    
+    /**
+     * Creates a new price range iterator.
+     * 
+     * @param materials the list of materials to iterate over
+     * @param minPrice the minimum price (inclusive)
+     * @param maxPrice the maximum price (inclusive)
+     * @throws IllegalArgumentException if price range is invalid
+     */
+<span class="fc" id="L33">    public PriceRangeIterator(List&lt;Material&gt; materials, double minPrice, double maxPrice) {</span>
+<span class="pc bpc" id="L34" title="3 of 6 branches missed.">        if (minPrice &lt; 0 || maxPrice &lt; 0 || minPrice &gt; maxPrice) {</span>
+<span class="nc" id="L35">            throw new IllegalArgumentException(&quot;Invalid price range: &quot; + minPrice + &quot; to &quot; + maxPrice);</span>
+        }
+        
+<span class="fc" id="L38">        this.materials = new ArrayList&lt;&gt;(materials);</span>
+<span class="fc" id="L39">        this.minPrice = minPrice;</span>
+<span class="fc" id="L40">        this.maxPrice = maxPrice;</span>
+<span class="fc" id="L41">        this.currentIndex = 0;</span>
+<span class="fc" id="L42">        this.totalCount = (int) materials.stream()</span>
+<span class="fc bfc" id="L43" title="All 4 branches covered.">            .filter(m -&gt; m.getPrice() &gt;= minPrice &amp;&amp; m.getPrice() &lt;= maxPrice)</span>
+<span class="fc" id="L44">            .count();</span>
+<span class="fc" id="L45">        advanceToNext();</span>
+<span class="fc" id="L46">    }</span>
+    
+    @Override
+    public boolean hasNext() {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        return currentIndex &lt; materials.size();</span>
+    }
+    
+    @Override
+    public Material next() {
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if (!hasNext()) {</span>
+<span class="nc" id="L56">            throw new NoSuchElementException(&quot;No more elements&quot;);</span>
+        }
+        
+<span class="fc" id="L59">        Material current = materials.get(currentIndex);</span>
+<span class="fc" id="L60">        currentIndex++;</span>
+<span class="fc" id="L61">        advanceToNext();</span>
+<span class="fc" id="L62">        return current;</span>
+    }
+    
+    @Override
+    public void reset() {
+<span class="nc" id="L67">        currentIndex = 0;</span>
+<span class="nc" id="L68">        advanceToNext();</span>
+<span class="nc" id="L69">    }</span>
+    
+    @Override
+    public int getCurrentPosition() {
+<span class="nc" id="L73">        return currentIndex;</span>
+    }
+    
+    @Override
+    public int getTotalCount() {
+<span class="nc" id="L78">        return totalCount;</span>
+    }
+    
+    @Override
+    public int getRemainingCount() {
+<span class="nc" id="L83">        return totalCount - getCurrentPosition();</span>
+    }
+    
+    @Override
+    public boolean isAtBeginning() {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        return currentIndex == 0;</span>
+    }
+    
+    @Override
+    public boolean isAtEnd() {
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        return currentIndex &gt;= materials.size();</span>
+    }
+    
+    /**
+     * Gets the minimum price.
+     * 
+     * @return the minimum price
+     */
+    public double getMinPrice() {
+<span class="nc" id="L102">        return minPrice;</span>
+    }
+    
+    /**
+     * Gets the maximum price.
+     * 
+     * @return the maximum price
+     */
+    public double getMaxPrice() {
+<span class="nc" id="L111">        return maxPrice;</span>
+    }
+    
+    /**
+     * Gets the price range.
+     * 
+     * @return the price range
+     */
+    public double getPriceRange() {
+<span class="nc" id="L120">        return maxPrice - minPrice;</span>
+    }
+    
+    /**
+     * Advances to the next material within the price range.
+     */
+    private void advanceToNext() {
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        while (currentIndex &lt; materials.size()) {</span>
+<span class="fc" id="L128">            Material material = materials.get(currentIndex);</span>
+<span class="fc bfc" id="L129" title="All 4 branches covered.">            if (material.getPrice() &gt;= minPrice &amp;&amp; material.getPrice() &lt;= maxPrice) {</span>
+<span class="fc" id="L130">                break;</span>
+            }
+<span class="fc" id="L132">            currentIndex++;</span>
+<span class="fc" id="L133">        }</span>
+<span class="fc" id="L134">    }</span>
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L138">        return String.format(&quot;PriceRangeIterator[Range=$%.2f-$%.2f, Position=%d/%d]&quot;,</span>
+<span class="nc" id="L139">            minPrice, maxPrice, getCurrentPosition(), getTotalCount());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

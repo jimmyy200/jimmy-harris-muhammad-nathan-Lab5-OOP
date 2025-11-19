@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookArrayUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.utils</a> &gt; <span class="el_source">BookArrayUtils.java</span></div><h1>BookArrayUtils.java</h1><pre class="source lang-java linenums">package com.university.bookstore.utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Stream;
+
+import com.university.bookstore.model.Book;
+
+/**
+ * Utility class for array-based operations on Book objects.
+ * 
+ * &lt;p&gt;This class provides static methods for manipulating and analyzing
+ * arrays of books, demonstrating array operations without using ArrayList.&lt;/p&gt;
+ * 
+ * &lt;p&gt;All methods handle null arrays and null elements gracefully.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 1.0
+ * @since 2024-09-15
+ */
+public final class BookArrayUtils {
+    
+    /**
+     * Private constructor to prevent instantiation.
+     */
+<span class="fc" id="L31">    private BookArrayUtils() {</span>
+<span class="fc" id="L32">        throw new UnsupportedOperationException(&quot;Utility class cannot be instantiated&quot;);</span>
+    }
+    
+    /**
+     * Counts books published before a given year.
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @param yearCutoff the cutoff year (exclusive)
+     * @return count of books published before the cutoff year
+     */
+    public static int countBeforeYear(Book[] books, int yearCutoff) {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L44">            return 0;</span>
+        }
+        
+<span class="fc" id="L47">        int count = 0;</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L49" title="All 4 branches covered.">            if (book != null &amp;&amp; book.getYear() &lt; yearCutoff) {</span>
+<span class="fc" id="L50">                count++;</span>
+            }
+        }
+<span class="fc" id="L53">        return count;</span>
+    }
+    
+    /**
+     * Counts books by a specific author (case-insensitive, exact match).
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @param author the author name to search for
+     * @return count of books by the specified author
+     */
+    public static int countByAuthor(Book[] books, String author) {
+<span class="fc bfc" id="L64" title="All 4 branches covered.">        if (books == null || author == null) {</span>
+<span class="fc" id="L65">            return 0;</span>
+        }
+        
+<span class="fc" id="L68">        int count = 0;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="pc bpc" id="L70" title="1 of 4 branches missed.">            if (book != null &amp;&amp; book.getAuthor().equalsIgnoreCase(author)) {</span>
+<span class="fc" id="L71">                count++;</span>
+            }
+        }
+<span class="fc" id="L74">        return count;</span>
+    }
+    
+    /**
+     * Filters books with price at most the specified maximum.
+     * Returns a compact array (no nulls, exact size).
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @param maxPrice maximum price (inclusive)
+     * @return compact array of books with price less than or equal to maxPrice
+     * @throws IllegalArgumentException if maxPrice is negative
+     */
+    public static Book[] filterPriceAtMost(Book[] books, double maxPrice) {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (maxPrice &lt; 0) {</span>
+<span class="fc" id="L88">            throw new IllegalArgumentException(&quot;Max price cannot be negative&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L92">            return new Book[0];</span>
+        }
+        
+        // Count matching books
+<span class="fc" id="L96">        int count = 0;</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L98" title="All 4 branches covered.">            if (book != null &amp;&amp; book.getPrice() &lt;= maxPrice) {</span>
+<span class="fc" id="L99">                count++;</span>
+            }
+        }
+        
+        // Create compact array
+<span class="fc" id="L104">        Book[] result = new Book[count];</span>
+<span class="fc" id="L105">        int index = 0;</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L107" title="All 4 branches covered.">            if (book != null &amp;&amp; book.getPrice() &lt;= maxPrice) {</span>
+<span class="fc" id="L108">                result[index++] = book;</span>
+            }
+        }
+        
+<span class="fc" id="L112">        return result;</span>
+    }
+    
+    /**
+     * Filters books published in a specific decade.
+     * For example, decade 1990 includes years 1990-1999.
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @param decade the decade start year (e.g., 1990, 2000)
+     * @return compact array of books from that decade
+     */
+    public static Book[] filterByDecade(Book[] books, int decade) {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L125">            return new Book[0];</span>
+        }
+        
+<span class="fc" id="L128">        int decadeEnd = decade + 9;</span>
+        
+        // Count matching books
+<span class="fc" id="L131">        int count = 0;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="pc bpc" id="L133" title="1 of 6 branches missed.">            if (book != null &amp;&amp; book.getYear() &gt;= decade &amp;&amp; book.getYear() &lt;= decadeEnd) {</span>
+<span class="fc" id="L134">                count++;</span>
+            }
+        }
+        
+        // Create compact array
+<span class="fc" id="L139">        Book[] result = new Book[count];</span>
+<span class="fc" id="L140">        int index = 0;</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="pc bpc" id="L142" title="1 of 6 branches missed.">            if (book != null &amp;&amp; book.getYear() &gt;= decade &amp;&amp; book.getYear() &lt;= decadeEnd) {</span>
+<span class="fc" id="L143">                result[index++] = book;</span>
+            }
+        }
+        
+<span class="fc" id="L147">        return result;</span>
+    }
+    
+    /**
+     * Sorts books by price in ascending order (in-place).
+     * Nulls are moved to the end.
+     * 
+     * @param books array to sort (modified in-place)
+     */
+    public static void sortByPrice(Book[] books) {
+<span class="fc bfc" id="L157" title="All 4 branches covered.">        if (books == null || books.length &lt;= 1) {</span>
+<span class="fc" id="L158">            return;</span>
+        }
+        
+<span class="fc" id="L161">        Arrays.sort(books, (a, b) -&gt; {</span>
+<span class="fc bfc" id="L162" title="All 4 branches covered.">            if (a == null &amp;&amp; b == null) return 0;</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">            if (a == null) return 1;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">            if (b == null) return -1;</span>
+<span class="fc" id="L165">            return Double.compare(a.getPrice(), b.getPrice());</span>
+        });
+<span class="fc" id="L167">    }</span>
+    
+    /**
+     * Sorts books by year in ascending order (in-place).
+     * Nulls are moved to the end.
+     * 
+     * @param books array to sort (modified in-place)
+     */
+    public static void sortByYear(Book[] books) {
+<span class="fc bfc" id="L176" title="All 4 branches covered.">        if (books == null || books.length &lt;= 1) {</span>
+<span class="fc" id="L177">            return;</span>
+        }
+        
+<span class="fc" id="L180">        Arrays.sort(books, (a, b) -&gt; {</span>
+<span class="pc bpc" id="L181" title="3 of 4 branches missed.">            if (a == null &amp;&amp; b == null) return 0;</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">            if (a == null) return 1;</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">            if (b == null) return -1;</span>
+<span class="fc" id="L184">            return Integer.compare(a.getYear(), b.getYear());</span>
+        });
+<span class="fc" id="L186">    }</span>
+    
+    /**
+     * Calculates the average price of books in the array.
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @return average price, or 0.0 if array is null or empty
+     */
+    public static double averagePrice(Book[] books) {
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L196">            return 0.0;</span>
+        }
+        
+<span class="fc" id="L199">        double sum = 0.0;</span>
+<span class="fc" id="L200">        int count = 0;</span>
+        
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            if (book != null) {</span>
+<span class="fc" id="L204">                sum += book.getPrice();</span>
+<span class="fc" id="L205">                count++;</span>
+            }
+        }
+        
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        return count == 0 ? 0.0 : sum / count;</span>
+    }
+    
+    /**
+     * Finds the oldest book (earliest publication year).
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @return the oldest book, or null if array is null/empty
+     */
+    public static Book findOldest(Book[] books) {
+<span class="fc bfc" id="L219" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L220">            return null;</span>
+        }
+        
+<span class="fc" id="L223">        Book oldest = null;</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">            if (book != null) {</span>
+<span class="fc bfc" id="L226" title="All 4 branches covered.">                if (oldest == null || book.getYear() &lt; oldest.getYear()) {</span>
+<span class="fc" id="L227">                    oldest = book;</span>
+                }
+            }
+        }
+        
+<span class="fc" id="L232">        return oldest;</span>
+    }
+    
+    /**
+     * Merges two book arrays into one, preserving all elements.
+     * 
+     * @param arr1 first array (may be null)
+     * @param arr2 second array (may be null)
+     * @return merged array containing all books from both arrays
+     */
+    public static Book[] merge(Book[] arr1, Book[] arr2) {
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        int len1 = (arr1 == null) ? 0 : arr1.length;</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        int len2 = (arr2 == null) ? 0 : arr2.length;</span>
+        
+<span class="fc" id="L246">        Book[] result = new Book[len1 + len2];</span>
+        
+<span class="fc bfc" id="L248" title="All 2 branches covered.">        if (arr1 != null) {</span>
+<span class="fc" id="L249">            System.arraycopy(arr1, 0, result, 0, len1);</span>
+        }
+<span class="fc bfc" id="L251" title="All 2 branches covered.">        if (arr2 != null) {</span>
+<span class="fc" id="L252">            System.arraycopy(arr2, 0, result, len1, len2);</span>
+        }
+        
+<span class="fc" id="L255">        return result;</span>
+    }
+    
+    /**
+     * Removes duplicate books based on ISBN.
+     * Returns a compact array with unique books only.
+     * 
+     * @param books array of books (may be null or contain nulls)
+     * @return compact array with duplicates removed
+     */
+    public static Book[] removeDuplicates(Book[] books) {
+<span class="fc bfc" id="L266" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L267">            return new Book[0];</span>
+        }
+        
+<span class="fc" id="L270">        Set&lt;String&gt; seenIsbns = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L271">        List&lt;Book&gt; unique = new ArrayList&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L274" title="All 4 branches covered.">            if (book != null &amp;&amp; seenIsbns.add(book.getIsbn())) {</span>
+<span class="fc" id="L275">                unique.add(book);</span>
+            }
+        }
+        
+<span class="fc" id="L279">        return unique.toArray(new Book[0]);</span>
+    }
+    
+    /**
+     * Finds books within a year range (inclusive).
+     * 
+     * @param books array of books
+     * @param startYear start year (inclusive)
+     * @param endYear end year (inclusive)
+     * @return compact array of books within the year range
+     */
+    public static Book[] filterByYearRange(Book[] books, int startYear, int endYear) {
+<span class="fc bfc" id="L291" title="All 4 branches covered.">        if (books == null || startYear &gt; endYear) {</span>
+<span class="fc" id="L292">            return new Book[0];</span>
+        }
+        
+<span class="fc" id="L295">        return Stream.of(books)</span>
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">            .filter(book -&gt; book != null &amp;&amp; </span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                    book.getYear() &gt;= startYear &amp;&amp; </span>
+<span class="fc bfc" id="L298" title="All 2 branches covered.">                    book.getYear() &lt;= endYear)</span>
+<span class="fc" id="L299">            .toArray(Book[]::new);</span>
+    }
+    
+    /**
+     * Groups books by decade and returns a summary.
+     * 
+     * @param books array of books
+     * @return map with decade as key and count as value
+     */
+    public static Map&lt;Integer, Integer&gt; countByDecade(Book[] books) {
+<span class="fc" id="L309">        Map&lt;Integer, Integer&gt; decadeCounts = new TreeMap&lt;&gt;();</span>
+        
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        if (books != null) {</span>
+<span class="fc bfc" id="L312" title="All 2 branches covered.">            for (Book book : books) {</span>
+<span class="pc bpc" id="L313" title="1 of 2 branches missed.">                if (book != null) {</span>
+<span class="fc" id="L314">                    int decade = (book.getYear() / 10) * 10;</span>
+<span class="fc" id="L315">                    decadeCounts.merge(decade, 1, Integer::sum);</span>
+                }
+            }
+        }
+        
+<span class="fc" id="L320">        return decadeCounts;</span>
+    }
+    
+    /**
+     * Finds the book with the longest title.
+     * 
+     * @param books array of books
+     * @return book with longest title, null if array is null/empty
+     */
+    public static Book findLongestTitle(Book[] books) {
+<span class="fc bfc" id="L330" title="All 2 branches covered.">        if (books == null) {</span>
+<span class="fc" id="L331">            return null;</span>
+        }
+        
+<span class="fc" id="L334">        Book longest = null;</span>
+<span class="fc" id="L335">        int maxLength = 0;</span>
+        
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        for (Book book : books) {</span>
+<span class="fc bfc" id="L338" title="All 4 branches covered.">            if (book != null &amp;&amp; book.getTitle().length() &gt; maxLength) {</span>
+<span class="fc" id="L339">                maxLength = book.getTitle().length();</span>
+<span class="fc" id="L340">                longest = book;</span>
+            }
+        }
+        
+<span class="fc" id="L344">        return longest;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

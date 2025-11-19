@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PolymorphismDemo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.demo</a> &gt; <span class="el_source">PolymorphismDemo.java</span></div><h1>PolymorphismDemo.java</h1><pre class="source lang-java linenums">package com.university.bookstore.demo;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.university.bookstore.api.MaterialStore;
+import com.university.bookstore.impl.MaterialStoreImpl;
+import com.university.bookstore.model.AudioBook;
+import com.university.bookstore.model.Magazine;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+import com.university.bookstore.model.PrintedBook;
+import com.university.bookstore.model.VideoMaterial;
+
+/**
+ * Demonstration class showing polymorphism and OOP best practices.
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ */
+<span class="nc" id="L24">public class PolymorphismDemo {</span>
+    
+<span class="nc" id="L26">    private static final Logger LOGGER = LoggerFactory.getLogger(PolymorphismDemo.class);</span>
+    
+    public static void main(String[] args) {
+<span class="nc" id="L29">        LOGGER.info(&quot;=== Material Store Polymorphism Demo ===\n&quot;);</span>
+        
+<span class="nc" id="L31">        MaterialStore store = createSampleStore();</span>
+        
+<span class="nc" id="L33">        demonstratePolymorphicBehavior(store);</span>
+<span class="nc" id="L34">        demonstrateInterfaceSegregation(store);</span>
+<span class="nc" id="L35">        demonstrateAbstraction(store);</span>
+<span class="nc" id="L36">        demonstrateDynamicBinding(store);</span>
+<span class="nc" id="L37">        demonstrateSOLIDPrinciples(store);</span>
+<span class="nc" id="L38">        demonstrateMediaVersatility(store);</span>
+<span class="nc" id="L39">        demonstrateStreamingVsDownload(store);</span>
+<span class="nc" id="L40">    }</span>
+    
+    private static MaterialStore createSampleStore() {
+<span class="nc" id="L43">        MaterialStoreImpl store = new MaterialStoreImpl();</span>
+        
+        // Traditional print materials
+<span class="nc" id="L46">        PrintedBook book = new PrintedBook(</span>
+            &quot;9780134685991&quot;, &quot;Effective Java&quot;, &quot;Joshua Bloch&quot;,
+            45.99, 2018, 412, &quot;Addison-Wesley&quot;, true
+        );
+        
+<span class="nc" id="L51">        Magazine magazine = new Magazine(</span>
+            &quot;12345678&quot;, &quot;National Geographic&quot;, &quot;NatGeo Society&quot;,
+            6.99, 2024, 3, &quot;Monthly&quot;, &quot;Science&quot;
+        );
+        
+        // Audio materials with various qualities
+<span class="nc" id="L57">        AudioBook audioBook1 = new AudioBook(</span>
+            &quot;9780143038092&quot;, &quot;1984&quot;, &quot;George Orwell&quot;, &quot;Simon Prebble&quot;,
+            14.99, 2020, 690, &quot;MP3&quot;, 850.5,
+            Media.MediaQuality.HIGH, &quot;English&quot;, true
+        );
+        
+<span class="nc" id="L63">        AudioBook audioBook2 = new AudioBook(</span>
+            &quot;9780547928227&quot;, &quot;The Hobbit&quot;, &quot;J.R.R. Tolkien&quot;, &quot;Rob Inglis&quot;,
+            24.99, 2022, 660, &quot;M4B&quot;, 450.0,
+            Media.MediaQuality.STANDARD, &quot;English&quot;, false
+        );
+        
+<span class="nc" id="L69">        AudioBook audiobook3 = new AudioBook(</span>
+            &quot;9781250318398&quot;, &quot;Atomic Habits&quot;, &quot;James Clear&quot;, &quot;James Clear&quot;,
+            19.99, 2023, 320, &quot;FLAC&quot;, 1200.0,
+            Media.MediaQuality.ULTRA_HD, &quot;English&quot;, true
+        );
+        
+        // Diverse video content
+<span class="nc" id="L76">        VideoMaterial documentary = new VideoMaterial(</span>
+            &quot;883929665839&quot;, &quot;Planet Earth II&quot;, &quot;David Attenborough&quot;,
+            29.99, 2016, 300, &quot;MP4&quot;, 4500.0,
+            Media.MediaQuality.ULTRA_HD, VideoMaterial.VideoType.DOCUMENTARY,
+<span class="nc" id="L80">            &quot;G&quot;, Arrays.asList(&quot;David Attenborough&quot;), true, &quot;16:9&quot;</span>
+        );
+        
+<span class="nc" id="L83">        VideoMaterial movie = new VideoMaterial(</span>
+            &quot;043396544789&quot;, &quot;The Matrix&quot;, &quot;The Wachowskis&quot;,
+            19.99, 1999, 136, &quot;MP4&quot;, 2800.0,
+            Media.MediaQuality.HD, VideoMaterial.VideoType.MOVIE,
+<span class="nc" id="L87">            &quot;R&quot;, Arrays.asList(&quot;Keanu Reeves&quot;, &quot;Laurence Fishburne&quot;, &quot;Carrie-Anne Moss&quot;),</span>
+            true, &quot;2.39:1&quot;
+        );
+        
+<span class="nc" id="L91">        VideoMaterial tutorial = new VideoMaterial(</span>
+            &quot;TUT20240001&quot;, &quot;Advanced Java Programming&quot;, &quot;Tech Education Inc&quot;,
+            89.99, 2024, 480, &quot;MP4&quot;, 3200.0,
+            Media.MediaQuality.HD, VideoMaterial.VideoType.TUTORIAL,
+<span class="nc" id="L95">            &quot;NR&quot;, Arrays.asList(&quot;Dr. Sarah Chen&quot;), true, &quot;16:9&quot;</span>
+        );
+        
+<span class="nc" id="L98">        VideoMaterial tvSeries = new VideoMaterial(</span>
+            &quot;883929696789&quot;, &quot;Breaking Bad - Season 1&quot;, &quot;Vince Gilligan&quot;,
+            39.99, 2008, 420, &quot;MKV&quot;, 8500.0,
+            Media.MediaQuality.HD, VideoMaterial.VideoType.TV_SERIES,
+<span class="nc" id="L102">            &quot;TV-MA&quot;, Arrays.asList(&quot;Bryan Cranston&quot;, &quot;Aaron Paul&quot;, &quot;Anna Gunn&quot;),</span>
+            true, &quot;16:9&quot;
+        );
+        
+<span class="nc" id="L106">        VideoMaterial shortFilm = new VideoMaterial(</span>
+            &quot;SHORT2023001&quot;, &quot;The Red Balloon&quot;, &quot;Albert Lamorisse&quot;,
+            9.99, 1956, 34, &quot;AVI&quot;, 250.0,
+            Media.MediaQuality.STANDARD, VideoMaterial.VideoType.SHORT_FILM,
+<span class="nc" id="L110">            &quot;G&quot;, Arrays.asList(&quot;Pascal Lamorisse&quot;), false, &quot;4:3&quot;</span>
+        );
+        
+<span class="nc" id="L113">        VideoMaterial educationalVideo = new VideoMaterial(</span>
+            &quot;EDU2024567&quot;, &quot;Quantum Physics Explained&quot;, &quot;MIT OpenCourseWare&quot;,
+            0.00, 2024, 90, &quot;WEBM&quot;, 680.0,
+            Media.MediaQuality.HIGH, VideoMaterial.VideoType.EDUCATIONAL,
+<span class="nc" id="L117">            &quot;NR&quot;, Arrays.asList(&quot;Prof. Walter Lewin&quot;), true, &quot;16:9&quot;</span>
+        );
+        
+        // Add all materials to store
+<span class="nc" id="L121">        store.addMaterial(book);</span>
+<span class="nc" id="L122">        store.addMaterial(magazine);</span>
+<span class="nc" id="L123">        store.addMaterial(audioBook1);</span>
+<span class="nc" id="L124">        store.addMaterial(audioBook2);</span>
+<span class="nc" id="L125">        store.addMaterial(audiobook3);</span>
+<span class="nc" id="L126">        store.addMaterial(documentary);</span>
+<span class="nc" id="L127">        store.addMaterial(movie);</span>
+<span class="nc" id="L128">        store.addMaterial(tutorial);</span>
+<span class="nc" id="L129">        store.addMaterial(tvSeries);</span>
+<span class="nc" id="L130">        store.addMaterial(shortFilm);</span>
+<span class="nc" id="L131">        store.addMaterial(educationalVideo);</span>
+        
+<span class="nc" id="L133">        return store;</span>
+    }
+    
+    private static void demonstratePolymorphicBehavior(MaterialStore store) {
+<span class="nc" id="L137">        LOGGER.info(&quot;1. POLYMORPHIC BEHAVIOR&quot;);</span>
+<span class="nc" id="L138">        LOGGER.info(&quot;------------------------&quot;);</span>
+        
+<span class="nc" id="L140">        List&lt;Material&gt; materials = store.getAllMaterials();</span>
+        
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        for (Material material : materials) {</span>
+<span class="nc" id="L143">            LOGGER.info(&quot;\nMaterial Type: {}&quot;, material.getType().getDisplayName());</span>
+<span class="nc" id="L144">            LOGGER.info(&quot;Title: {}&quot;, material.getTitle());</span>
+<span class="nc" id="L145">            LOGGER.info(&quot;Creator: {}&quot;, material.getCreator());</span>
+<span class="nc" id="L146">            LOGGER.info(&quot;Display Info: {}&quot;, material.getDisplayInfo());</span>
+<span class="nc" id="L147">            LOGGER.info(&quot;Original Price: ${}&quot;, String.format(&quot;%.2f&quot;, material.getPrice()));</span>
+<span class="nc" id="L148">            LOGGER.info(&quot;Discount Rate: {}%&quot;, (material.getDiscountRate() * 100));</span>
+<span class="nc" id="L149">            LOGGER.info(&quot;Discounted Price: ${}&quot;, String.format(&quot;%.2f&quot;, material.getDiscountedPrice()));</span>
+<span class="nc" id="L150">        }</span>
+        
+<span class="nc" id="L152">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L153">    }</span>
+    
+    private static void demonstrateInterfaceSegregation(MaterialStore store) {
+<span class="nc" id="L156">        LOGGER.info(&quot;2. INTERFACE SEGREGATION (Media Interface)&quot;);</span>
+<span class="nc" id="L157">        LOGGER.info(&quot;-------------------------------------------&quot;);</span>
+        
+<span class="nc" id="L159">        List&lt;Media&gt; mediaItems = store.getMediaMaterials();</span>
+        
+<span class="nc" id="L161">        LOGGER.info(&quot;Found {} media items:\n&quot;, mediaItems.size());</span>
+        
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        for (Media media : mediaItems) {</span>
+<span class="nc" id="L164">            LOGGER.info(&quot;Media: {}&quot;, ((Material)media).getTitle());</span>
+<span class="nc" id="L165">            LOGGER.info(&quot;  {}&quot;, media.getPlaybackInfo());</span>
+<span class="nc" id="L166">            LOGGER.info(&quot;  Download time at 10 Mbps: {} seconds&quot;, media.estimateDownloadTime(10));</span>
+<span class="nc" id="L167">            LOGGER.info(&quot;  Streaming only: {}&quot;, media.isStreamingOnly());</span>
+<span class="nc" id="L168">        }</span>
+        
+<span class="nc" id="L170">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L171">    }</span>
+    
+    private static void demonstrateAbstraction(MaterialStore store) {
+<span class="nc" id="L174">        LOGGER.info(&quot;3. ABSTRACTION (Abstract Base Class)&quot;);</span>
+<span class="nc" id="L175">        LOGGER.info(&quot;-------------------------------------&quot;);</span>
+        
+<span class="nc" id="L177">        LOGGER.info(&quot;Materials grouped by type:\n&quot;);</span>
+        
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        for (Material.MaterialType type : Material.MaterialType.values()) {</span>
+<span class="nc" id="L180">            List&lt;Material&gt; ofType = store.getMaterialsByType(type);</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">            if (!ofType.isEmpty()) {</span>
+<span class="nc" id="L182">                LOGGER.info(&quot;{}: {} items&quot;, type.getDisplayName(), ofType.size());</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                for (Material m : ofType) {</span>
+<span class="nc" id="L184">                    LOGGER.info(&quot;  - {} (${})&quot;, m.getTitle(), String.format(&quot;%.2f&quot;, m.getPrice()));</span>
+<span class="nc" id="L185">                }</span>
+            }
+        }
+        
+<span class="nc" id="L189">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L190">    }</span>
+    
+    private static void demonstrateDynamicBinding(MaterialStore store) {
+<span class="nc" id="L193">        LOGGER.info(&quot;4. DYNAMIC BINDING&quot;);</span>
+<span class="nc" id="L194">        LOGGER.info(&quot;-------------------&quot;);</span>
+        
+<span class="nc" id="L196">        Material cheapest = store.filterMaterials(m -&gt; true).stream()</span>
+<span class="nc" id="L197">            .min((a, b) -&gt; Double.compare(a.getPrice(), b.getPrice()))</span>
+<span class="nc" id="L198">            .orElse(null);</span>
+        
+<span class="nc" id="L200">        Material mostExpensive = store.filterMaterials(m -&gt; true).stream()</span>
+<span class="nc" id="L201">            .max((a, b) -&gt; Double.compare(a.getPrice(), b.getPrice()))</span>
+<span class="nc" id="L202">            .orElse(null);</span>
+        
+<span class="nc" id="L204">        LOGGER.info(&quot;Cheapest item: {}&quot;, cheapest.getDisplayInfo());</span>
+<span class="nc" id="L205">        LOGGER.info(&quot;Most expensive: {}&quot;, mostExpensive.getDisplayInfo());</span>
+        
+<span class="nc" id="L207">        LOGGER.info(&quot;\nDynamic method dispatch:&quot;);</span>
+<span class="nc" id="L208">        processPolymorphically(cheapest);</span>
+<span class="nc" id="L209">        processPolymorphically(mostExpensive);</span>
+        
+<span class="nc" id="L211">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L212">    }</span>
+    
+    private static void processPolymorphically(Material material) {
+<span class="nc" id="L215">        LOGGER.info(&quot;  Processing: {}&quot;, material.getTitle());</span>
+        
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (material instanceof Media) {</span>
+<span class="nc" id="L218">            Media media = (Media) material;</span>
+<span class="nc" id="L219">            LOGGER.info(&quot;    -&gt; This is media with duration: {} minutes&quot;, media.getDuration());</span>
+        }
+        
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (material instanceof PrintedBook) {</span>
+<span class="nc" id="L223">            PrintedBook book = (PrintedBook) material;</span>
+<span class="nc" id="L224">            LOGGER.info(&quot;    -&gt; This is a book with {} pages&quot;, book.getPages());</span>
+        }
+        
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (material instanceof Magazine) {</span>
+<span class="nc" id="L228">            Magazine mag = (Magazine) material;</span>
+<span class="nc" id="L229">            LOGGER.info(&quot;    -&gt; This is a magazine, issue #{}&quot;, mag.getIssueNumber());</span>
+        }
+<span class="nc" id="L231">    }</span>
+    
+    private static void demonstrateSOLIDPrinciples(MaterialStore store) {
+<span class="nc" id="L234">        LOGGER.info(&quot;5. SOLID PRINCIPLES IN ACTION&quot;);</span>
+<span class="nc" id="L235">        LOGGER.info(&quot;------------------------------&quot;);</span>
+        
+<span class="nc" id="L237">        MaterialStore.InventoryStats stats = store.getInventoryStats();</span>
+        
+<span class="nc" id="L239">        LOGGER.info(&quot;Inventory Statistics:&quot;);</span>
+<span class="nc" id="L240">        LOGGER.info(&quot;  Total items: {}&quot;, stats.getTotalCount());</span>
+<span class="nc" id="L241">        LOGGER.info(&quot;  Average price: ${}&quot;, String.format(&quot;%.2f&quot;, stats.getAveragePrice()));</span>
+<span class="nc" id="L242">        LOGGER.info(&quot;  Median price: ${}&quot;, String.format(&quot;%.2f&quot;, stats.getMedianPrice()));</span>
+<span class="nc" id="L243">        LOGGER.info(&quot;  Unique types: {}&quot;, stats.getUniqueTypes());</span>
+<span class="nc" id="L244">        LOGGER.info(&quot;  Media items: {}&quot;, stats.getMediaCount());</span>
+<span class="nc" id="L245">        LOGGER.info(&quot;  Print items: {}&quot;, stats.getPrintCount());</span>
+        
+<span class="nc" id="L247">        LOGGER.info(&quot;\nTotal inventory value: ${}&quot;, String.format(&quot;%.2f&quot;, store.getTotalInventoryValue()));</span>
+<span class="nc" id="L248">        LOGGER.info(&quot;Total with discounts: ${}&quot;, String.format(&quot;%.2f&quot;, store.getTotalDiscountedValue()));</span>
+        
+<span class="nc" id="L250">        double savings = store.getTotalInventoryValue() - store.getTotalDiscountedValue();</span>
+<span class="nc" id="L251">        LOGGER.info(&quot;Total savings: ${}&quot;, String.format(&quot;%.2f&quot;, savings));</span>
+        
+<span class="nc" id="L253">        LOGGER.info(&quot;\nFiltered Results (Lambda Expression):&quot;);</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        List&lt;Material&gt; affordable = store.filterMaterials(m -&gt; m.getPrice() &lt; 20);</span>
+<span class="nc" id="L255">        LOGGER.info(&quot;  Items under $20: {}&quot;, affordable.size());</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        for (Material m : affordable) {</span>
+<span class="nc" id="L257">            LOGGER.info(&quot;    - {} (${})&quot;, m.getTitle(), String.format(&quot;%.2f&quot;, m.getPrice()));</span>
+<span class="nc" id="L258">        }</span>
+<span class="nc" id="L259">    }</span>
+    
+    private static void demonstrateMediaVersatility(MaterialStore store) {
+<span class="nc" id="L262">        LOGGER.info(&quot;\n6. MEDIA VERSATILITY SHOWCASE&quot;);</span>
+<span class="nc" id="L263">        LOGGER.info(&quot;-------------------------------&quot;);</span>
+        
+<span class="nc" id="L265">        LOGGER.info(&quot;\nVideo Content Types:&quot;);</span>
+<span class="nc" id="L266">        List&lt;Material&gt; videos = store.getMaterialsByType(Material.MaterialType.VIDEO);</span>
+<span class="nc" id="L267">        videos.addAll(store.getMaterialsByType(Material.MaterialType.DOCUMENTARY));</span>
+        
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        for (Material material : videos) {</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            if (material instanceof VideoMaterial) {</span>
+<span class="nc" id="L271">                VideoMaterial video = (VideoMaterial) material;</span>
+<span class="nc" id="L272">                LOGGER.info(&quot;\n  {}: {}&quot;, video.getVideoType(), video.getTitle());</span>
+<span class="nc" id="L273">                LOGGER.info(&quot;    Director: {}&quot;, video.getDirector());</span>
+<span class="nc" id="L274">                LOGGER.info(&quot;    Duration: {} minutes&quot;, video.getDuration());</span>
+<span class="nc" id="L275">                LOGGER.info(&quot;    Quality: {}&quot;, video.getQuality());</span>
+<span class="nc" id="L276">                LOGGER.info(&quot;    Format: {}&quot;, video.getFormat());</span>
+<span class="nc" id="L277">                LOGGER.info(&quot;    Rating: {}&quot;, video.getRating());</span>
+<span class="nc" id="L278">                LOGGER.info(&quot;    Aspect Ratio: {}&quot;, video.getAspectRatio());</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">                LOGGER.info(&quot;    Subtitles: {}&quot;, (video.hasSubtitles() ? &quot;Yes&quot; : &quot;No&quot;));</span>
+<span class="nc" id="L280">                LOGGER.info(&quot;    Streaming Bandwidth: {} Mbps&quot;, video.getStreamingBandwidth());</span>
+                
+<span class="nc bnc" id="L282" title="All 2 branches missed.">                if (!video.getCast().isEmpty()) {</span>
+<span class="nc" id="L283">                    LOGGER.info(&quot;    Cast: {}&quot;, String.join(&quot;, &quot;, </span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">                        video.getCast().size() &gt; 3 ? </span>
+<span class="nc" id="L285">                        video.getCast().subList(0, 3) : video.getCast()));</span>
+                }
+            }
+<span class="nc" id="L288">        }</span>
+        
+<span class="nc" id="L290">        LOGGER.info(&quot;\n\nAudio Quality Comparison:&quot;);</span>
+<span class="nc" id="L291">        List&lt;Material&gt; audioMaterials = store.filterMaterials(m -&gt; m instanceof AudioBook);</span>
+        
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        for (Material material : audioMaterials) {</span>
+<span class="nc" id="L294">            AudioBook audio = (AudioBook) material;</span>
+<span class="nc" id="L295">            LOGGER.info(&quot;\n  {}&quot;, audio.getTitle());</span>
+<span class="nc" id="L296">            LOGGER.info(&quot;    Quality: {}&quot;, audio.getQuality());</span>
+<span class="nc" id="L297">            LOGGER.info(&quot;    Format: {}&quot;, audio.getFormat());</span>
+<span class="nc" id="L298">            LOGGER.info(&quot;    File Size: {} MB&quot;, audio.getFileSize());</span>
+<span class="nc" id="L299">            LOGGER.info(&quot;    Duration: {} minutes&quot;, audio.getDuration());</span>
+<span class="nc" id="L300">            double estimatedBitrate = (audio.getFileSize() * 8 * 1024) / (audio.getDuration() * 60);</span>
+<span class="nc" id="L301">            LOGGER.info(&quot;    Estimated Bitrate: {} kbps&quot;, String.format(&quot;%.0f&quot;, estimatedBitrate));</span>
+<span class="nc" id="L302">            LOGGER.info(&quot;    Download Time (10 Mbps): {} seconds&quot;, audio.estimateDownloadTime(10));</span>
+<span class="nc" id="L303">        }</span>
+        
+<span class="nc" id="L305">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L306">    }</span>
+    
+    private static void demonstrateStreamingVsDownload(MaterialStore store) {
+<span class="nc" id="L309">        LOGGER.info(&quot;7. STREAMING VS DOWNLOAD ANALYSIS&quot;);</span>
+<span class="nc" id="L310">        LOGGER.info(&quot;-----------------------------------&quot;);</span>
+        
+<span class="nc" id="L312">        List&lt;Media&gt; mediaItems = store.getMediaMaterials();</span>
+        
+<span class="nc" id="L314">        LOGGER.info(&quot;\nStreaming-Only Content (Large Files &gt; 4GB):&quot;);</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        for (Media media : mediaItems) {</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">            if (media.isStreamingOnly()) {</span>
+<span class="nc" id="L317">                Material material = (Material) media;</span>
+<span class="nc" id="L318">                LOGGER.info(&quot;  - {} ({} MB)&quot;, material.getTitle(), media.getFileSize());</span>
+            }
+<span class="nc" id="L320">        }</span>
+        
+<span class="nc" id="L322">        LOGGER.info(&quot;\nDownloadable Content:&quot;);</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">        for (Media media : mediaItems) {</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">            if (!media.isStreamingOnly()) {</span>
+<span class="nc" id="L325">                Material material = (Material) media;</span>
+<span class="nc" id="L326">                LOGGER.info(&quot;  - {} ({} MB, Download time @ 50 Mbps: {}s)&quot;, </span>
+<span class="nc" id="L327">                           material.getTitle(), media.getFileSize(), media.estimateDownloadTime(50));</span>
+            }
+<span class="nc" id="L329">        }</span>
+        
+<span class="nc" id="L331">        LOGGER.info(&quot;\nQuality vs Storage Requirements:&quot;);</span>
+<span class="nc" id="L332">        LOGGER.info(&quot;  Format Distribution:&quot;);</span>
+        
+<span class="nc" id="L334">        int ultraHD = 0, highQ = 0, standard = 0;</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        for (Media media : mediaItems) {</span>
+<span class="nc bnc" id="L336" title="All 3 branches missed.">            switch (media.getQuality()) {</span>
+<span class="nc" id="L337">                case ULTRA_HD: ultraHD++; break;</span>
+                case HIGH:
+<span class="nc" id="L339">                case HD: highQ++; break;</span>
+<span class="nc" id="L340">                default: standard++; break;</span>
+            }
+<span class="nc" id="L342">        }</span>
+        
+<span class="nc" id="L344">        LOGGER.info(&quot;    Ultra HD: {} items&quot;, ultraHD);</span>
+<span class="nc" id="L345">        LOGGER.info(&quot;    High/HD: {} items&quot;, highQ);</span>
+<span class="nc" id="L346">        LOGGER.info(&quot;    Standard/Low: {} items&quot;, standard);</span>
+        
+<span class="nc" id="L348">        double totalStorage = mediaItems.stream()</span>
+<span class="nc" id="L349">            .mapToDouble(Media::getFileSize)</span>
+<span class="nc" id="L350">            .sum();</span>
+        
+<span class="nc" id="L352">        LOGGER.info(&quot;\n  Total Storage Required: {} GB&quot;, String.format(&quot;%.2f&quot;, totalStorage / 1024));</span>
+        
+<span class="nc" id="L354">        LOGGER.info(&quot;\n  Bandwidth Requirements by Quality:&quot;);</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">        for (Material material : store.getAllMaterials()) {</span>
+<span class="nc bnc" id="L356" title="All 2 branches missed.">            if (material instanceof VideoMaterial) {</span>
+<span class="nc" id="L357">                VideoMaterial video = (VideoMaterial) material;</span>
+<span class="nc bnc" id="L358" title="All 2 branches missed.">                if (video.getQuality() == Media.MediaQuality.ULTRA_HD || </span>
+<span class="nc bnc" id="L359" title="All 2 branches missed.">                    video.getQuality() == Media.MediaQuality.HD) {</span>
+<span class="nc" id="L360">                    LOGGER.info(&quot;    {} ({}): {} Mbps&quot;, video.getTitle(), video.getQuality(), video.getStreamingBandwidth());</span>
+                }
+            }
+<span class="nc" id="L363">        }</span>
+        
+<span class="nc" id="L365">        LOGGER.info(&quot;\n&quot;);</span>
+<span class="nc" id="L366">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialDirector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.builder</a> &gt; <span class="el_source">MaterialDirector.java</span></div><h1>MaterialDirector.java</h1><pre class="source lang-java linenums">package com.university.bookstore.builder;
+
+import java.util.List;
+
+import com.university.bookstore.composite.MaterialBundle;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+
+/**
+ * Director class that orchestrates the construction of complex Material objects
+ * using various builders. Demonstrates the Director pattern in conjunction
+ * with the Builder pattern for creating predefined configurations.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class MaterialDirector {
+    
+    private final EBookBuilder eBookBuilder;
+    private final MaterialBundleBuilder bundleBuilder;
+    
+    /**
+     * Constructs a MaterialDirector with the specified builders.
+     * 
+     * @param eBookBuilder the EBook builder
+     * @param bundleBuilder the MaterialBundle builder
+     */
+<span class="nc" id="L29">    public MaterialDirector(EBookBuilder eBookBuilder, MaterialBundleBuilder bundleBuilder) {</span>
+<span class="nc" id="L30">        this.eBookBuilder = eBookBuilder;</span>
+<span class="nc" id="L31">        this.bundleBuilder = bundleBuilder;</span>
+<span class="nc" id="L32">    }</span>
+    
+    /**
+     * Constructs a premium EBook with all features enabled.
+     * 
+     * @param id the EBook ID
+     * @param title the EBook title
+     * @param author the EBook author
+     * @param price the EBook price
+     * @return a premium EBook
+     */
+    public Material buildPremiumEBook(String id, String title, String author, double price) {
+<span class="nc" id="L44">        eBookBuilder.reset();</span>
+<span class="nc" id="L45">        return eBookBuilder</span>
+<span class="nc" id="L46">            .setId(id)</span>
+<span class="nc" id="L47">            .setTitle(title)</span>
+<span class="nc" id="L48">            .setAuthor(author)</span>
+<span class="nc" id="L49">            .setPrice(price)</span>
+<span class="nc" id="L50">            .setFileFormat(&quot;EPUB&quot;)</span>
+<span class="nc" id="L51">            .setFileSize(1024 * 1024 * 5) // 5MB</span>
+<span class="nc" id="L52">            .setDrmEnabled(false)</span>
+<span class="nc" id="L53">            .setWordCount(50000)</span>
+<span class="nc" id="L54">            .setQuality(Media.MediaQuality.HIGH)</span>
+<span class="nc" id="L55">            .build();</span>
+    }
+    
+    /**
+     * Constructs a basic EBook with minimal features.
+     * 
+     * @param id the EBook ID
+     * @param title the EBook title
+     * @param author the EBook author
+     * @param price the EBook price
+     * @return a basic EBook
+     */
+    public Material buildBasicEBook(String id, String title, String author, double price) {
+<span class="nc" id="L68">        eBookBuilder.reset();</span>
+<span class="nc" id="L69">        return eBookBuilder</span>
+<span class="nc" id="L70">            .setId(id)</span>
+<span class="nc" id="L71">            .setTitle(title)</span>
+<span class="nc" id="L72">            .setAuthor(author)</span>
+<span class="nc" id="L73">            .setPrice(price)</span>
+<span class="nc" id="L74">            .setFileFormat(&quot;PDF&quot;)</span>
+<span class="nc" id="L75">            .setFileSize(1024 * 1024 * 2) // 2MB</span>
+<span class="nc" id="L76">            .setDrmEnabled(true)</span>
+<span class="nc" id="L77">            .setWordCount(30000)</span>
+<span class="nc" id="L78">            .setQuality(Media.MediaQuality.MEDIUM)</span>
+<span class="nc" id="L79">            .build();</span>
+    }
+    
+    /**
+     * Constructs a student EBook with educational features.
+     * 
+     * @param id the EBook ID
+     * @param title the EBook title
+     * @param author the EBook author
+     * @param price the EBook price
+     * @return a student EBook
+     */
+    public Material buildStudentEBook(String id, String title, String author, double price) {
+<span class="nc" id="L92">        eBookBuilder.reset();</span>
+<span class="nc" id="L93">        return eBookBuilder</span>
+<span class="nc" id="L94">            .setId(id)</span>
+<span class="nc" id="L95">            .setTitle(title)</span>
+<span class="nc" id="L96">            .setAuthor(author)</span>
+<span class="nc" id="L97">            .setPrice(price)</span>
+<span class="nc" id="L98">            .setFileFormat(&quot;EPUB&quot;)</span>
+<span class="nc" id="L99">            .setFileSize(1024 * 1024 * 3) // 3MB</span>
+<span class="nc" id="L100">            .setDrmEnabled(false)</span>
+<span class="nc" id="L101">            .setWordCount(40000)</span>
+<span class="nc" id="L102">            .setQuality(Media.MediaQuality.HIGH)</span>
+<span class="nc" id="L103">            .build();</span>
+    }
+    
+    /**
+     * Constructs a textbook bundle with a 20% discount.
+     * 
+     * @param bundleName the bundle name
+     * @param materials the materials to include in the bundle
+     * @return a textbook bundle
+     */
+    public MaterialBundle buildTextbookBundle(String bundleName, List&lt;Material&gt; materials) {
+<span class="nc" id="L114">        bundleBuilder.reset();</span>
+<span class="nc" id="L115">        return bundleBuilder</span>
+<span class="nc" id="L116">            .setBundleName(bundleName)</span>
+<span class="nc" id="L117">            .setMediumDiscount() // 20% discount</span>
+<span class="nc" id="L118">            .addMaterials(materials)</span>
+<span class="nc" id="L119">            .build();</span>
+    }
+    
+    /**
+     * Constructs a course bundle with a 25% discount.
+     * 
+     * @param bundleName the bundle name
+     * @param materials the materials to include in the bundle
+     * @return a course bundle
+     */
+    public MaterialBundle buildCourseBundle(String bundleName, List&lt;Material&gt; materials) {
+<span class="nc" id="L130">        bundleBuilder.reset();</span>
+<span class="nc" id="L131">        return bundleBuilder</span>
+<span class="nc" id="L132">            .setBundleName(bundleName)</span>
+<span class="nc" id="L133">            .setBundleDiscount(0.25) // 25% discount</span>
+<span class="nc" id="L134">            .addMaterials(materials)</span>
+<span class="nc" id="L135">            .build();</span>
+    }
+    
+    /**
+     * Constructs a premium bundle with a 30% discount.
+     * 
+     * @param bundleName the bundle name
+     * @param materials the materials to include in the bundle
+     * @return a premium bundle
+     */
+    public MaterialBundle buildPremiumBundle(String bundleName, List&lt;Material&gt; materials) {
+<span class="nc" id="L146">        bundleBuilder.reset();</span>
+<span class="nc" id="L147">        return bundleBuilder</span>
+<span class="nc" id="L148">            .setBundleName(bundleName)</span>
+<span class="nc" id="L149">            .setLargeDiscount() // 30% discount</span>
+<span class="nc" id="L150">            .addMaterials(materials)</span>
+<span class="nc" id="L151">            .build();</span>
+    }
+    
+    /**
+     * Constructs a starter bundle with a 10% discount.
+     * 
+     * @param bundleName the bundle name
+     * @param materials the materials to include in the bundle
+     * @return a starter bundle
+     */
+    public MaterialBundle buildStarterBundle(String bundleName, List&lt;Material&gt; materials) {
+<span class="nc" id="L162">        bundleBuilder.reset();</span>
+<span class="nc" id="L163">        return bundleBuilder</span>
+<span class="nc" id="L164">            .setBundleName(bundleName)</span>
+<span class="nc" id="L165">            .setSmallDiscount() // 10% discount</span>
+<span class="nc" id="L166">            .addMaterials(materials)</span>
+<span class="nc" id="L167">            .build();</span>
+    }
+    
+    /**
+     * Constructs a nested bundle (bundle containing other bundles).
+     * 
+     * @param bundleName the bundle name
+     * @param bundles the bundles to include
+     * @param discount the discount rate
+     * @return a nested bundle
+     */
+    public MaterialBundle buildNestedBundle(String bundleName, List&lt;MaterialBundle&gt; bundles, double discount) {
+<span class="nc" id="L179">        bundleBuilder.reset();</span>
+<span class="nc" id="L180">        MaterialBundleBuilder builder = bundleBuilder</span>
+<span class="nc" id="L181">            .setBundleName(bundleName)</span>
+<span class="nc" id="L182">            .setBundleDiscount(discount);</span>
+        
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        for (MaterialBundle bundle : bundles) {</span>
+<span class="nc" id="L185">            builder.addBundle(bundle);</span>
+<span class="nc" id="L186">        }</span>
+        
+<span class="nc" id="L188">        return builder.build();</span>
+    }
+    
+    /**
+     * Constructs a custom bundle with specified parameters.
+     * 
+     * @param bundleName the bundle name
+     * @param materials the materials to include
+     * @param discount the discount rate
+     * @return a custom bundle
+     */
+    public MaterialBundle buildCustomBundle(String bundleName, List&lt;Material&gt; materials, double discount) {
+<span class="nc" id="L200">        bundleBuilder.reset();</span>
+<span class="nc" id="L201">        return bundleBuilder</span>
+<span class="nc" id="L202">            .setBundleName(bundleName)</span>
+<span class="nc" id="L203">            .setBundleDiscount(discount)</span>
+<span class="nc" id="L204">            .addMaterials(materials)</span>
+<span class="nc" id="L205">            .build();</span>
+    }
+    
+    /**
+     * Gets the EBook builder for custom configurations.
+     * 
+     * @return the EBook builder
+     */
+    public EBookBuilder getEBookBuilder() {
+<span class="nc" id="L214">        return eBookBuilder;</span>
+    }
+    
+    /**
+     * Gets the MaterialBundle builder for custom configurations.
+     * 
+     * @return the MaterialBundle builder
+     */
+    public MaterialBundleBuilder getBundleBuilder() {
+<span class="nc" id="L223">        return bundleBuilder;</span>
+    }
+    
+    /**
+     * Creates a new EBook builder instance.
+     * 
+     * @return a new EBook builder
+     */
+    public EBookBuilder createEBookBuilder() {
+<span class="nc" id="L232">        return new EBookBuilder();</span>
+    }
+    
+    /**
+     * Creates a new MaterialBundle builder instance.
+     * 
+     * @return a new MaterialBundle builder
+     */
+    public MaterialBundleBuilder createBundleBuilder() {
+<span class="nc" id="L241">        return new MaterialBundleBuilder();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

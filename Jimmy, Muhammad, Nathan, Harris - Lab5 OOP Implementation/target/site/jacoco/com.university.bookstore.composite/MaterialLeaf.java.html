@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialLeaf.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.composite</a> &gt; <span class="el_source">MaterialLeaf.java</span></div><h1>MaterialLeaf.java</h1><pre class="source lang-java linenums">package com.university.bookstore.composite;
+
+import java.util.List;
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Leaf component in the Composite pattern.
+ * Represents an individual material that cannot contain other components.
+ * 
+ * &lt;p&gt;This class wraps a Material object and implements the MaterialComponent interface,
+ * allowing individual materials to be treated uniformly with composite bundles.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class MaterialLeaf implements MaterialComponent {
+    
+    private final Material material;
+    
+    /**
+     * Creates a new material leaf wrapping the specified material.
+     * 
+     * @param material the material to wrap
+     * @throws IllegalArgumentException if material is null
+     */
+<span class="fc" id="L29">    public MaterialLeaf(Material material) {</span>
+<span class="fc" id="L30">        this.material = Objects.requireNonNull(material, &quot;Material cannot be null&quot;);</span>
+<span class="fc" id="L31">    }</span>
+    
+    @Override
+    public String getTitle() {
+<span class="fc" id="L35">        return material.getTitle();</span>
+    }
+    
+    @Override
+    public double getPrice() {
+<span class="fc" id="L40">        return material.getPrice();</span>
+    }
+    
+    @Override
+    public double getDiscountedPrice() {
+<span class="fc" id="L45">        return material.getDiscountedPrice();</span>
+    }
+    
+    @Override
+    public String getDescription() {
+<span class="fc" id="L50">        return material.getDisplayInfo();</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterials() {
+<span class="fc" id="L55">        return List.of(material);</span>
+    }
+    
+    @Override
+    public int getItemCount() {
+<span class="fc" id="L60">        return 1;</span>
+    }
+    
+    @Override
+    public double getDiscountRate() {
+<span class="fc" id="L65">        return material.getDiscountRate();</span>
+    }
+    
+    @Override
+    public boolean isLeaf() {
+<span class="fc" id="L70">        return true;</span>
+    }
+    
+    /**
+     * Gets the wrapped material.
+     * 
+     * @return the underlying material
+     */
+    public Material getMaterial() {
+<span class="fc" id="L79">        return material;</span>
+    }
+    
+    /**
+     * Gets the material ID.
+     * 
+     * @return the material ID
+     */
+    public String getId() {
+<span class="fc" id="L88">        return material.getId();</span>
+    }
+    
+    /**
+     * Gets the material type.
+     * 
+     * @return the material type
+     */
+    public Material.MaterialType getType() {
+<span class="fc" id="L97">        return material.getType();</span>
+    }
+    
+    /**
+     * Gets the material creator.
+     * 
+     * @return the material creator
+     */
+    public String getCreator() {
+<span class="fc" id="L106">        return material.getCreator();</span>
+    }
+    
+    /**
+     * Gets the material year.
+     * 
+     * @return the material year
+     */
+    public int getYear() {
+<span class="fc" id="L115">        return material.getYear();</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="fc bfc" id="L121" title="All 4 branches covered.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="fc" id="L123">        MaterialLeaf that = (MaterialLeaf) obj;</span>
+<span class="fc" id="L124">        return Objects.equals(material, that.material);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="fc" id="L129">        return Objects.hash(material);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L134">        return String.format(&quot;MaterialLeaf[%s]&quot;, material.getTitle());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

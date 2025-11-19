@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DiscountApprovalService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.chain</a> &gt; <span class="el_source">DiscountApprovalService.java</span></div><h1>DiscountApprovalService.java</h1><pre class="source lang-java linenums">package com.university.bookstore.chain;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Service for managing discount approval using the Chain of Responsibility pattern.
+ * Builds and manages the approval chain and processes discount requests.
+ * 
+ * &lt;p&gt;This service demonstrates the Chain of Responsibility pattern by creating
+ * a hierarchy of approval handlers and processing requests through the chain.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class DiscountApprovalService {
+    
+<span class="fc" id="L25">    private static final Logger LOGGER = LoggerFactory.getLogger(DiscountApprovalService.class);</span>
+    private final DiscountHandler chain;
+    private final List&lt;DiscountRequest&gt; processedRequests;
+    
+    /**
+     * Creates a new discount approval service with the default chain.
+     */
+<span class="fc" id="L32">    public DiscountApprovalService() {</span>
+<span class="fc" id="L33">        this.chain = buildDefaultChain();</span>
+<span class="fc" id="L34">        this.processedRequests = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L35">    }</span>
+    
+    /**
+     * Creates a new discount approval service with a custom chain.
+     * 
+     * @param chain the approval chain to use
+     */
+<span class="nc" id="L42">    public DiscountApprovalService(DiscountHandler chain) {</span>
+<span class="nc" id="L43">        this.chain = Objects.requireNonNull(chain, &quot;Chain cannot be null&quot;);</span>
+<span class="nc" id="L44">        this.processedRequests = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L45">    }</span>
+    
+    /**
+     * Processes a discount request through the approval chain.
+     * 
+     * @param material the material for which discount is requested
+     * @param discountPercent the discount percentage (0.0 to 100.0)
+     * @param customerId the customer requesting the discount
+     * @param reason the reason for the discount request
+     * @return the processed discount request
+     */
+    public DiscountRequest requestDiscount(Material material, double discountPercent, 
+                                         String customerId, String reason) {
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L59">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+<span class="pc bpc" id="L61" title="2 of 4 branches missed.">        if (customerId == null || customerId.trim().isEmpty()) {</span>
+<span class="nc" id="L62">            throw new IllegalArgumentException(&quot;Customer ID cannot be null or empty&quot;);</span>
+        }
+<span class="pc bpc" id="L64" title="2 of 4 branches missed.">        if (reason == null || reason.trim().isEmpty()) {</span>
+<span class="nc" id="L65">            throw new IllegalArgumentException(&quot;Reason cannot be null or empty&quot;);</span>
+        }
+        
+        // Convert percentage to decimal
+<span class="fc" id="L69">        double discountRate = discountPercent / 100.0;</span>
+        
+<span class="fc" id="L71">        DiscountRequest request = new DiscountRequest(material, discountRate, customerId, reason);</span>
+        
+<span class="fc" id="L73">        LOGGER.info(&quot;Processing discount request:&quot;);</span>
+<span class="fc" id="L74">        LOGGER.info(&quot;Material: {}&quot;, material.getTitle());</span>
+<span class="fc" id="L75">        LOGGER.info(&quot;Requested discount: {}%&quot;, discountPercent);</span>
+<span class="fc" id="L76">        LOGGER.info(&quot;Customer: {}&quot;, customerId);</span>
+<span class="fc" id="L77">        LOGGER.info(&quot;Reason: {}&quot;, reason);</span>
+<span class="fc" id="L78">        LOGGER.info(&quot;---&quot;);</span>
+        
+        // Process through the chain
+<span class="fc" id="L81">        chain.handleRequest(request);</span>
+        
+        // Store the processed request
+<span class="fc" id="L84">        processedRequests.add(request);</span>
+        
+        // Print result
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (request.isApproved()) {</span>
+<span class="fc" id="L88">            LOGGER.info(&quot;// [OK] APPROVED by {}&quot;, request.getApprovedBy());</span>
+<span class="fc" id="L89">            LOGGER.info(&quot;Final price: ${}&quot;, String.format(&quot;%.2f&quot;, request.getDiscountedPrice()));</span>
+<span class="fc" id="L90">            LOGGER.info(&quot;Savings: ${}&quot;, String.format(&quot;%.2f&quot;, request.getSavingsAmount()));</span>
+        } else {
+<span class="fc" id="L92">            LOGGER.info(&quot;[X] REJECTED: {}&quot;, request.getRejectionReason());</span>
+        }
+        
+<span class="fc" id="L95">        return request;</span>
+    }
+    
+    /**
+     * Calculates the final price for an approved discount request.
+     * 
+     * @param request the discount request
+     * @return the final price
+     */
+    public double calculateFinalPrice(DiscountRequest request) {
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (request == null) {</span>
+<span class="nc" id="L106">            throw new IllegalArgumentException(&quot;Request cannot be null&quot;);</span>
+        }
+        
+<span class="nc" id="L109">        return request.getDiscountedPrice();</span>
+    }
+    
+    /**
+     * Gets all processed discount requests.
+     * 
+     * @return list of processed requests
+     */
+    public List&lt;DiscountRequest&gt; getProcessedRequests() {
+<span class="nc" id="L118">        return new ArrayList&lt;&gt;(processedRequests);</span>
+    }
+    
+    /**
+     * Gets approved discount requests.
+     * 
+     * @return list of approved requests
+     */
+    public List&lt;DiscountRequest&gt; getApprovedRequests() {
+<span class="nc" id="L127">        return processedRequests.stream()</span>
+<span class="nc" id="L128">            .filter(DiscountRequest::isApproved)</span>
+<span class="nc" id="L129">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets rejected discount requests.
+     * 
+     * @return list of rejected requests
+     */
+    public List&lt;DiscountRequest&gt; getRejectedRequests() {
+<span class="nc" id="L138">        return processedRequests.stream()</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">            .filter(request -&gt; !request.isApproved())</span>
+<span class="nc" id="L140">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets discount requests for a specific customer.
+     * 
+     * @param customerId the customer ID
+     * @return list of requests for the customer
+     */
+    public List&lt;DiscountRequest&gt; getRequestsForCustomer(String customerId) {
+<span class="nc" id="L150">        return processedRequests.stream()</span>
+<span class="nc" id="L151">            .filter(request -&gt; Objects.equals(request.getCustomerId(), customerId))</span>
+<span class="nc" id="L152">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets discount requests for a specific material.
+     * 
+     * @param material the material
+     * @return list of requests for the material
+     */
+    public List&lt;DiscountRequest&gt; getRequestsForMaterial(Material material) {
+<span class="nc" id="L162">        return processedRequests.stream()</span>
+<span class="nc" id="L163">            .filter(request -&gt; Objects.equals(request.getMaterial(), material))</span>
+<span class="nc" id="L164">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets approval statistics.
+     * 
+     * @return approval statistics
+     */
+    public ApprovalStats getApprovalStats() {
+<span class="nc" id="L173">        int totalRequests = processedRequests.size();</span>
+<span class="nc" id="L174">        int approvedRequests = (int) processedRequests.stream()</span>
+<span class="nc" id="L175">            .filter(DiscountRequest::isApproved)</span>
+<span class="nc" id="L176">            .count();</span>
+<span class="nc" id="L177">        int rejectedRequests = totalRequests - approvedRequests;</span>
+        
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        double approvalRate = totalRequests &gt; 0 ? (double) approvedRequests / totalRequests : 0.0;</span>
+        
+<span class="nc" id="L181">        double totalSavings = processedRequests.stream()</span>
+<span class="nc" id="L182">            .filter(DiscountRequest::isApproved)</span>
+<span class="nc" id="L183">            .mapToDouble(DiscountRequest::getSavingsAmount)</span>
+<span class="nc" id="L184">            .sum();</span>
+        
+<span class="nc" id="L186">        return new ApprovalStats(</span>
+            totalRequests,
+            approvedRequests,
+            rejectedRequests,
+            approvalRate,
+            totalSavings
+        );
+    }
+    
+    /**
+     * Clears all processed requests.
+     */
+    public void clearRequests() {
+<span class="nc" id="L199">        processedRequests.clear();</span>
+<span class="nc" id="L200">    }</span>
+    
+    /**
+     * Gets the approval chain information.
+     * 
+     * @return chain information
+     */
+    public String getChainInfo() {
+<span class="nc" id="L208">        return chain.getHandlerInfo();</span>
+    }
+    
+    /**
+     * Builds the default approval chain: Manager -&gt; Director -&gt; VP.
+     * 
+     * @return the default approval chain
+     */
+    private DiscountHandler buildDefaultChain() {
+<span class="fc" id="L217">        DiscountHandler manager = new ManagerHandler();</span>
+<span class="fc" id="L218">        DiscountHandler director = new DirectorHandler();</span>
+<span class="fc" id="L219">        DiscountHandler vp = new VPHandler();</span>
+        
+        // Set up the chain
+<span class="fc" id="L222">        manager.setNext(director);</span>
+<span class="fc" id="L223">        director.setNext(vp);</span>
+        
+<span class="fc" id="L225">        return manager;</span>
+    }
+    
+    /**
+     * Statistics class for approval analysis.
+     */
+    public static class ApprovalStats {
+        private final int totalRequests;
+        private final int approvedRequests;
+        private final int rejectedRequests;
+        private final double approvalRate;
+        private final double totalSavings;
+        
+        public ApprovalStats(int totalRequests, int approvedRequests, int rejectedRequests,
+<span class="nc" id="L239">                           double approvalRate, double totalSavings) {</span>
+<span class="nc" id="L240">            this.totalRequests = totalRequests;</span>
+<span class="nc" id="L241">            this.approvedRequests = approvedRequests;</span>
+<span class="nc" id="L242">            this.rejectedRequests = rejectedRequests;</span>
+<span class="nc" id="L243">            this.approvalRate = approvalRate;</span>
+<span class="nc" id="L244">            this.totalSavings = totalSavings;</span>
+<span class="nc" id="L245">        }</span>
+        
+<span class="nc" id="L247">        public int getTotalRequests() { return totalRequests; }</span>
+<span class="nc" id="L248">        public int getApprovedRequests() { return approvedRequests; }</span>
+<span class="nc" id="L249">        public int getRejectedRequests() { return rejectedRequests; }</span>
+<span class="nc" id="L250">        public double getApprovalRate() { return approvalRate; }</span>
+<span class="nc" id="L251">        public double getTotalSavings() { return totalSavings; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L255">            return String.format(&quot;ApprovalStats[Total=%d, Approved=%d, Rejected=%d, Rate=%.1f%%, Savings=$%.2f]&quot;,</span>
+<span class="nc" id="L256">                totalRequests, approvedRequests, rejectedRequests, approvalRate * 100, totalSavings);</span>
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L262">        return String.format(&quot;DiscountApprovalService[Chain=%s, Requests=%d]&quot;,</span>
+<span class="nc" id="L263">            chain.getHandlerName(), processedRequests.size());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

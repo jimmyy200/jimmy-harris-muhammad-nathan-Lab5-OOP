@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SearchResultCache.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.search</a> &gt; <span class="el_source">SearchResultCache.java</span></div><h1>SearchResultCache.java</h1><pre class="source lang-java linenums">package com.university.bookstore.search;
+
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * LRU (Least Recently Used) cache for search results.
+ * Evicts least recently used items when the cache reaches its maximum size.
+ * 
+ * &lt;p&gt;This implementation provides O(1) average time complexity for get and put operations
+ * by using a HashMap for O(1) lookups and a Deque for O(1) access order tracking.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class SearchResultCache {
+    
+    private final int maxSize;
+    private final Map&lt;String, CacheEntry&gt; cache;
+    private final Deque&lt;String&gt; accessOrder;
+    
+    /**
+     * Creates a new search result cache with the specified maximum size.
+     * 
+     * @param maxSize the maximum number of entries the cache can hold
+     * @throws IllegalArgumentException if maxSize is not positive
+     */
+<span class="fc" id="L36">    public SearchResultCache(int maxSize) {</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (maxSize &lt;= 0) {</span>
+<span class="fc" id="L38">            throw new IllegalArgumentException(&quot;Cache size must be positive: &quot; + maxSize);</span>
+        }
+        
+<span class="fc" id="L41">        this.maxSize = maxSize;</span>
+<span class="fc" id="L42">        this.cache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L43">        this.accessOrder = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L44">    }</span>
+    
+    /**
+     * Retrieves cached search results for the given key.
+     * Updates the access order to mark this entry as recently used.
+     * 
+     * @param key the cache key
+     * @return Optional containing the cached results if found
+     */
+    public Optional&lt;List&lt;Material&gt;&gt; get(String key) {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (key == null) {</span>
+<span class="fc" id="L55">            return Optional.empty();</span>
+        }
+        
+<span class="fc" id="L58">        CacheEntry entry = cache.get(key);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (entry != null) {</span>
+            // Move to end (most recently used)
+<span class="fc" id="L61">            accessOrder.remove(key);</span>
+<span class="fc" id="L62">            accessOrder.addLast(key);</span>
+<span class="fc" id="L63">            return Optional.of(new ArrayList&lt;&gt;(entry.results));</span>
+        }
+        
+<span class="fc" id="L66">        return Optional.empty();</span>
+    }
+    
+    /**
+     * Stores search results in the cache with the given key.
+     * Evicts the least recently used entry if the cache is full.
+     * 
+     * @param key the cache key
+     * @param results the search results to cache
+     * @throws IllegalArgumentException if key is null
+     */
+    public void put(String key, List&lt;Material&gt; results) {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (key == null) {</span>
+<span class="fc" id="L79">            throw new IllegalArgumentException(&quot;Cache key cannot be null&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (results == null) {</span>
+<span class="fc" id="L83">            throw new IllegalArgumentException(&quot;Search results cannot be null&quot;);</span>
+        }
+        
+        // If cache is full, remove least recently used entry
+<span class="pc bpc" id="L87" title="1 of 4 branches missed.">        if (cache.size() &gt;= maxSize &amp;&amp; !cache.containsKey(key)) {</span>
+<span class="fc" id="L88">            evictLRU();</span>
+        }
+        
+        // Store the new entry
+<span class="fc" id="L92">        cache.put(key, new CacheEntry(results));</span>
+        
+        // Update access order
+<span class="fc" id="L95">        accessOrder.remove(key); // Remove if already exists</span>
+<span class="fc" id="L96">        accessOrder.addLast(key);</span>
+<span class="fc" id="L97">    }</span>
+    
+    /**
+     * Checks if the cache contains results for the given key.
+     * 
+     * @param key the cache key
+     * @return true if the key exists in the cache
+     */
+    public boolean containsKey(String key) {
+<span class="nc bnc" id="L106" title="All 4 branches missed.">        return key != null &amp;&amp; cache.containsKey(key);</span>
+    }
+    
+    /**
+     * Removes the entry with the given key from the cache.
+     * 
+     * @param key the cache key to remove
+     * @return true if an entry was removed, false if key not found
+     */
+    public boolean remove(String key) {
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if (key == null) {</span>
+<span class="nc" id="L117">            return false;</span>
+        }
+        
+<span class="fc" id="L120">        CacheEntry removed = cache.remove(key);</span>
+<span class="fc" id="L121">        accessOrder.remove(key);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        return removed != null;</span>
+    }
+    
+    /**
+     * Clears all entries from the cache.
+     */
+    public void clear() {
+<span class="fc" id="L129">        cache.clear();</span>
+<span class="fc" id="L130">        accessOrder.clear();</span>
+<span class="fc" id="L131">    }</span>
+    
+    /**
+     * Gets the current number of entries in the cache.
+     * 
+     * @return the cache size
+     */
+    public int size() {
+<span class="fc" id="L139">        return cache.size();</span>
+    }
+    
+    /**
+     * Gets the maximum number of entries the cache can hold.
+     * 
+     * @return the maximum cache size
+     */
+    public int getMaxSize() {
+<span class="fc" id="L148">        return maxSize;</span>
+    }
+    
+    /**
+     * Checks if the cache is empty.
+     * 
+     * @return true if no entries are cached
+     */
+    public boolean isEmpty() {
+<span class="nc" id="L157">        return cache.isEmpty();</span>
+    }
+    
+    /**
+     * Checks if the cache is full.
+     * 
+     * @return true if the cache has reached its maximum size
+     */
+    public boolean isFull() {
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        return cache.size() &gt;= maxSize;</span>
+    }
+    
+    /**
+     * Gets cache statistics including hit ratio and average age.
+     * 
+     * @return cache statistics
+     */
+    public CacheStats getStats() {
+<span class="fc" id="L175">        long totalRequests = 0;</span>
+<span class="fc" id="L176">        long totalHits = 0;</span>
+<span class="fc" id="L177">        long totalAge = 0;</span>
+<span class="fc" id="L178">        long currentTime = System.currentTimeMillis();</span>
+        
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        for (CacheEntry entry : cache.values()) {</span>
+<span class="fc" id="L181">            totalRequests += entry.accessCount;</span>
+<span class="fc" id="L182">            totalHits += entry.hitCount;</span>
+<span class="fc" id="L183">            totalAge += (currentTime - entry.timestamp);</span>
+<span class="fc" id="L184">        }</span>
+        
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        double hitRatio = totalRequests &gt; 0 ? (double) totalHits / totalRequests : 0.0;</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        double averageAge = cache.size() &gt; 0 ? (double) totalAge / cache.size() : 0.0;</span>
+        
+<span class="fc" id="L189">        return new CacheStats(</span>
+<span class="fc" id="L190">            cache.size(),</span>
+            maxSize,
+            hitRatio,
+            averageAge,
+            totalRequests,
+            totalHits
+        );
+    }
+    
+    /**
+     * Evicts the least recently used entry from the cache.
+     */
+    private void evictLRU() {
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">        if (!accessOrder.isEmpty()) {</span>
+<span class="fc" id="L204">            String lruKey = accessOrder.removeFirst();</span>
+<span class="fc" id="L205">            cache.remove(lruKey);</span>
+        }
+<span class="fc" id="L207">    }</span>
+    
+    /**
+     * Internal class representing a cache entry.
+     */
+    private static class CacheEntry {
+        final List&lt;Material&gt; results;
+        final long timestamp;
+        long accessCount;
+        long hitCount;
+        
+<span class="fc" id="L218">        CacheEntry(List&lt;Material&gt; results) {</span>
+<span class="fc" id="L219">            this.results = new ArrayList&lt;&gt;(results);</span>
+<span class="fc" id="L220">            this.timestamp = System.currentTimeMillis();</span>
+<span class="fc" id="L221">            this.accessCount = 0;</span>
+<span class="fc" id="L222">            this.hitCount = 0;</span>
+<span class="fc" id="L223">        }</span>
+    }
+    
+    /**
+     * Statistics class for cache performance monitoring.
+     */
+    public static class CacheStats {
+        private final int currentSize;
+        private final int maxSize;
+        private final double hitRatio;
+        private final double averageAge;
+        private final long totalRequests;
+        private final long totalHits;
+        
+        public CacheStats(int currentSize, int maxSize, double hitRatio, 
+<span class="fc" id="L238">                         double averageAge, long totalRequests, long totalHits) {</span>
+<span class="fc" id="L239">            this.currentSize = currentSize;</span>
+<span class="fc" id="L240">            this.maxSize = maxSize;</span>
+<span class="fc" id="L241">            this.hitRatio = hitRatio;</span>
+<span class="fc" id="L242">            this.averageAge = averageAge;</span>
+<span class="fc" id="L243">            this.totalRequests = totalRequests;</span>
+<span class="fc" id="L244">            this.totalHits = totalHits;</span>
+<span class="fc" id="L245">        }</span>
+        
+<span class="fc" id="L247">        public int getCurrentSize() { return currentSize; }</span>
+<span class="fc" id="L248">        public int getMaxSize() { return maxSize; }</span>
+<span class="fc" id="L249">        public double getHitRatio() { return hitRatio; }</span>
+<span class="nc" id="L250">        public double getAverageAge() { return averageAge; }</span>
+<span class="nc" id="L251">        public long getTotalRequests() { return totalRequests; }</span>
+<span class="nc" id="L252">        public long getTotalHits() { return totalHits; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L256">            return String.format(&quot;CacheStats[Size=%d/%d, HitRatio=%.2f%%, AvgAge=%.0fms, Requests=%d, Hits=%d]&quot;,</span>
+<span class="nc" id="L257">                currentSize, maxSize, hitRatio * 100, averageAge, totalRequests, totalHits);</span>
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L263">        return String.format(&quot;SearchResultCache[Size=%d/%d, HitRatio=%.2f%%]&quot;,</span>
+<span class="nc" id="L264">            size(), maxSize, getStats().getHitRatio() * 100);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

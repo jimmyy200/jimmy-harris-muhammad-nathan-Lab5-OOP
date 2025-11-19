@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ModernMaterialStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.api</a> &gt; <span class="el_source">ModernMaterialStore.java</span></div><h1>ModernMaterialStore.java</h1><pre class="source lang-java linenums">package com.university.bookstore.api;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+
+/**
+ * Modern interface for polymorphic material store with async operations.
+ * Extends the base MaterialStore with modern Java features.
+ * 
+ * @author Navid Mohaghegh
+ * @version 4.0
+ * @since 2024-09-15
+ */
+public interface ModernMaterialStore extends MaterialStore {
+    
+    /**
+     * Modern InventoryStats using Java record for immutability.
+     * Records provide built-in equals(), hashCode(), and toString() methods.
+     * 
+     * @param totalCount total number of materials
+     * @param averagePrice average price of all materials
+     * @param medianPrice median price of all materials
+     * @param uniqueTypes number of unique material types
+     * @param mediaCount number of media materials
+     * @param printCount number of printed materials
+     */
+    record ModernInventoryStats(
+        int totalCount,
+        double averagePrice,
+        double medianPrice,
+        int uniqueTypes,
+        int mediaCount,
+        int printCount
+    ) {
+        /**
+         * Compact constructor for validation.
+         */
+<span class="fc" id="L43">        public ModernInventoryStats {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            if (totalCount &lt; 0) {</span>
+<span class="fc" id="L45">                throw new IllegalArgumentException(&quot;Total count cannot be negative&quot;);</span>
+            }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            if (averagePrice &lt; 0) {</span>
+<span class="fc" id="L48">                throw new IllegalArgumentException(&quot;Average price cannot be negative&quot;);</span>
+            }
+<span class="fc bfc" id="L50" title="All 2 branches covered.">            if (medianPrice &lt; 0) {</span>
+<span class="fc" id="L51">                throw new IllegalArgumentException(&quot;Median price cannot be negative&quot;);</span>
+            }
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (uniqueTypes &lt; 0) {</span>
+<span class="fc" id="L54">                throw new IllegalArgumentException(&quot;Unique types cannot be negative&quot;);</span>
+            }
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (mediaCount &lt; 0) {</span>
+<span class="fc" id="L57">                throw new IllegalArgumentException(&quot;Media count cannot be negative&quot;);</span>
+            }
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            if (printCount &lt; 0) {</span>
+<span class="fc" id="L60">                throw new IllegalArgumentException(&quot;Print count cannot be negative&quot;);</span>
+            }
+<span class="fc" id="L62">        }</span>
+        
+        /**
+         * Creates an empty stats instance.
+         * 
+         * @return stats with all zero values
+         */
+        public static ModernInventoryStats empty() {
+<span class="fc" id="L70">            return new ModernInventoryStats(0, 0, 0, 0, 0, 0);</span>
+        }
+        
+        /**
+         * Checks if the inventory is empty.
+         * 
+         * @return true if total count is zero
+         */
+        public boolean isEmpty() {
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            return totalCount == 0;</span>
+        }
+        
+        /**
+         * Gets the percentage of media materials.
+         * 
+         * @return media percentage (0-100)
+         */
+        public double getMediaPercentage() {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">            return totalCount &gt; 0 ? (mediaCount * 100.0) / totalCount : 0;</span>
+        }
+        
+        /**
+         * Gets the percentage of print materials.
+         * 
+         * @return print percentage (0-100)
+         */
+        public double getPrintPercentage() {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            return totalCount &gt; 0 ? (printCount * 100.0) / totalCount : 0;</span>
+        }
+        
+        /**
+         * Creates a summary string for reporting.
+         * 
+         * @return formatted summary
+         */
+        public String getSummary() {
+<span class="nc" id="L106">            return String.format(</span>
+                &quot;&quot;&quot;
+                Inventory Statistics:
+                - Total Items: %d
+                - Average Price: $%.2f
+                - Median Price: $%.2f
+                - Unique Types: %d
+                - Media Materials: %d (%.1f%%)
+                - Print Materials: %d (%.1f%%)
+                &quot;&quot;&quot;,
+<span class="nc" id="L116">                totalCount, averagePrice, medianPrice, uniqueTypes,</span>
+<span class="nc" id="L117">                mediaCount, getMediaPercentage(),</span>
+<span class="nc" id="L118">                printCount, getPrintPercentage()</span>
+            );
+        }
+    }
+    
+    /**
+     * Batch operation result record.
+     * 
+     * @param successful number of successful operations
+     * @param failed number of failed operations
+     * @param errors list of error messages
+     */
+<span class="nc" id="L130">    record BatchOperationResult(</span>
+        int successful,
+        int failed,
+        List&lt;String&gt; errors
+    ) {
+        /**
+         * Checks if all operations were successful.
+         * 
+         * @return true if no failures
+         */
+        public boolean isCompleteSuccess() {
+<span class="nc bnc" id="L141" title="All 6 branches missed.">            return failed == 0 &amp;&amp; (errors == null || errors.isEmpty());</span>
+        }
+        
+        /**
+         * Gets the total number of operations.
+         * 
+         * @return sum of successful and failed
+         */
+        public int totalOperations() {
+<span class="nc" id="L150">            return successful + failed;</span>
+        }
+        
+        /**
+         * Gets the success rate.
+         * 
+         * @return success percentage (0-100)
+         */
+        public double successRate() {
+<span class="nc" id="L159">            int total = totalOperations();</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            return total &gt; 0 ? (successful * 100.0) / total : 0;</span>
+        }
+    }
+    
+    /**
+     * Search criteria record for complex searches.
+     * 
+     * @param title optional title search term
+     * @param creator optional creator search term
+     * @param type optional material type filter
+     * @param minPrice optional minimum price
+     * @param maxPrice optional maximum price
+     * @param yearFrom optional start year
+     * @param yearTo optional end year
+     */
+<span class="nc" id="L175">    record SearchCriteria(</span>
+        Optional&lt;String&gt; title,
+        Optional&lt;String&gt; creator,
+        Optional&lt;Material.MaterialType&gt; type,
+        Optional&lt;Double&gt; minPrice,
+        Optional&lt;Double&gt; maxPrice,
+        Optional&lt;Integer&gt; yearFrom,
+        Optional&lt;Integer&gt; yearTo
+    ) {
+        /**
+         * Builder for SearchCriteria.
+         */
+<span class="nc" id="L187">        public static class Builder {</span>
+<span class="nc" id="L188">            private Optional&lt;String&gt; title = Optional.empty();</span>
+<span class="nc" id="L189">            private Optional&lt;String&gt; creator = Optional.empty();</span>
+<span class="nc" id="L190">            private Optional&lt;Material.MaterialType&gt; type = Optional.empty();</span>
+<span class="nc" id="L191">            private Optional&lt;Double&gt; minPrice = Optional.empty();</span>
+<span class="nc" id="L192">            private Optional&lt;Double&gt; maxPrice = Optional.empty();</span>
+<span class="nc" id="L193">            private Optional&lt;Integer&gt; yearFrom = Optional.empty();</span>
+<span class="nc" id="L194">            private Optional&lt;Integer&gt; yearTo = Optional.empty();</span>
+            
+            public Builder withTitle(String title) {
+<span class="nc" id="L197">                this.title = Optional.ofNullable(title);</span>
+<span class="nc" id="L198">                return this;</span>
+            }
+            
+            public Builder withCreator(String creator) {
+<span class="nc" id="L202">                this.creator = Optional.ofNullable(creator);</span>
+<span class="nc" id="L203">                return this;</span>
+            }
+            
+            public Builder withType(Material.MaterialType type) {
+<span class="nc" id="L207">                this.type = Optional.ofNullable(type);</span>
+<span class="nc" id="L208">                return this;</span>
+            }
+            
+            public Builder withPriceRange(Double min, Double max) {
+<span class="nc" id="L212">                this.minPrice = Optional.ofNullable(min);</span>
+<span class="nc" id="L213">                this.maxPrice = Optional.ofNullable(max);</span>
+<span class="nc" id="L214">                return this;</span>
+            }
+            
+            public Builder withYearRange(Integer from, Integer to) {
+<span class="nc" id="L218">                this.yearFrom = Optional.ofNullable(from);</span>
+<span class="nc" id="L219">                this.yearTo = Optional.ofNullable(to);</span>
+<span class="nc" id="L220">                return this;</span>
+            }
+            
+            public SearchCriteria build() {
+<span class="nc" id="L224">                return new SearchCriteria(</span>
+                    title, creator, type, 
+                    minPrice, maxPrice, 
+                    yearFrom, yearTo
+                );
+            }
+        }
+        
+        /**
+         * Creates a new builder.
+         * 
+         * @return new builder instance
+         */
+        public static Builder builder() {
+<span class="nc" id="L238">            return new Builder();</span>
+        }
+        
+        /**
+         * Checks if any criteria is specified.
+         * 
+         * @return true if at least one criterion is present
+         */
+        public boolean hasAnyCriteria() {
+<span class="nc bnc" id="L247" title="All 6 branches missed.">            return title.isPresent() || creator.isPresent() || type.isPresent() ||</span>
+<span class="nc bnc" id="L248" title="All 4 branches missed.">                   minPrice.isPresent() || maxPrice.isPresent() ||</span>
+<span class="nc bnc" id="L249" title="All 4 branches missed.">                   yearFrom.isPresent() || yearTo.isPresent();</span>
+        }
+    }
+    
+    // Async operation methods
+    
+    /**
+     * Adds material asynchronously.
+     * 
+     * @param material the material to add
+     * @return CompletableFuture with the result
+     */
+    CompletableFuture&lt;Boolean&gt; addMaterialAsync(Material material);
+    
+    /**
+     * Finds material by ID asynchronously.
+     * 
+     * @param id the material ID
+     * @return CompletableFuture with the result
+     */
+    CompletableFuture&lt;Optional&lt;Material&gt;&gt; findByIdAsync(String id);
+    
+    /**
+     * Searches by title asynchronously.
+     * 
+     * @param title the title to search for
+     * @return CompletableFuture with the results
+     */
+    CompletableFuture&lt;List&lt;Material&gt;&gt; searchByTitleAsync(String title);
+    
+    /**
+     * Gets inventory statistics asynchronously.
+     * 
+     * @return CompletableFuture with the statistics
+     */
+    CompletableFuture&lt;ModernInventoryStats&gt; getModernInventoryStatsAsync();
+    
+    /**
+     * Performs advanced search with multiple criteria.
+     * 
+     * @param criteria the search criteria
+     * @return CompletableFuture with matching materials
+     */
+    CompletableFuture&lt;List&lt;Material&gt;&gt; advancedSearchAsync(SearchCriteria criteria);
+    
+    /**
+     * Adds multiple materials in batch.
+     * 
+     * @param materials collection of materials to add
+     * @return CompletableFuture with batch operation result
+     */
+    CompletableFuture&lt;BatchOperationResult&gt; addMaterialsBatchAsync(List&lt;Material&gt; materials);
+    
+    /**
+     * Removes multiple materials in batch.
+     * 
+     * @param ids collection of IDs to remove
+     * @return CompletableFuture with batch operation result
+     */
+    CompletableFuture&lt;BatchOperationResult&gt; removeMaterialsBatchAsync(List&lt;String&gt; ids);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

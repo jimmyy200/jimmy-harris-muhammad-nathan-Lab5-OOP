@@ -1,0 +1,170 @@
+2025-10-12 13:26:43.322 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:26:43.323 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Java Guide
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 0.1%
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C001
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Student discount
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:26:43.324 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager approved 0.1% discount for Java Guide
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Manager
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $35.94
+2025-10-12 13:26:43.324 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $0.04
+2025-10-12 13:26:43.328 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: E001 count: 1
+2025-10-12 13:26:43.329 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test EBook: $29.99 -> $24.99
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 10.0%
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C001
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Student discount
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:26:43.330 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager approved 10.0% discount for Test EBook
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Manager
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $90.00
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $10.00
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 20.0%
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C002
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Bulk purchase
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:26:43.330 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:26:43.330 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director approved 20.0% discount for Test EBook
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Director
+2025-10-12 13:26:43.330 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $80.00
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $20.00
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 35.0%
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C003
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Special promotion
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director cannot approve discount > 25.0%. Passing to VP.
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.VPHandler - VP approved 35.0% discount for Test EBook
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by VP
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $65.00
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $35.00
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 50.0%
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C004
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Too high discount
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director cannot approve discount > 25.0%. Passing to VP.
+2025-10-12 13:26:43.331 [main] INFO  com.university.bookstore.chain.VPHandler - VP rejected discount > 40.0%
+2025-10-12 13:26:43.331 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - [X] REJECTED: Discount too high - exceeds VP approval limit
+2025-10-12 13:26:43.338 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:26:43.338 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:26:43.338 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.339 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.339 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.339 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $34.99
+2025-10-12 13:26:43.340 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $34.99
+2025-10-12 13:26:43.340 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $34.99 -> $39.99
+2025-10-12 13:26:43.340 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.340 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $39.99
+2025-10-12 13:26:43.341 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:26:43.341 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:26:43.341 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: E001 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000000 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000001 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000002 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000003 count: 1
+2025-10-12 13:26:43.342 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000004 count: 1
+2025-10-12 13:26:43.343 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:26:43.343 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:26:43.343 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:26:43.343 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:26:43.767 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - Starting MaterialControllerTest using Java 24.0.2 with PID 73239 (started by navid in /Users/navid/Downloads/lab4_codes)
+2025-10-12 13:26:43.767 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - No active profile set, falling back to 1 default profile: "default"
+2025-10-12 13:26:44.453 [main] INFO  o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2025-10-12 13:26:44.453 [main] INFO  o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2025-10-12 13:26:44.454 [main] INFO  o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
+2025-10-12 13:26:44.464 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - Started MaterialControllerTest in 0.917 seconds (process running for 2.837)
+2025-10-12 13:27:08.900 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:27:08.901 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Java Guide
+2025-10-12 13:27:08.902 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 0.1%
+2025-10-12 13:27:08.902 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C001
+2025-10-12 13:27:08.902 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Student discount
+2025-10-12 13:27:08.902 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:27:08.902 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager approved 0.1% discount for Java Guide
+2025-10-12 13:27:08.902 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Manager
+2025-10-12 13:27:08.903 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $35.94
+2025-10-12 13:27:08.903 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $0.04
+2025-10-12 13:27:08.907 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: E001 count: 1
+2025-10-12 13:27:08.908 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test EBook: $29.99 -> $24.99
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 10.0%
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C001
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Student discount
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:27:08.908 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager approved 10.0% discount for Test EBook
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Manager
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $90.00
+2025-10-12 13:27:08.908 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $10.00
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 20.0%
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C002
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Bulk purchase
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director approved 20.0% discount for Test EBook
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by Director
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $80.00
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $20.00
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 35.0%
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C003
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Special promotion
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director cannot approve discount > 25.0%. Passing to VP.
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.VPHandler - VP approved 35.0% discount for Test EBook
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - // [OK] APPROVED by VP
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Final price: $65.00
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Savings: $35.00
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Processing discount request:
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Material: Test EBook
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Requested discount: 50.0%
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Customer: C004
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - Reason: Too high discount
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - ---
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.ManagerHandler - Manager cannot approve discount > 15.0%. Passing to Director.
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.DirectorHandler - Director cannot approve discount > 25.0%. Passing to VP.
+2025-10-12 13:27:08.909 [main] INFO  com.university.bookstore.chain.VPHandler - VP rejected discount > 40.0%
+2025-10-12 13:27:08.909 [main] INFO  c.u.bookstore.chain.DiscountApprovalService - [X] REJECTED: Discount too high - exceeds VP approval limit
+2025-10-12 13:27:08.917 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:27:08.917 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:27:08.918 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.918 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.918 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.919 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $34.99
+2025-10-12 13:27:08.919 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $34.99
+2025-10-12 13:27:08.919 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $34.99 -> $39.99
+2025-10-12 13:27:08.919 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.919 [main] INFO  c.university.bookstore.observer.InventoryObserver - Price changed for Test Book: $29.99 -> $39.99
+2025-10-12 13:27:08.920 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:27:08.920 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:27:08.921 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: E001 count: 1
+2025-10-12 13:27:08.921 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.921 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781234567890 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000000 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000001 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000002 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000003 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9780000000004 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9781111111111 count: 1
+2025-10-12 13:27:08.922 [main] INFO  c.university.bookstore.observer.InventoryObserver - Inventory updated: 9782222222222 count: 1
+2025-10-12 13:27:09.342 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - Starting MaterialControllerTest using Java 24.0.2 with PID 73570 (started by navid in /Users/navid/Downloads/lab4_codes)
+2025-10-12 13:27:09.342 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - No active profile set, falling back to 1 default profile: "default"
+2025-10-12 13:27:10.054 [main] INFO  o.s.b.test.mock.web.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+2025-10-12 13:27:10.055 [main] INFO  o.s.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+2025-10-12 13:27:10.055 [main] INFO  o.s.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+2025-10-12 13:27:10.066 [main] INFO  c.u.bookstore.controller.MaterialControllerTest - Started MaterialControllerTest in 0.944 seconds (process running for 2.83)

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.controller</a> &gt; <span class="el_source">MaterialController.java</span></div><h1>MaterialController.java</h1><pre class="source lang-java linenums">package com.university.bookstore.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.university.bookstore.api.MaterialStore;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Material.MaterialType;
+
+/**
+ * REST Controller for Material management operations.
+ * 
+ * &lt;p&gt;This controller demonstrates how the existing MaterialStore interface
+ * can be easily exposed as REST endpoints without modifying the core
+ * business logic. It showcases the extensibility of the hexagonal
+ * architecture design.&lt;/p&gt;
+ * 
+ * &lt;p&gt;All operations delegate to the existing MaterialStore implementation,
+ * maintaining the same business logic and validation rules.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 1.0
+ * @since 2024-12-19
+ */
+@RestController
+@RequestMapping(&quot;/api/materials&quot;)
+public class MaterialController {
+
+    private final MaterialStore materialStore;
+
+    /**
+     * Constructor with dependency injection of MaterialStore.
+     * 
+     * @param materialStore the material store implementation
+     */
+<span class="fc" id="L48">    public MaterialController(MaterialStore materialStore) {</span>
+<span class="fc" id="L49">        this.materialStore = materialStore;</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * GET /api/materials - Retrieve all materials
+     * 
+     * @return list of all materials
+     */
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; getAllMaterials() {
+<span class="fc" id="L59">        List&lt;Material&gt; materials = materialStore.getAllMaterials();</span>
+<span class="fc" id="L60">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * GET /api/materials/{id} - Retrieve a specific material by ID
+     * 
+     * @param id the material ID
+     * @return the material if found, 404 if not found
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Material&gt; getMaterialById(@PathVariable(&quot;id&quot;) String id) {
+<span class="fc" id="L71">        Optional&lt;Material&gt; material = materialStore.findById(id);</span>
+<span class="fc" id="L72">        return material.map(ResponseEntity::ok)</span>
+<span class="fc" id="L73">                      .orElse(ResponseEntity.notFound().build());</span>
+    }
+
+    /**
+     * POST /api/materials - Create a new material
+     * 
+     * @param material the material to create
+     * @return the created material or 400 if invalid
+     */
+    @PostMapping
+    public ResponseEntity&lt;Material&gt; createMaterial(@RequestBody Material material) {
+        try {
+<span class="fc" id="L85">            boolean added = materialStore.addMaterial(material);</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            if (added) {</span>
+<span class="fc" id="L87">                return ResponseEntity.status(HttpStatus.CREATED).body(material);</span>
+            } else {
+<span class="nc" id="L89">                return ResponseEntity.badRequest().build();</span>
+            }
+<span class="nc" id="L91">        } catch (Exception e) {</span>
+<span class="nc" id="L92">            return ResponseEntity.badRequest().build();</span>
+        }
+    }
+
+    /**
+     * PUT /api/materials/{id} - Update an existing material
+     * 
+     * @param id the material ID
+     * @param material the updated material
+     * @return the updated material or 404 if not found
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Material&gt; updateMaterial(@PathVariable(&quot;id&quot;) String id, @RequestBody Material material) {
+        // Remove existing material and add the updated one
+<span class="fc" id="L106">        Optional&lt;Material&gt; existing = materialStore.removeMaterial(id);</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (existing.isPresent()) {</span>
+<span class="fc" id="L108">            boolean added = materialStore.addMaterial(material);</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">            if (added) {</span>
+<span class="fc" id="L110">                return ResponseEntity.ok(material);</span>
+            } else {
+                // Rollback: add the original material back
+<span class="nc" id="L113">                materialStore.addMaterial(existing.get());</span>
+<span class="nc" id="L114">                return ResponseEntity.badRequest().build();</span>
+            }
+        }
+<span class="nc" id="L117">        return ResponseEntity.notFound().build();</span>
+    }
+
+    /**
+     * DELETE /api/materials/{id} - Delete a material
+     * 
+     * @param id the material ID
+     * @return 204 if deleted, 404 if not found
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteMaterial(@PathVariable(&quot;id&quot;) String id) {
+<span class="fc" id="L128">        Optional&lt;Material&gt; removed = materialStore.removeMaterial(id);</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        return removed.isPresent() ? </span>
+<span class="fc" id="L130">            ResponseEntity.noContent().build() : </span>
+<span class="nc" id="L131">            ResponseEntity.notFound().build();</span>
+    }
+
+    /**
+     * GET /api/materials/search/title?q={query} - Search materials by title
+     * 
+     * @param q the search query
+     * @return list of matching materials
+     */
+    @GetMapping(&quot;/search/title&quot;)
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; searchByTitle(@RequestParam(&quot;q&quot;) String q) {
+<span class="fc" id="L142">        List&lt;Material&gt; materials = materialStore.searchByTitle(q);</span>
+<span class="fc" id="L143">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * GET /api/materials/search/creator?q={query} - Search materials by creator
+     * 
+     * @param q the search query
+     * @return list of matching materials
+     */
+    @GetMapping(&quot;/search/creator&quot;)
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; searchByCreator(@RequestParam(&quot;q&quot;) String q) {
+<span class="fc" id="L154">        List&lt;Material&gt; materials = materialStore.searchByCreator(q);</span>
+<span class="fc" id="L155">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * GET /api/materials/type/{type} - Get materials by type
+     * 
+     * @param type the material type
+     * @return list of materials of the specified type
+     */
+    @GetMapping(&quot;/type/{type}&quot;)
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; getMaterialsByType(@PathVariable(&quot;type&quot;) MaterialType type) {
+<span class="fc" id="L166">        List&lt;Material&gt; materials = materialStore.getMaterialsByType(type);</span>
+<span class="fc" id="L167">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * GET /api/materials/recent?years={years} - Get recent materials
+     * 
+     * @param years number of years to look back
+     * @return list of recent materials
+     */
+    @GetMapping(&quot;/recent&quot;)
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; getRecentMaterials(@RequestParam(value = &quot;years&quot;, defaultValue = &quot;5&quot;) int years) {
+<span class="fc" id="L178">        List&lt;Material&gt; materials = materialStore.findRecentMaterials(years);</span>
+<span class="fc" id="L179">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * Get materials by price range.
+     * 
+     * @param min minimum price
+     * @param max maximum price
+     * @return list of materials in price range
+     */
+    @GetMapping(&quot;/price-range&quot;)
+    public ResponseEntity&lt;List&lt;Material&gt;&gt; getMaterialsByPriceRange(
+            @RequestParam(&quot;min&quot;) double min, 
+            @RequestParam(&quot;max&quot;) double max) {
+<span class="fc" id="L193">        List&lt;Material&gt; materials = materialStore.getMaterialsByPriceRange(min, max);</span>
+<span class="fc" id="L194">        return ResponseEntity.ok(materials);</span>
+    }
+
+    /**
+     * GET /api/materials/stats - Get inventory statistics
+     * 
+     * @return inventory statistics
+     */
+    @GetMapping(&quot;/stats&quot;)
+    public ResponseEntity&lt;MaterialStore.InventoryStats&gt; getInventoryStats() {
+<span class="fc" id="L204">        MaterialStore.InventoryStats stats = materialStore.getInventoryStats();</span>
+<span class="fc" id="L205">        return ResponseEntity.ok(stats);</span>
+    }
+
+    /**
+     * GET /api/materials/count - Get total material count
+     * 
+     * @return total number of materials
+     */
+    @GetMapping(&quot;/count&quot;)
+    public ResponseEntity&lt;Integer&gt; getMaterialCount() {
+<span class="fc" id="L215">        int count = materialStore.size();</span>
+<span class="fc" id="L216">        return ResponseEntity.ok(count);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

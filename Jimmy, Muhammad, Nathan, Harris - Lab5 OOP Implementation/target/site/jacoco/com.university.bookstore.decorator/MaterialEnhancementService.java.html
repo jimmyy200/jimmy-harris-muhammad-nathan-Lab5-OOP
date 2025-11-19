@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialEnhancementService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.decorator</a> &gt; <span class="el_source">MaterialEnhancementService.java</span></div><h1>MaterialEnhancementService.java</h1><pre class="source lang-java linenums">package com.university.bookstore.decorator;
+
+import com.university.bookstore.model.EBook;
+import com.university.bookstore.model.Material;
+
+/**
+ * Service for managing material enhancements using the Decorator pattern.
+ * Provides methods to apply various decorators to materials and create enhancement packages.
+ * 
+ * &lt;p&gt;This service demonstrates the Decorator pattern in action by providing
+ * a high-level interface for dynamically adding features to materials.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+<span class="fc" id="L17">public class MaterialEnhancementService {</span>
+    
+    /**
+     * Adds gift wrapping to a material.
+     * 
+     * @param material the material to enhance
+     * @param style the wrapping style
+     * @return the enhanced material with gift wrapping
+     * @throws IllegalArgumentException if material or style is null
+     */
+    public Material addGiftWrapping(Material material, String style) {
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L29">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L31" title="All 4 branches covered.">        if (style == null || style.trim().isEmpty()) {</span>
+<span class="fc" id="L32">            throw new IllegalArgumentException(&quot;Wrapping style cannot be null or empty&quot;);</span>
+        }
+        
+<span class="fc" id="L35">        return new GiftWrappingDecorator(material, style);</span>
+    }
+    
+    /**
+     * Adds expedited delivery to a material.
+     * 
+     * @param material the material to enhance
+     * @param deliveryDays the number of days for delivery
+     * @return the enhanced material with expedited delivery
+     * @throws IllegalArgumentException if material is null or deliveryDays is invalid
+     */
+    public Material addExpeditedDelivery(Material material, int deliveryDays) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L48">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (deliveryDays &lt; 1) {</span>
+<span class="fc" id="L51">            throw new IllegalArgumentException(&quot;Delivery days must be at least 1: &quot; + deliveryDays);</span>
+        }
+        
+<span class="fc" id="L54">        return new ExpeditedDeliveryDecorator(material, deliveryDays);</span>
+    }
+    
+    /**
+     * Adds digital annotations to a material.
+     * 
+     * @param material the material to enhance
+     * @return the enhanced material with digital annotations
+     * @throws IllegalArgumentException if material is null
+     */
+    public Material addDigitalAnnotations(Material material) {
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L66">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L69">        return new DigitalAnnotationDecorator(material);</span>
+    }
+    
+    /**
+     * Creates a premium package with multiple enhancements.
+     * 
+     * @param material the material to enhance
+     * @param giftStyle the gift wrapping style
+     * @param deliveryDays the number of days for delivery
+     * @return the enhanced material with premium package
+     * @throws IllegalArgumentException if material is null or parameters are invalid
+     */
+    public Material createPremiumPackage(Material material, String giftStyle, int deliveryDays) {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L83">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L86">        Material enhanced = material;</span>
+<span class="fc" id="L87">        enhanced = addGiftWrapping(enhanced, giftStyle);</span>
+<span class="fc" id="L88">        enhanced = addExpeditedDelivery(enhanced, deliveryDays);</span>
+        
+        // Add digital annotations if it's an e-book
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (material instanceof EBook) {</span>
+<span class="fc" id="L92">            enhanced = addDigitalAnnotations(enhanced);</span>
+        }
+        
+<span class="fc" id="L95">        return enhanced;</span>
+    }
+    
+    /**
+     * Creates a gift package with gift wrapping and expedited delivery.
+     * 
+     * @param material the material to enhance
+     * @param giftStyle the gift wrapping style
+     * @param deliveryDays the number of days for delivery
+     * @return the enhanced material with gift package
+     */
+    public Material createGiftPackage(Material material, String giftStyle, int deliveryDays) {
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L108">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L111">        Material enhanced = material;</span>
+<span class="fc" id="L112">        enhanced = addGiftWrapping(enhanced, giftStyle);</span>
+<span class="fc" id="L113">        enhanced = addExpeditedDelivery(enhanced, deliveryDays);</span>
+        
+<span class="fc" id="L115">        return enhanced;</span>
+    }
+    
+    /**
+     * Creates a digital package with digital annotations (for e-books only).
+     * 
+     * @param material the material to enhance
+     * @return the enhanced material with digital package, or original if not an e-book
+     */
+    public Material createDigitalPackage(Material material) {
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L126">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">        if (material instanceof EBook) {</span>
+<span class="fc" id="L130">            return addDigitalAnnotations(material);</span>
+        }
+        
+<span class="nc" id="L133">        return material; // Return original if not an e-book</span>
+    }
+    
+    /**
+     * Calculates the total enhancement cost for a material.
+     * 
+     * @param original the original material
+     * @param enhanced the enhanced material
+     * @return the total enhancement cost
+     */
+    public double calculateEnhancementCost(Material original, Material enhanced) {
+<span class="pc bpc" id="L144" title="2 of 4 branches missed.">        if (original == null || enhanced == null) {</span>
+<span class="nc" id="L145">            throw new IllegalArgumentException(&quot;Materials cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L148">        return enhanced.getPrice() - original.getPrice();</span>
+    }
+    
+    /**
+     * Gets a summary of enhancements applied to a material.
+     * 
+     * @param material the material to analyze
+     * @return enhancement summary
+     */
+    public String getEnhancementSummary(Material material) {
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L159">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L162">        StringBuilder summary = new StringBuilder();</span>
+        
+        // Check if there are any enhancements
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        if (!hasEnhancements(material)) {</span>
+<span class="fc" id="L166">            summary.append(&quot;No enhancements applied&quot;);</span>
+<span class="fc" id="L167">            return summary.toString();</span>
+        }
+        
+<span class="fc" id="L170">        summary.append(&quot;Enhancements:\n&quot;);</span>
+        
+        // Check for decorators by examining the display info
+<span class="fc" id="L173">        String displayInfo = material.getDisplayInfo();</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">        if (displayInfo.contains(&quot;Gift Wrapped&quot;)) {</span>
+<span class="fc" id="L175">            summary.append(&quot;// [OK] Gift Wrapping\n&quot;);</span>
+        }
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">        if (displayInfo.contains(&quot;Expedited Delivery&quot;)) {</span>
+<span class="fc" id="L178">            summary.append(&quot;// [OK] Expedited Delivery\n&quot;);</span>
+        }
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">        if (displayInfo.contains(&quot;Digital Annotations&quot;)) {</span>
+<span class="fc" id="L181">            summary.append(&quot;// [OK] Digital Annotations\n&quot;);</span>
+        }
+        
+<span class="fc" id="L184">        double enhancementCost = material.getPrice() - getBasePrice(material);</span>
+<span class="fc" id="L185">        summary.append(&quot;Total Cost: $&quot;).append(String.format(&quot;%.2f&quot;, material.getPrice()));</span>
+        
+<span class="fc" id="L187">        return summary.toString();</span>
+    }
+    
+    /**
+     * Gets the base price of a material (without decorators).
+     * 
+     * @param material the material to analyze
+     * @return the base price
+     */
+    public double getBasePrice(Material material) {
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L198">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L201">        Material current = material;</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc" id="L203">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+        
+<span class="fc" id="L206">        return current.getPrice();</span>
+    }
+    
+    /**
+     * Checks if a material has any enhancements applied.
+     * 
+     * @param material the material to check
+     * @return true if enhancements are applied
+     */
+    public boolean hasEnhancements(Material material) {
+<span class="fc bfc" id="L216" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L217">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L220">        return material instanceof MaterialDecorator;</span>
+    }
+    
+    /**
+     * Gets the number of decorators applied to a material.
+     * 
+     * @param material the material to analyze
+     * @return the decorator count
+     */
+    public int getEnhancementCount(Material material) {
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L231">            return 0;</span>
+        }
+        
+<span class="fc" id="L234">        int count = 0;</span>
+<span class="fc" id="L235">        Material current = material;</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc" id="L237">            count++;</span>
+<span class="fc" id="L238">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+        
+<span class="fc" id="L241">        return count;</span>
+    }
+    
+    /**
+     * Gets the base material (unwraps all decorators).
+     * 
+     * @param material the material to unwrap
+     * @return the base material
+     */
+    public Material getBaseMaterial(Material material) {
+<span class="pc bpc" id="L251" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L252">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L255">        Material current = material;</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc" id="L257">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+        
+<span class="fc" id="L260">        return current;</span>
+    }
+    
+    /**
+     * Checks if a material has a specific type of enhancement.
+     * 
+     * @param material the material to check
+     * @param enhancementType the type of enhancement to look for
+     * @return true if the enhancement is applied
+     */
+    public boolean hasEnhancement(Material material, Class&lt;? extends MaterialDecorator&gt; enhancementType) {
+<span class="pc bpc" id="L271" title="2 of 4 branches missed.">        if (material == null || enhancementType == null) {</span>
+<span class="nc" id="L272">            return false;</span>
+        }
+        
+<span class="fc" id="L275">        Material current = material;</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">        while (current instanceof MaterialDecorator) {</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">            if (enhancementType.isInstance(current)) {</span>
+<span class="fc" id="L278">                return true;</span>
+            }
+<span class="fc" id="L280">            current = ((MaterialDecorator) current).getDecoratedMaterial();</span>
+        }
+        
+<span class="fc" id="L283">        return false;</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L288">        return &quot;MaterialEnhancementService[Available enhancements: Gift Wrapping, Expedited Delivery, Digital Annotations]&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

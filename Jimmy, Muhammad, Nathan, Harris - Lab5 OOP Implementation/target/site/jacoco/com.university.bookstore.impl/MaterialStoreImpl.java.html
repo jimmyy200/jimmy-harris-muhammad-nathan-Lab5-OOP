@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialStoreImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.impl</a> &gt; <span class="el_source">MaterialStoreImpl.java</span></div><h1>MaterialStoreImpl.java</h1><pre class="source lang-java linenums">package com.university.bookstore.impl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import com.university.bookstore.api.MaterialStore;
+import com.university.bookstore.model.Magazine;
+import com.university.bookstore.model.Material;
+import com.university.bookstore.model.Media;
+import com.university.bookstore.model.PrintedBook;
+
+/**
+ * Implementation of MaterialStore using ArrayList with polymorphic handling.
+ * Demonstrates polymorphism, SOLID principles, and defensive programming.
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+public class MaterialStoreImpl implements MaterialStore {
+    
+    private final List&lt;Material&gt; inventory;
+    private final Map&lt;String, Material&gt; idIndex;
+    
+    /**
+     * Creates a new empty material store.
+     */
+<span class="fc" id="L39">    public MaterialStoreImpl() {</span>
+<span class="fc" id="L40">        this.inventory = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L41">        this.idIndex = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L42">    }</span>
+    
+    /**
+     * Creates a material store with initial materials.
+     * 
+     * @param initialMaterials materials to add initially
+     */
+    public MaterialStoreImpl(Collection&lt;Material&gt; initialMaterials) {
+<span class="fc" id="L50">        this();</span>
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        if (initialMaterials != null) {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">            for (Material material : initialMaterials) {</span>
+<span class="fc" id="L53">                addMaterial(material);</span>
+<span class="fc" id="L54">            }</span>
+        }
+<span class="fc" id="L56">    }</span>
+    
+    @Override
+    public synchronized boolean addMaterial(Material material) {
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L61">            throw new NullPointerException(&quot;Cannot add null material&quot;);</span>
+        }
+        
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (idIndex.containsKey(material.getId())) {</span>
+<span class="fc" id="L65">            return false;</span>
+        }
+        
+<span class="fc" id="L68">        inventory.add(material);</span>
+<span class="fc" id="L69">        idIndex.put(material.getId(), material);</span>
+<span class="fc" id="L70">        return true;</span>
+    }
+    
+    @Override
+    public synchronized Optional&lt;Material&gt; removeMaterial(String id) {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (id == null) {</span>
+<span class="fc" id="L76">            return Optional.empty();</span>
+        }
+        
+<span class="fc" id="L79">        Material material = idIndex.remove(id);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (material != null) {</span>
+<span class="fc" id="L81">            inventory.remove(material);</span>
+<span class="fc" id="L82">            return Optional.of(material);</span>
+        }
+<span class="fc" id="L84">        return Optional.empty();</span>
+    }
+    
+    @Override
+    public Optional&lt;Material&gt; findById(String id) {
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (id == null) {</span>
+<span class="fc" id="L90">            return Optional.empty();</span>
+        }
+<span class="fc" id="L92">        return Optional.ofNullable(idIndex.get(id));</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; searchByTitle(String title) {
+<span class="fc bfc" id="L97" title="All 4 branches covered.">        if (title == null || title.trim().isEmpty()) {</span>
+<span class="fc" id="L98">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L101">        String searchTerm = title.toLowerCase().trim();</span>
+<span class="fc" id="L102">        return inventory.stream()</span>
+<span class="fc" id="L103">            .filter(m -&gt; m.getTitle().toLowerCase().contains(searchTerm))</span>
+<span class="fc" id="L104">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; searchByCreator(String creator) {
+<span class="fc bfc" id="L109" title="All 4 branches covered.">        if (creator == null || creator.trim().isEmpty()) {</span>
+<span class="fc" id="L110">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L113">        String searchTerm = creator.toLowerCase().trim();</span>
+<span class="fc" id="L114">        return inventory.stream()</span>
+<span class="fc" id="L115">            .filter(m -&gt; m.getCreator().toLowerCase().contains(searchTerm))</span>
+<span class="fc" id="L116">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByType(Material.MaterialType type) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (type == null) {</span>
+<span class="fc" id="L122">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L125">        return inventory.stream()</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            .filter(m -&gt; m.getType() == type)</span>
+<span class="fc" id="L127">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Media&gt; getMediaMaterials() {
+<span class="fc" id="L132">        return inventory.stream()</span>
+<span class="fc" id="L133">            .filter(m -&gt; m instanceof Media)</span>
+<span class="fc" id="L134">            .map(m -&gt; (Media) m)</span>
+<span class="fc" id="L135">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; filterMaterials(Predicate&lt;Material&gt; predicate) {
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        if (predicate == null) {</span>
+<span class="fc" id="L141">            throw new NullPointerException(&quot;Predicate cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L144">        return inventory.stream()</span>
+<span class="fc" id="L145">            .filter(predicate)</span>
+<span class="fc" id="L146">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByPriceRange(double minPrice, double maxPrice) {
+<span class="pc bpc" id="L151" title="1 of 6 branches missed.">        if (minPrice &lt; 0 || maxPrice &lt; 0 || minPrice &gt; maxPrice) {</span>
+<span class="fc" id="L152">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L155">        return inventory.stream()</span>
+<span class="fc bfc" id="L156" title="All 4 branches covered.">            .filter(m -&gt; m.getPrice() &gt;= minPrice &amp;&amp; m.getPrice() &lt;= maxPrice)</span>
+<span class="fc" id="L157">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getMaterialsByYear(int year) {
+<span class="fc" id="L162">        return inventory.stream()</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">            .filter(m -&gt; m.getYear() == year)</span>
+<span class="fc" id="L164">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getAllMaterialsSorted() {
+<span class="fc" id="L169">        List&lt;Material&gt; sorted = new ArrayList&lt;&gt;(inventory);</span>
+<span class="fc" id="L170">        Collections.sort(sorted);</span>
+<span class="fc" id="L171">        return sorted;</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getAllMaterials() {
+<span class="fc" id="L176">        return new ArrayList&lt;&gt;(inventory);</span>
+    }
+    
+    @Override
+    public double getTotalInventoryValue() {
+<span class="fc" id="L181">        return inventory.stream()</span>
+<span class="fc" id="L182">            .mapToDouble(Material::getPrice)</span>
+<span class="fc" id="L183">            .sum();</span>
+    }
+    
+    @Override
+    public double getTotalDiscountedValue() {
+<span class="fc" id="L188">        return inventory.stream()</span>
+<span class="fc" id="L189">            .mapToDouble(Material::getDiscountedPrice)</span>
+<span class="fc" id="L190">            .sum();</span>
+    }
+    
+    @Override
+    public InventoryStats getInventoryStats() {
+<span class="fc bfc" id="L195" title="All 2 branches covered.">        if (inventory.isEmpty()) {</span>
+<span class="fc" id="L196">            return new InventoryStats(0, 0, 0, 0, 0, 0);</span>
+        }
+        
+<span class="fc" id="L199">        List&lt;Double&gt; prices = inventory.stream()</span>
+<span class="fc" id="L200">            .map(Material::getPrice)</span>
+<span class="fc" id="L201">            .sorted()</span>
+<span class="fc" id="L202">            .collect(Collectors.toList());</span>
+        
+<span class="fc" id="L204">        double averagePrice = prices.stream()</span>
+<span class="fc" id="L205">            .mapToDouble(Double::doubleValue)</span>
+<span class="fc" id="L206">            .average()</span>
+<span class="fc" id="L207">            .orElse(0.0);</span>
+        
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        double medianPrice = prices.size() % 2 == 0</span>
+<span class="fc" id="L210">            ? (prices.get(prices.size() / 2 - 1) + prices.get(prices.size() / 2)) / 2</span>
+<span class="fc" id="L211">            : prices.get(prices.size() / 2);</span>
+        
+<span class="fc" id="L213">        int uniqueTypes = (int) inventory.stream()</span>
+<span class="fc" id="L214">            .map(Material::getType)</span>
+<span class="fc" id="L215">            .distinct()</span>
+<span class="fc" id="L216">            .count();</span>
+        
+<span class="fc" id="L218">        int mediaCount = (int) inventory.stream()</span>
+<span class="fc" id="L219">            .filter(m -&gt; m instanceof Media)</span>
+<span class="fc" id="L220">            .count();</span>
+        
+<span class="fc" id="L222">        int printCount = (int) inventory.stream()</span>
+<span class="fc bfc" id="L223" title="All 4 branches covered.">            .filter(m -&gt; m instanceof PrintedBook || m instanceof Magazine)</span>
+<span class="fc" id="L224">            .count();</span>
+        
+<span class="fc" id="L226">        return new InventoryStats(</span>
+<span class="fc" id="L227">            inventory.size(),</span>
+            averagePrice,
+            medianPrice,
+            uniqueTypes,
+            mediaCount,
+            printCount
+        );
+    }
+    
+    @Override
+    public synchronized void clearInventory() {
+<span class="fc" id="L238">        inventory.clear();</span>
+<span class="fc" id="L239">        idIndex.clear();</span>
+<span class="fc" id="L240">    }</span>
+    
+    @Override
+    public int size() {
+<span class="fc" id="L244">        return inventory.size();</span>
+    }
+    
+    @Override
+    public boolean isEmpty() {
+<span class="fc" id="L249">        return inventory.isEmpty();</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; findRecentMaterials(int years) {
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        if (years &lt; 0) {</span>
+<span class="fc" id="L255">            throw new IllegalArgumentException(&quot;Years cannot be negative: &quot; + years);</span>
+        }
+        
+<span class="fc" id="L258">        int currentYear = java.time.Year.now().getValue();</span>
+<span class="fc" id="L259">        int cutoffYear = currentYear - years;</span>
+        
+<span class="fc" id="L261">        return inventory.stream()</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">            .filter(material -&gt; material.getYear() &gt;= cutoffYear)</span>
+<span class="fc" id="L263">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; findByCreators(String... creators) {
+<span class="fc bfc" id="L268" title="All 4 branches covered.">        if (creators == null || creators.length == 0) {</span>
+<span class="fc" id="L269">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L272">        Set&lt;String&gt; creatorSet = Arrays.stream(creators)</span>
+<span class="fc" id="L273">            .filter(Objects::nonNull)</span>
+<span class="fc" id="L274">            .map(String::trim)</span>
+<span class="fc bfc" id="L275" title="All 2 branches covered.">            .filter(s -&gt; !s.isEmpty())</span>
+<span class="fc" id="L276">            .collect(Collectors.toSet());</span>
+        
+<span class="pc bpc" id="L278" title="1 of 2 branches missed.">        if (creatorSet.isEmpty()) {</span>
+<span class="nc" id="L279">            return new ArrayList&lt;&gt;();</span>
+        }
+        
+<span class="fc" id="L282">        return inventory.stream()</span>
+<span class="fc" id="L283">            .filter(material -&gt; creatorSet.contains(material.getCreator()))</span>
+<span class="fc" id="L284">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; findWithPredicate(Predicate&lt;Material&gt; condition) {
+<span class="fc bfc" id="L289" title="All 2 branches covered.">        if (condition == null) {</span>
+<span class="fc" id="L290">            throw new NullPointerException(&quot;Predicate cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L293">        return inventory.stream()</span>
+<span class="fc" id="L294">            .filter(condition)</span>
+<span class="fc" id="L295">            .collect(Collectors.toList());</span>
+    }
+    
+    @Override
+    public List&lt;Material&gt; getSorted(Comparator&lt;Material&gt; comparator) {
+<span class="fc bfc" id="L300" title="All 2 branches covered.">        if (comparator == null) {</span>
+<span class="fc" id="L301">            throw new NullPointerException(&quot;Comparator cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L304">        return inventory.stream()</span>
+<span class="fc" id="L305">            .sorted(comparator)</span>
+<span class="fc" id="L306">            .collect(Collectors.toList());</span>
+    }
+    
+    /**
+     * Demonstrates polymorphic behavior by getting display info for all materials.
+     * 
+     * @return list of display strings
+     */
+    public List&lt;String&gt; getAllDisplayInfo() {
+<span class="nc" id="L315">        return inventory.stream()</span>
+<span class="nc" id="L316">            .map(Material::getDisplayInfo)</span>
+<span class="nc" id="L317">            .collect(Collectors.toList());</span>
+    }
+    
+    /**
+     * Groups materials by type for reporting.
+     * 
+     * @return map of type to materials
+     */
+    public Map&lt;Material.MaterialType, List&lt;Material&gt;&gt; groupByType() {
+<span class="fc" id="L326">        return inventory.stream()</span>
+<span class="fc" id="L327">            .collect(Collectors.groupingBy(Material::getType));</span>
+    }
+    
+    /**
+     * Gets materials with active discounts.
+     * 
+     * @return list of discounted materials
+     */
+    public List&lt;Material&gt; getDiscountedMaterials() {
+<span class="fc" id="L336">        return inventory.stream()</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">            .filter(m -&gt; m.getDiscountRate() &gt; 0)</span>
+<span class="fc" id="L338">            .collect(Collectors.toList());</span>
+    }
+    
+    /**
+     * Calculates total savings from discounts.
+     * 
+     * @return total discount amount
+     */
+    public double getTotalDiscountAmount() {
+<span class="nc" id="L347">        return inventory.stream()</span>
+<span class="nc" id="L348">            .mapToDouble(m -&gt; m.getPrice() * m.getDiscountRate())</span>
+<span class="nc" id="L349">            .sum();</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L354">        return String.format(&quot;MaterialStore[Size=%d, Types=%d, Value=$%.2f]&quot;,</span>
+<span class="nc" id="L355">            size(),</span>
+<span class="nc" id="L356">            groupByType().size(),</span>
+<span class="nc" id="L357">            getTotalInventoryValue());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

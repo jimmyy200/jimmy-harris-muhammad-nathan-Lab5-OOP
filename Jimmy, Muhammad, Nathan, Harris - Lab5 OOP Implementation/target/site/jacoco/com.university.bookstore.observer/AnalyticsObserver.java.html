@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AnalyticsObserver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">AnalyticsObserver.java</span></div><h1>AnalyticsObserver.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Observer that collects analytics data from material events.
+ * Tracks event counts, material statistics, and system performance metrics.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class AnalyticsObserver implements MaterialObserver {
+    
+    private final Map&lt;String, Integer&gt; eventCounts;
+    private final Map&lt;String, Double&gt; totalValue;
+    private final Map&lt;String, Integer&gt; materialTypeCounts;
+    private int totalEvents;
+    private long firstEventTime;
+    private long lastEventTime;
+    
+    /**
+     * Creates a new analytics observer.
+     */
+<span class="fc" id="L26">    public AnalyticsObserver() {</span>
+<span class="fc" id="L27">        this.eventCounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L28">        this.totalValue = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L29">        this.materialTypeCounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L30">        this.totalEvents = 0;</span>
+<span class="fc" id="L31">        this.firstEventTime = 0;</span>
+<span class="fc" id="L32">        this.lastEventTime = 0;</span>
+<span class="fc" id="L33">    }</span>
+    
+    @Override
+    public void onEvent(MaterialEvent event) {
+<span class="fc" id="L37">        totalEvents++;</span>
+<span class="fc" id="L38">        long currentTime = event.getTimestamp();</span>
+        
+        // Track event timing
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (firstEventTime == 0) {</span>
+<span class="fc" id="L42">            firstEventTime = currentTime;</span>
+        }
+<span class="fc" id="L44">        lastEventTime = currentTime;</span>
+        
+        // Track event counts
+<span class="fc" id="L47">        String eventType = event.getEventType();</span>
+<span class="fc" id="L48">        eventCounts.merge(eventType, 1, Integer::sum);</span>
+        
+        // Track material statistics
+<span class="fc" id="L51">        String materialId = event.getMaterial().getId();</span>
+<span class="fc" id="L52">        String materialType = event.getMaterial().getType().toString();</span>
+        
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (&quot;MATERIAL_ADDED&quot;.equals(eventType)) {</span>
+<span class="fc" id="L55">            totalValue.merge(materialId, event.getMaterial().getPrice(), Double::sum);</span>
+<span class="fc" id="L56">            materialTypeCounts.merge(materialType, 1, Integer::sum);</span>
+        }
+<span class="fc" id="L58">    }</span>
+    
+    /**
+     * Gets event statistics.
+     * 
+     * @return map of event type to count
+     */
+    public Map&lt;String, Integer&gt; getEventStatistics() {
+<span class="fc" id="L66">        return new HashMap&lt;&gt;(eventCounts);</span>
+    }
+    
+    /**
+     * Gets the count for a specific event type.
+     * 
+     * @param eventType the event type
+     * @return the event count
+     */
+    public int getEventCount(String eventType) {
+<span class="nc" id="L76">        return eventCounts.getOrDefault(eventType, 0);</span>
+    }
+    
+    /**
+     * Gets the total number of events processed.
+     * 
+     * @return the total event count
+     */
+    public int getTotalEvents() {
+<span class="nc" id="L85">        return totalEvents;</span>
+    }
+    
+    /**
+     * Gets the total inventory value.
+     * 
+     * @return the total value
+     */
+    public double getTotalInventoryValue() {
+<span class="nc" id="L94">        return totalValue.values().stream()</span>
+<span class="nc" id="L95">            .mapToDouble(Double::doubleValue)</span>
+<span class="nc" id="L96">            .sum();</span>
+    }
+    
+    /**
+     * Gets material type statistics.
+     * 
+     * @return map of material type to count
+     */
+    public Map&lt;String, Integer&gt; getMaterialTypeStatistics() {
+<span class="nc" id="L105">        return new HashMap&lt;&gt;(materialTypeCounts);</span>
+    }
+    
+    /**
+     * Gets the count for a specific material type.
+     * 
+     * @param materialType the material type
+     * @return the material count
+     */
+    public int getMaterialTypeCount(String materialType) {
+<span class="nc" id="L115">        return materialTypeCounts.getOrDefault(materialType, 0);</span>
+    }
+    
+    /**
+     * Gets the number of unique materials.
+     * 
+     * @return the unique material count
+     */
+    public int getUniqueMaterialCount() {
+<span class="nc" id="L124">        return totalValue.size();</span>
+    }
+    
+    /**
+     * Gets the time of the first event.
+     * 
+     * @return the first event timestamp
+     */
+    public long getFirstEventTime() {
+<span class="nc" id="L133">        return firstEventTime;</span>
+    }
+    
+    /**
+     * Gets the time of the last event.
+     * 
+     * @return the last event timestamp
+     */
+    public long getLastEventTime() {
+<span class="nc" id="L142">        return lastEventTime;</span>
+    }
+    
+    /**
+     * Gets the time span of events.
+     * 
+     * @return the time span in milliseconds
+     */
+    public long getEventTimeSpan() {
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (firstEventTime == 0) {</span>
+<span class="nc" id="L152">            return 0;</span>
+        }
+<span class="nc" id="L154">        return lastEventTime - firstEventTime;</span>
+    }
+    
+    /**
+     * Gets the average events per second.
+     * 
+     * @return the average event rate
+     */
+    public double getAverageEventRate() {
+<span class="nc" id="L163">        long timeSpan = getEventTimeSpan();</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        if (timeSpan == 0) {</span>
+<span class="nc" id="L165">            return 0.0;</span>
+        }
+<span class="nc" id="L167">        return (double) totalEvents / (timeSpan / 1000.0);</span>
+    }
+    
+    /**
+     * Gets comprehensive analytics data.
+     * 
+     * @return analytics data object
+     */
+    public AnalyticsData getAnalyticsData() {
+<span class="nc" id="L176">        return new AnalyticsData(</span>
+            totalEvents,
+<span class="nc" id="L178">            getTotalInventoryValue(),</span>
+<span class="nc" id="L179">            getUniqueMaterialCount(),</span>
+<span class="nc" id="L180">            getEventStatistics(),</span>
+<span class="nc" id="L181">            getMaterialTypeStatistics(),</span>
+            firstEventTime,
+            lastEventTime,
+<span class="nc" id="L184">            getEventTimeSpan(),</span>
+<span class="nc" id="L185">            getAverageEventRate()</span>
+        );
+    }
+    
+    /**
+     * Clears all analytics data.
+     */
+    public void clear() {
+<span class="nc" id="L193">        eventCounts.clear();</span>
+<span class="nc" id="L194">        totalValue.clear();</span>
+<span class="nc" id="L195">        materialTypeCounts.clear();</span>
+<span class="nc" id="L196">        totalEvents = 0;</span>
+<span class="nc" id="L197">        firstEventTime = 0;</span>
+<span class="nc" id="L198">        lastEventTime = 0;</span>
+<span class="nc" id="L199">    }</span>
+    
+    @Override
+    public String getObserverName() {
+<span class="nc" id="L203">        return &quot;AnalyticsObserver&quot;;</span>
+    }
+    
+    /**
+     * Comprehensive analytics data container.
+     */
+    public static class AnalyticsData {
+        private final int totalEvents;
+        private final double totalInventoryValue;
+        private final int uniqueMaterialCount;
+        private final Map&lt;String, Integer&gt; eventStatistics;
+        private final Map&lt;String, Integer&gt; materialTypeStatistics;
+        private final long firstEventTime;
+        private final long lastEventTime;
+        private final long eventTimeSpan;
+        private final double averageEventRate;
+        
+        /**
+         * Creates analytics data with comprehensive statistics.
+         * 
+         * @param totalEvents total number of events
+         * @param totalInventoryValue total value of inventory
+         * @param uniqueMaterialCount number of unique materials
+         * @param eventStatistics map of event type to count
+         * @param materialTypeStatistics map of material type to count
+         * @param firstEventTime timestamp of first event
+         * @param lastEventTime timestamp of last event
+         * @param eventTimeSpan time span of events
+         * @param averageEventRate average rate of events
+         */
+        public AnalyticsData(int totalEvents, double totalInventoryValue, int uniqueMaterialCount,
+                           Map&lt;String, Integer&gt; eventStatistics, Map&lt;String, Integer&gt; materialTypeStatistics,
+<span class="nc" id="L235">                           long firstEventTime, long lastEventTime, long eventTimeSpan, double averageEventRate) {</span>
+<span class="nc" id="L236">            this.totalEvents = totalEvents;</span>
+<span class="nc" id="L237">            this.totalInventoryValue = totalInventoryValue;</span>
+<span class="nc" id="L238">            this.uniqueMaterialCount = uniqueMaterialCount;</span>
+<span class="nc" id="L239">            this.eventStatistics = new HashMap&lt;&gt;(eventStatistics);</span>
+<span class="nc" id="L240">            this.materialTypeStatistics = new HashMap&lt;&gt;(materialTypeStatistics);</span>
+<span class="nc" id="L241">            this.firstEventTime = firstEventTime;</span>
+<span class="nc" id="L242">            this.lastEventTime = lastEventTime;</span>
+<span class="nc" id="L243">            this.eventTimeSpan = eventTimeSpan;</span>
+<span class="nc" id="L244">            this.averageEventRate = averageEventRate;</span>
+<span class="nc" id="L245">        }</span>
+        
+        /** Gets the total number of events. @return total number of events */
+<span class="nc" id="L248">        public int getTotalEvents() { return totalEvents; }</span>
+        /** Gets the total inventory value. @return total inventory value */
+<span class="nc" id="L250">        public double getTotalInventoryValue() { return totalInventoryValue; }</span>
+        /** Gets the number of unique materials. @return number of unique materials */
+<span class="nc" id="L252">        public int getUniqueMaterialCount() { return uniqueMaterialCount; }</span>
+        /** Gets the event statistics map. @return map of event type to count */
+<span class="nc" id="L254">        public Map&lt;String, Integer&gt; getEventStatistics() { return new HashMap&lt;&gt;(eventStatistics); }</span>
+        /** Gets the material type statistics map. @return map of material type to count */
+<span class="nc" id="L256">        public Map&lt;String, Integer&gt; getMaterialTypeStatistics() { return new HashMap&lt;&gt;(materialTypeStatistics); }</span>
+        /** Gets the timestamp of first event. @return timestamp of first event */
+<span class="nc" id="L258">        public long getFirstEventTime() { return firstEventTime; }</span>
+        /** Gets the timestamp of last event. @return timestamp of last event */
+<span class="nc" id="L260">        public long getLastEventTime() { return lastEventTime; }</span>
+        /** Gets the time span of events. @return time span of events */
+<span class="nc" id="L262">        public long getEventTimeSpan() { return eventTimeSpan; }</span>
+        /** Gets the average rate of events. @return average rate of events */
+<span class="nc" id="L264">        public double getAverageEventRate() { return averageEventRate; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L268">            return String.format(&quot;AnalyticsData[Events=%d, Value=$%.2f, Materials=%d, Rate=%.2f/s]&quot;,</span>
+<span class="nc" id="L269">                totalEvents, totalInventoryValue, uniqueMaterialCount, averageEventRate);</span>
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L275">        return String.format(&quot;AnalyticsObserver[Events=%d, Materials=%d, Value=$%.2f]&quot;,</span>
+<span class="nc" id="L276">            getTotalEvents(), getUniqueMaterialCount(), getTotalInventoryValue());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

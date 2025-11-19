@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookstoreApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore</a> &gt; <span class="el_source">BookstoreApplication.java</span></div><h1>BookstoreApplication.java</h1><pre class="source lang-java linenums">package com.university.bookstore;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.university.bookstore.api.MaterialStore;
+import com.university.bookstore.impl.ModernConcurrentMaterialStore;
+
+/**
+ * Spring Boot application entry point for the Bookstore Management System.
+ * 
+ * &lt;p&gt;This class demonstrates how the existing design can be easily extended
+ * with Spring Boot to provide REST API capabilities without modifying the
+ * core business logic or existing implementations.&lt;/p&gt;
+ * 
+ * &lt;p&gt;The application leverages the existing MaterialStore interface and
+ * implementations, showing the extensibility and scalability of the
+ * hexagonal architecture design.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 1.0
+ * @since 2024-12-19
+ */
+@SpringBootApplication
+@Configuration
+<span class="fc" id="L28">public class BookstoreApplication {</span>
+
+    /**
+     * Main entry point for the Spring Boot application.
+     * 
+     * @param args command line arguments
+     */
+    public static void main(String[] args) {
+<span class="nc" id="L36">        SpringApplication.run(BookstoreApplication.class, args);</span>
+<span class="nc" id="L37">    }</span>
+
+    /**
+     * Configures the MaterialStore bean using the existing ModernConcurrentMaterialStore.
+     * This demonstrates how the existing implementations can be easily integrated
+     * with Spring Boot dependency injection.
+     * 
+     * @return configured MaterialStore instance
+     */
+    @Bean
+    public MaterialStore materialStore() {
+<span class="fc" id="L48">        return new ModernConcurrentMaterialStore();</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

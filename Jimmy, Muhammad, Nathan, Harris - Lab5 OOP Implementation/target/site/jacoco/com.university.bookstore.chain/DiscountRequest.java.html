@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DiscountRequest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.chain</a> &gt; <span class="el_source">DiscountRequest.java</span></div><h1>DiscountRequest.java</h1><pre class="source lang-java linenums">package com.university.bookstore.chain;
+
+import java.util.Objects;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Request object for discount approval in the Chain of Responsibility pattern.
+ * Contains all information needed to process a discount request.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class DiscountRequest {
+    
+    private final Material material;
+    private final double requestedDiscount;
+    private final String customerId;
+    private final String reason;
+    private boolean approved;
+    private String approvedBy;
+    private String rejectionReason;
+    private final long timestamp;
+    
+    /**
+     * Creates a new discount request.
+     * 
+     * @param material the material for which discount is requested
+     * @param requestedDiscount the requested discount rate (0.0 to 1.0)
+     * @param customerId the customer requesting the discount
+     * @param reason the reason for the discount request
+     * @throws IllegalArgumentException if parameters are invalid
+     */
+    public DiscountRequest(Material material, double requestedDiscount, 
+<span class="fc" id="L36">                          String customerId, String reason) {</span>
+<span class="fc" id="L37">        this.material = Objects.requireNonNull(material, &quot;Material cannot be null&quot;);</span>
+<span class="fc" id="L38">        this.requestedDiscount = Math.max(0.0, Math.min(1.0, requestedDiscount));</span>
+<span class="fc" id="L39">        this.customerId = Objects.requireNonNull(customerId, &quot;Customer ID cannot be null&quot;);</span>
+<span class="fc" id="L40">        this.reason = Objects.requireNonNull(reason, &quot;Reason cannot be null&quot;);</span>
+<span class="fc" id="L41">        this.approved = false;</span>
+<span class="fc" id="L42">        this.timestamp = System.currentTimeMillis();</span>
+<span class="fc" id="L43">    }</span>
+    
+    /**
+     * Gets the material for which discount is requested.
+     * 
+     * @return the material
+     */
+    public Material getMaterial() {
+<span class="fc" id="L51">        return material;</span>
+    }
+    
+    /**
+     * Gets the requested discount rate.
+     * 
+     * @return the discount rate (0.0 to 1.0)
+     */
+    public double getRequestedDiscount() {
+<span class="fc" id="L60">        return requestedDiscount;</span>
+    }
+    
+    /**
+     * Gets the requested discount percentage.
+     * 
+     * @return the discount percentage (0.0 to 100.0)
+     */
+    public double getRequestedDiscountPercentage() {
+<span class="fc" id="L69">        return requestedDiscount * 100.0;</span>
+    }
+    
+    /**
+     * Gets the customer ID.
+     * 
+     * @return the customer ID
+     */
+    public String getCustomerId() {
+<span class="nc" id="L78">        return customerId;</span>
+    }
+    
+    /**
+     * Gets the reason for the discount request.
+     * 
+     * @return the reason
+     */
+    public String getReason() {
+<span class="nc" id="L87">        return reason;</span>
+    }
+    
+    /**
+     * Checks if the request is approved.
+     * 
+     * @return true if approved
+     */
+    public boolean isApproved() {
+<span class="fc" id="L96">        return approved;</span>
+    }
+    
+    /**
+     * Sets the approval status.
+     * 
+     * @param approved the approval status
+     */
+    public void setApproved(boolean approved) {
+<span class="fc" id="L105">        this.approved = approved;</span>
+<span class="fc" id="L106">    }</span>
+    
+    /**
+     * Gets who approved the request.
+     * 
+     * @return the approver name
+     */
+    public String getApprovedBy() {
+<span class="fc" id="L114">        return approvedBy;</span>
+    }
+    
+    /**
+     * Sets who approved the request.
+     * 
+     * @param approvedBy the approver name
+     */
+    public void setApprovedBy(String approvedBy) {
+<span class="fc" id="L123">        this.approvedBy = approvedBy;</span>
+<span class="fc" id="L124">    }</span>
+    
+    /**
+     * Gets the rejection reason.
+     * 
+     * @return the rejection reason
+     */
+    public String getRejectionReason() {
+<span class="fc" id="L132">        return rejectionReason;</span>
+    }
+    
+    /**
+     * Sets the rejection reason.
+     * 
+     * @param rejectionReason the rejection reason
+     */
+    public void setRejectionReason(String rejectionReason) {
+<span class="fc" id="L141">        this.rejectionReason = rejectionReason;</span>
+<span class="fc" id="L142">    }</span>
+    
+    /**
+     * Gets the request timestamp.
+     * 
+     * @return the timestamp in milliseconds
+     */
+    public long getTimestamp() {
+<span class="nc" id="L150">        return timestamp;</span>
+    }
+    
+    /**
+     * Calculates the discounted price if approved.
+     * 
+     * @return the discounted price
+     */
+    public double getDiscountedPrice() {
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (approved) {</span>
+<span class="fc" id="L160">            return material.getPrice() * (1.0 - requestedDiscount);</span>
+        }
+<span class="nc" id="L162">        return material.getPrice();</span>
+    }
+    
+    /**
+     * Calculates the savings amount if approved.
+     * 
+     * @return the savings amount
+     */
+    public double getSavingsAmount() {
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">        if (approved) {</span>
+<span class="fc" id="L172">            return material.getPrice() * requestedDiscount;</span>
+        }
+<span class="nc" id="L174">        return 0.0;</span>
+    }
+    
+    /**
+     * Gets a summary of the discount request.
+     * 
+     * @return the request summary
+     */
+    public String getSummary() {
+<span class="nc" id="L183">        return String.format(&quot;Discount Request: %s for %s (%.1f%%) - %s&quot;,</span>
+<span class="nc" id="L184">            material.getTitle(), customerId, getRequestedDiscountPercentage(), reason);</span>
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        if (this == obj) return true;</span>
+<span class="nc bnc" id="L190" title="All 4 branches missed.">        if (obj == null || getClass() != obj.getClass()) return false;</span>
+        
+<span class="nc" id="L192">        DiscountRequest that = (DiscountRequest) obj;</span>
+<span class="nc bnc" id="L193" title="All 6 branches missed.">        return Double.compare(that.requestedDiscount, requestedDiscount) == 0 &amp;&amp;</span>
+               approved == that.approved &amp;&amp;
+               timestamp == that.timestamp &amp;&amp;
+<span class="nc bnc" id="L196" title="All 2 branches missed.">               Objects.equals(material, that.material) &amp;&amp;</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">               Objects.equals(customerId, that.customerId) &amp;&amp;</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">               Objects.equals(reason, that.reason) &amp;&amp;</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">               Objects.equals(approvedBy, that.approvedBy) &amp;&amp;</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">               Objects.equals(rejectionReason, that.rejectionReason);</span>
+    }
+    
+    @Override
+    public int hashCode() {
+<span class="nc" id="L205">        return Objects.hash(material, requestedDiscount, customerId, reason, </span>
+<span class="nc" id="L206">                          approved, approvedBy, rejectionReason, timestamp);</span>
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L211">        return String.format(&quot;DiscountRequest[%s, %.1f%%, %s, %s, Approved=%s]&quot;,</span>
+<span class="nc" id="L212">            material.getTitle(), getRequestedDiscountPercentage(), customerId, reason, approved);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.service</a> &gt; <span class="el_source">MaterialService.java</span></div><h1>MaterialService.java</h1><pre class="source lang-java linenums">package com.university.bookstore.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import com.university.bookstore.model.Material;
+import com.university.bookstore.repository.MaterialRepository;
+
+/**
+ * Domain service that orchestrates business logic for material management.
+ * Demonstrates hexagonal architecture by coordinating between domain logic and infrastructure.
+ * 
+ * &lt;p&gt;This service encapsulates business rules and coordinates between the domain layer
+ * and the repository layer, maintaining clean separation of concerns.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class MaterialService {
+    
+    private final MaterialRepository repository;
+    
+    /**
+     * Creates a new material service with the specified repository.
+     * 
+     * @param repository the material repository to use
+     */
+<span class="fc" id="L29">    public MaterialService(MaterialRepository repository) {</span>
+<span class="fc" id="L30">        this.repository = repository;</span>
+<span class="fc" id="L31">    }</span>
+    
+    /**
+     * Adds a material to the system with business logic validation.
+     * 
+     * @param material the material to add
+     * @throws InvalidMaterialException if the material is invalid
+     */
+    public void addMaterial(Material material) {
+<span class="fc" id="L40">        validateMaterial(material);</span>
+<span class="fc" id="L41">        repository.save(material);</span>
+<span class="fc" id="L42">    }</span>
+    
+    /**
+     * Updates an existing material with business logic validation.
+     * 
+     * @param material the material to update
+     * @throws InvalidMaterialException if the material is invalid
+     * @throws MaterialNotFoundException if the material doesn't exist
+     */
+    public void updateMaterial(Material material) {
+<span class="nc" id="L52">        validateMaterial(material);</span>
+        
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (!repository.exists(material.getId())) {</span>
+<span class="nc" id="L55">            throw new MaterialNotFoundException(&quot;Material not found: &quot; + material.getId());</span>
+        }
+        
+<span class="nc" id="L58">        repository.save(material);</span>
+<span class="nc" id="L59">    }</span>
+    
+    /**
+     * Finds a material by its ID.
+     * 
+     * @param id the material ID
+     * @return the material if found
+     * @throws MaterialNotFoundException if the material doesn't exist
+     */
+    public Material findMaterial(String id) {
+<span class="pc" id="L69">        return repository.findById(id)</span>
+<span class="pc" id="L70">            .orElseThrow(() -&gt; new MaterialNotFoundException(&quot;Material not found: &quot; + id));</span>
+    }
+    
+    /**
+     * Finds a material by its ID, returning Optional.
+     * 
+     * @param id the material ID
+     * @return Optional containing the material if found
+     */
+    public Optional&lt;Material&gt; findMaterialOptional(String id) {
+<span class="fc" id="L80">        return repository.findById(id);</span>
+    }
+    
+    /**
+     * Gets all materials in the system.
+     * 
+     * @return list of all materials
+     */
+    public List&lt;Material&gt; getAllMaterials() {
+<span class="nc" id="L89">        return repository.findAll();</span>
+    }
+    
+    /**
+     * Removes a material from the system.
+     * 
+     * @param id the material ID to remove
+     * @return true if the material was removed, false if not found
+     */
+    public boolean removeMaterial(String id) {
+<span class="nc" id="L99">        return repository.delete(id);</span>
+    }
+    
+    /**
+     * Checks if a material exists in the system.
+     * 
+     * @param id the material ID
+     * @return true if the material exists
+     */
+    public boolean materialExists(String id) {
+<span class="nc" id="L109">        return repository.exists(id);</span>
+    }
+    
+    /**
+     * Gets the total number of materials in the system.
+     * 
+     * @return the material count
+     */
+    public long getMaterialCount() {
+<span class="nc" id="L118">        return repository.count();</span>
+    }
+    
+    /**
+     * Clears all materials from the system.
+     */
+    public void clearAllMaterials() {
+<span class="nc" id="L125">        repository.deleteAll();</span>
+<span class="nc" id="L126">    }</span>
+    
+    /**
+     * Validates a material according to business rules.
+     * 
+     * @param material the material to validate
+     * @throws InvalidMaterialException if validation fails
+     */
+    private void validateMaterial(Material material) {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (material == null) {</span>
+<span class="nc" id="L136">            throw new InvalidMaterialException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">        if (material.getId() == null || material.getId().trim().isEmpty()) {</span>
+<span class="nc" id="L140">            throw new InvalidMaterialException(&quot;Material ID cannot be null or empty&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L143" title="2 of 4 branches missed.">        if (material.getTitle() == null || material.getTitle().trim().isEmpty()) {</span>
+<span class="nc" id="L144">            throw new InvalidMaterialException(&quot;Material title cannot be null or empty&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L147" title="2 of 4 branches missed.">        if (material.getCreator() == null || material.getCreator().trim().isEmpty()) {</span>
+<span class="nc" id="L148">            throw new InvalidMaterialException(&quot;Material creator cannot be null or empty&quot;);</span>
+        }
+        
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if (material.getPrice() &lt; 0) {</span>
+<span class="nc" id="L152">            throw new InvalidMaterialException(&quot;Material price cannot be negative: &quot; + material.getPrice());</span>
+        }
+        
+<span class="pc bpc" id="L155" title="2 of 4 branches missed.">        if (material.getYear() &lt; 1000 || material.getYear() &gt; 2100) {</span>
+<span class="nc" id="L156">            throw new InvalidMaterialException(&quot;Material year must be between 1000 and 2100: &quot; + material.getYear());</span>
+        }
+<span class="fc" id="L158">    }</span>
+    
+    /**
+     * Exception thrown when a material is invalid according to business rules.
+     */
+    public static class InvalidMaterialException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        
+        public InvalidMaterialException(String message) {
+<span class="nc" id="L167">            super(message);</span>
+<span class="nc" id="L168">        }</span>
+        
+        public InvalidMaterialException(String message, Throwable cause) {
+<span class="nc" id="L171">            super(message, cause);</span>
+<span class="nc" id="L172">        }</span>
+    }
+    
+    /**
+     * Exception thrown when a requested material is not found.
+     */
+    public static class MaterialNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        
+        public MaterialNotFoundException(String message) {
+<span class="fc" id="L182">            super(message);</span>
+<span class="fc" id="L183">        }</span>
+        
+        public MaterialNotFoundException(String message, Throwable cause) {
+<span class="nc" id="L186">            super(message, cause);</span>
+<span class="nc" id="L187">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

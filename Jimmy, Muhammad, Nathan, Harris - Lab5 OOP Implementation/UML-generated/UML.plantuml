@@ -1,0 +1,1530 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class AdvancedMaterialFactory {
+  + AdvancedMaterialFactory(): 
+  - validateMagazineProperties(Map<String, Object>): void
+  - getRequiredInt(Map<String, Object>, String): int
+  - getRequiredStringList(Map<String, Object>, String): List<String>
+  - createPrintedBook(Map<String, Object>): PrintedBook
+  + validateRequiredProperties(String, Map<String, Object>): void
+  - createAudioBook(Map<String, Object>): AudioBook
+  - validateEBookProperties(Map<String, Object>): void
+  - getRequiredDouble(Map<String, Object>, String): double
+  - createEBook(Map<String, Object>): EBook
+  + createMaterial(String, Map<String, Object>): Material
+  - createVideoMaterial(Map<String, Object>): VideoMaterial
+  - getRequiredEnum(Map<String, Object>, String, Class<T>): T
+  - validateVideoMaterialProperties(Map<String, Object>): void
+  - validateRequiredKeys(Map<String, Object>, String[]): void
+  - createMagazine(Map<String, Object>): Magazine
+  - validatePrintedBookProperties(Map<String, Object>): void
+  - validateAudioBookProperties(Map<String, Object>): void
+  - getRequiredString(Map<String, Object>, String): String
+  - getRequiredBoolean(Map<String, Object>, String): boolean
+}
+class AnalyticsData {
+  + AnalyticsData(int, double, int, Map<String, Integer>, Map<String, Integer>, long, long, long, double): 
+  - averageEventRate: double
+  - lastEventTime: long
+  - totalInventoryValue: double
+  - uniqueMaterialCount: int
+  - firstEventTime: long
+  - materialTypeStatistics: Map<String, Integer>
+  - totalEvents: int
+  - eventStatistics: Map<String, Integer>
+  - eventTimeSpan: long
+  + toString(): String
+   totalEvents: int
+   uniqueMaterialCount: int
+   eventTimeSpan: long
+   totalInventoryValue: double
+   materialTypeStatistics: Map<String, Integer>
+   averageEventRate: double
+   lastEventTime: long
+   firstEventTime: long
+   eventStatistics: Map<String, Integer>
+}
+class AnalyticsObserver {
+  + AnalyticsObserver(): 
+  - totalEvents: int
+  - lastEventTime: long
+  - firstEventTime: long
+  + clear(): void
+  + onEvent(MaterialEvent): void
+  + getMaterialTypeCount(String): int
+  + toString(): String
+  + getEventCount(String): int
+   totalEvents: int
+   uniqueMaterialCount: int
+   eventTimeSpan: long
+   totalInventoryValue: double
+   materialTypeStatistics: Map<String, Integer>
+   analyticsData: AnalyticsData
+   averageEventRate: double
+   observerName: String
+   lastEventTime: long
+   firstEventTime: long
+   eventStatistics: Map<String, Integer>
+}
+class ApprovalStats {
+  + ApprovalStats(int, int, int, double, double): 
+  - totalRequests: int
+  - approvedRequests: int
+  - totalSavings: double
+  - rejectedRequests: int
+  - approvalRate: double
+  + toString(): String
+   approvalRate: double
+   rejectedRequests: int
+   totalRequests: int
+   totalSavings: double
+   approvedRequests: int
+}
+class AudioBook {
+  + AudioBook(String, String, String, String, double, int, int, String, double, MediaQuality, String, boolean): 
+  - quality: MediaQuality
+  - language: String
+  - fileSize: double
+  - duration: int
+  - narrator: String
+  - streamingOnly: boolean
+  - author: String
+  - format: String
+  - unabridged: boolean
+  - isbn: String
+  - validateFileSize(double): double
+  + toString(): String
+  + getAdjustedDuration(double): int
+  - validateDuration(int): int
+  - validateIsbn(String): String
+  + calculateListeningSessions(int): int
+   format: String
+   language: String
+   fileSize: double
+   displayInfo: String
+   unabridged: boolean
+   isbn: String
+   quality: MediaQuality
+   streamingOnly: boolean
+   author: String
+   duration: int
+   narrator: String
+   discountRate: double
+   creator: String
+}
+class AuditLogEntry {
+  + AuditLogEntry(long, String, String, String, String): 
+  - eventType: String
+  - materialTitle: String
+  - timestamp: long
+  - description: String
+  - materialId: String
+  + toString(): String
+   description: String
+   eventType: String
+   timestamp: long
+   materialId: String
+   materialTitle: String
+}
+class AuditLogObserver {
+  + AuditLogObserver(int): 
+  + AuditLogObserver(): 
+  - auditLog: List<AuditLogEntry>
+  + clearAuditLog(): void
+  + getAuditLogForMaterial(String): List<AuditLogEntry>
+  + getAuditLogForEventType(String): List<AuditLogEntry>
+  + onEvent(MaterialEvent): void
+  + getAuditLogForTimeRange(long, long): List<AuditLogEntry>
+  + toString(): String
+  + printAuditLog(): void
+   logSize: int
+   auditLogStats: AuditLogStats
+   auditLog: List<AuditLogEntry>
+   observerName: String
+}
+class AuditLogStats {
+  + AuditLogStats(int, int, int, long, long): 
+  - priceChangedCount: int
+  - newestTimestamp: long
+  - totalEntries: int
+  - materialAddedCount: int
+  - oldestTimestamp: long
+  + toString(): String
+   newestTimestamp: long
+   priceChangedCount: int
+   totalEntries: int
+   materialAddedCount: int
+   oldestTimestamp: long
+}
+entity BatchOperationResult << record >> {
+  + BatchOperationResult(int, int, List<String>): 
+  + errors(): List<String>
+  + failed(): int
+  + totalOperations(): int
+  + successRate(): double
+  + successful(): int
+   completeSuccess: boolean
+}
+class Book {
+  + Book(String, String, String, double, int): 
+  - author: String
+  - price: double
+  - title: String
+  - year: int
+  - isbn: String
+  - validateIsbn(String): String
+  + compareTo(Book): int
+  - validateStringField(String, String): String
+  + equals(Object): boolean
+  + toString(): String
+  - validatePrice(double): double
+  + hashCode(): int
+  - validateYear(int): int
+   year: int
+   price: double
+   title: String
+   isbn: String
+   author: String
+}
+class BookArrayUtils {
+  - BookArrayUtils(): 
+  + filterPriceAtMost(Book[], double): Book[]
+  + countBeforeYear(Book[], int): int
+  + findOldest(Book[]): Book
+  + removeDuplicates(Book[]): Book[]
+  + sortByYear(Book[]): void
+  + countByAuthor(Book[], String): int
+  + countByDecade(Book[]): Map<Integer, Integer>
+  + averagePrice(Book[]): double
+  + findLongestTitle(Book[]): Book
+  + sortByPrice(Book[]): void
+  + filterByYearRange(Book[], int, int): Book[]
+  + filterByDecade(Book[], int): Book[]
+  + merge(Book[], Book[]): Book[]
+}
+interface BookstoreAPI << interface >> {
+  + findByPriceRange(double, double): List<Book>
+  + size(): int
+  + snapshotArray(): Book[]
+  + findByAuthor(String): List<Book>
+  + add(Book): boolean
+  + findByIsbn(String): Book
+  + removeByIsbn(String): boolean
+  + findByYear(int): List<Book>
+  + inventoryValue(): double
+  + findByTitle(String): List<Book>
+   mostExpensive: Book
+   mostRecent: Book
+   allBooks: List<Book>
+}
+class BookstoreApplication {
+  + BookstoreApplication(): 
+  + materialStore(): MaterialStore
+  + main(String[]): void
+}
+class BookstoreArrayList {
+  + BookstoreArrayList(): 
+  + BookstoreArrayList(Collection<Book>): 
+  + findByYear(int): List<Book>
+  + sortByTitle(): void
+  + findByPriceRange(double, double): List<Book>
+  + sortByYear(): void
+  + removeByIsbn(String): boolean
+  + size(): int
+  + clear(): void
+  + toString(): String
+  + findByIsbn(String): Book
+  + add(Book): boolean
+  + findByTitle(String): List<Book>
+  + snapshotArray(): Book[]
+  + findByAuthor(String): List<Book>
+  + inventoryValue(): double
+  + sortByPrice(): void
+   mostExpensive: Book
+   mostRecent: Book
+   statistics: Map<String, Object>
+   allBooks: List<Book>
+}
+class Builder {
+  + Builder(): 
+  + withTitle(String): Builder
+  + withYearRange(Integer, Integer): Builder
+  + withCreator(String): Builder
+  + withType(MaterialType): Builder
+  + withPriceRange(Double, Double): Builder
+  + build(): SearchCriteria
+}
+class BundleService {
+  + BundleService(): 
+  + calculateTotalSavings(): double
+  + addToBundle(String, Material): void
+  + removeFromBundle(String, Material): boolean
+  + toString(): String
+  + createBundle(String, double): MaterialBundle
+  + addBundleToBundle(String, String): void
+  + addComponentToBundle(String, MaterialComponent): void
+  + getBundlesByDiscount(double): List<MaterialBundle>
+  + getBundlesByValueRange(double, double): List<MaterialBundle>
+  + getBundle(String): Optional<MaterialBundle>
+  + calculateBundleSavings(String): double
+  + getBundlesByMaterialType(MaterialType): List<MaterialBundle>
+  + removeBundle(String): boolean
+  + clearAllBundles(): void
+   totalBundleValue: double
+   bundleCount: int
+   bundleNames: List<String>
+   empty: boolean
+   totalDiscountedBundleValue: double
+   allBundles: List<MaterialBundle>
+   bundleStats: BundleStats
+}
+class BundleStats {
+  + BundleStats(int, int, double, double, double, double): 
+  - totalDiscountedValue: double
+  - totalSavings: double
+  - averageDiscount: double
+  - totalItems: int
+  - totalValue: double
+  - totalBundles: int
+  + toString(): String
+   totalBundles: int
+   totalItems: int
+   totalValue: double
+   averageDiscount: double
+   totalDiscountedValue: double
+   totalSavings: double
+}
+class CacheEntry {
+  ~ CacheEntry(List<Material>): 
+}
+entity CacheEntry << record >> {
+  - CacheEntry(List<Material>, Instant, Instant, AtomicLong): 
+  + isStale(Duration): boolean
+  + value(): List<Material>
+  + isExpired(Duration): boolean
+  + createdAt(): Instant
+  + of(List<Material>): CacheEntry
+  + lastAccessedAt(): Instant
+  + accessCount(): AtomicLong
+  + recordAccess(): CacheEntry
+}
+entity CacheStats << record >> {
+  + CacheStats(long, long, long, long, double, double, int, long): 
+  + hitCount(): long
+  + missCount(): long
+  + evictionCount(): long
+  + loadCount(): long
+  + totalAccessCount(): long
+  + averageLoadTime(): double
+  + hitRate(): double
+  + size(): int
+   summary: String
+}
+class CacheStats {
+  + CacheStats(int, int, double, double, long, long): 
+  - averageAge: double
+  - totalHits: long
+  - currentSize: int
+  - maxSize: int
+  - totalRequests: long
+  - hitRatio: double
+  + toString(): String
+   averageAge: double
+   hitRatio: double
+   maxSize: int
+   currentSize: int
+   totalHits: long
+   totalRequests: long
+}
+class CachedSearchService {
+  + CachedSearchService(MaterialRepository, int): 
+  - initializeTrie(): void
+  + toString(): String
+  + searchByPrefixWithLimit(String, int): List<Material>
+  + addMaterial(Material): void
+  + removeMaterial(Material): void
+  - invalidateCacheForMaterial(Material): void
+  + refreshIndex(): void
+  + searchByPrefix(String): List<Material>
+  + clear(): void
+   indexEmpty: boolean
+   indexSize: int
+   cacheStats: CacheStats
+}
+interface ComponentBuilder<T> << interface >> {
+  + build(): T
+  + validate(): void
+  + reset(): void
+}
+class ConcurrentMaterialStore {
+  + ConcurrentMaterialStore(): 
+  + ConcurrentMaterialStore(Collection<Material>): 
+  + getMaterialsByPriceRange(double, double): List<Material>
+  + size(): int
+  + groupByType(): Map<MaterialType, List<Material>>
+  + searchByCreator(String): List<Material>
+  + removeMaterial(String): Optional<Material>
+  + getMaterialsByYear(int): List<Material>
+  + getSorted(Comparator<Material>): List<Material>
+  + findWithPredicate(Predicate<Material>): List<Material>
+  + findById(String): Optional<Material>
+  + toString(): String
+  + addMaterial(Material): boolean
+  + getMaterialsByType(MaterialType): List<Material>
+  + clearInventory(): void
+  + filterMaterials(Predicate<Material>): List<Material>
+  + findByCreators(String[]): List<Material>
+  + searchByTitle(String): List<Material>
+  + findRecentMaterials(int): List<Material>
+   mediaMaterials: List<Media>
+   discountedMaterials: List<Material>
+   allMaterials: List<Material>
+   empty: boolean
+   totalInventoryValue: double
+   allDisplayInfo: List<String>
+   allMaterialsSorted: List<Material>
+   inventoryStats: InventoryStats
+   totalDiscountAmount: double
+   totalDiscountedValue: double
+}
+class DigitalAnnotationDecorator {
+  + DigitalAnnotationDecorator(Material): 
+  - annotations: List<String>
+  + hasAnnotations(): boolean
+  + clearAnnotations(): void
+  + equals(Object): boolean
+  + removeAnnotation(int): String
+  + addAnnotation(String): void
+  + hashCode(): int
+   displayInfo: String
+   price: double
+   annotations: List<String>
+   digitalAnnotationCost: double
+   annotationCount: int
+}
+class DirectorHandler {
+  + DirectorHandler(): 
+  - MAX_DISCOUNT: double
+  + handleRequest(DiscountRequest): void
+   handlerName: String
+   MAX_DISCOUNT: double
+}
+class DiscountApprovalService {
+  + DiscountApprovalService(): 
+  + DiscountApprovalService(DiscountHandler): 
+  - processedRequests: List<DiscountRequest>
+  + clearRequests(): void
+  + getRequestsForCustomer(String): List<DiscountRequest>
+  + requestDiscount(Material, double, String, String): DiscountRequest
+  + toString(): String
+  + getRequestsForMaterial(Material): List<DiscountRequest>
+  + calculateFinalPrice(DiscountRequest): double
+  - buildDefaultChain(): DiscountHandler
+   chainInfo: String
+   approvalStats: ApprovalStats
+   approvedRequests: List<DiscountRequest>
+   processedRequests: List<DiscountRequest>
+   rejectedRequests: List<DiscountRequest>
+}
+class DiscountHandler {
+  + DiscountHandler(): 
+  + handleRequest(DiscountRequest): void
+  # passToNext(DiscountRequest): void
+  + canApprove(double): boolean
+  + toString(): String
+   handlerName: String
+   maxDiscount: double
+   chainLength: int
+   next: DiscountHandler
+   handlerInfo: String
+}
+class DiscountRequest {
+  + DiscountRequest(Material, double, String, String): 
+  - approvedBy: String
+  - approved: boolean
+  - rejectionReason: String
+  - material: Material
+  - reason: String
+  - customerId: String
+  - timestamp: long
+  - requestedDiscount: double
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   requestedDiscountPercentage: double
+   savingsAmount: double
+   discountedPrice: double
+   customerId: String
+   summary: String
+   timestamp: long
+   approvedBy: String
+   material: Material
+   approved: boolean
+   rejectionReason: String
+   reason: String
+   requestedDiscount: double
+}
+class EBook {
+  + EBook(String, String, String, double, int, String, double, boolean, int, MediaQuality): 
+  - quality: MediaQuality
+  - drmEnabled: boolean
+  - fileFormat: String
+  - fileSize: double
+  - author: String
+  - wordCount: int
+  + toString(): String
+  - validateFileSize(double): double
+  - validateFileFormat(String): String
+  - validateWordCount(int): int
+  + hashCode(): int
+  + equals(Object): boolean
+   description: String
+   format: String
+   fileSize: double
+   displayInfo: String
+   drmEnabled: boolean
+   quality: MediaQuality
+   streamingOnly: boolean
+   author: String
+   duration: int
+   fileFormat: String
+   discountRate: double
+   readingTimeMinutes: int
+   wordCount: int
+   creator: String
+}
+class EBookBuilder {
+  + EBookBuilder(): 
+  - fileSize: double
+  - title: String
+  - year: int
+  - drmEnabled: boolean
+  - price: double
+  - id: String
+  - fileFormat: String
+  - wordCount: int
+  - author: String
+  - quality: MediaQuality
+  + setHighQuality(): EBookBuilder
+  + build(): EBook
+  + enableDRM(): EBookBuilder
+  + disableDRM(): EBookBuilder
+  + setLowQuality(): EBookBuilder
+  + reset(): void
+  + validate(): void
+  + toString(): String
+   year: int
+   quality: MediaQuality
+   price: double
+   title: String
+   fileSize: double
+   author: String
+   fileFormat: String
+   drmEnabled: boolean
+   wordCount: int
+   id: String
+}
+class ExpeditedDeliveryDecorator {
+  + ExpeditedDeliveryDecorator(Material, int): 
+  - deliveryDays: int
+  + hashCode(): int
+  + equals(Object): boolean
+   expeditedDeliveryCost: double
+   displayInfo: String
+   price: double
+   deliveryDays: int
+}
+class GiftWrappingDecorator {
+  + GiftWrappingDecorator(Material, String): 
+  - GIFT_WRAPPING_COST: double
+  - wrappingStyle: String
+  + equals(Object): boolean
+  + hashCode(): int
+   wrappingStyle: String
+   displayInfo: String
+   GIFT_WRAPPING_COST: double
+   price: double
+}
+class InvalidMaterialException {
+  + InvalidMaterialException(String, Throwable): 
+  + InvalidMaterialException(String): 
+}
+class InventoryObserver {
+  + InventoryObserver(): 
+  - totalEvents: int
+  + onEvent(MaterialEvent): void
+  - handlePriceChanged(MaterialEvent): void
+  + getInventoryCount(String): int
+  + getTotalValue(String): double
+  + toString(): String
+  - handleMaterialAdded(MaterialEvent): void
+  + clear(): void
+   totalEvents: int
+   uniqueMaterialCount: int
+   totalInventoryValue: double
+   totalInventoryCount: int
+   allInventoryCounts: Map<String, Integer>
+   observerName: String
+   allTotalValues: Map<String, Double>
+}
+class InventoryStats {
+  + InventoryStats(int, double, double, int, int, int): 
+  - averagePrice: double
+  - uniqueTypes: int
+  - printCount: int
+  - medianPrice: double
+  - totalCount: int
+  - mediaCount: int
+  + toString(): String
+   uniqueTypes: int
+   printCount: int
+   averagePrice: double
+   medianPrice: double
+   totalCount: int
+   mediaCount: int
+}
+class JsonMaterialRepository {
+  + JsonMaterialRepository(String): 
+  - filePath: String
+  + count(): long
+  + dataFileExists(): boolean
+  + findById(String): Optional<Material>
+  + deleteAll(): void
+  + save(Material): void
+  - loadAll(): List<Material>
+  + delete(String): boolean
+  + exists(String): boolean
+  - validateAndSanitizePath(String): String
+  + findAll(): List<Material>
+   dataFileSize: long
+   filePath: String
+}
+class LoggerFactory {
+  - LoggerFactory(): 
+  + getLogger(Class<?>): Logger
+  + getLogger(String): Logger
+}
+class Magazine {
+  + Magazine(String, String, String, double, int, int, String, String): 
+  - issn: String
+  - publisher: String
+  - frequency: String
+  - category: String
+  - issueNumber: int
+  - validateIssn(String): String
+  + toString(): String
+  + calculateAnnualSubscription(): double
+  - validateIssueNumber(int): int
+   frequency: String
+   discountRate: double
+   displayInfo: String
+   issuesPerYear: int
+   issn: String
+   issueNumber: int
+   category: String
+   publisher: String
+   creator: String
+}
+class ManagerHandler {
+  + ManagerHandler(): 
+  - MAX_DISCOUNT: double
+  + handleRequest(DiscountRequest): void
+   handlerName: String
+   MAX_DISCOUNT: double
+}
+class Material {
+  # Material(String, String, double, int, MaterialType): 
+  # title: String
+  # year: int
+  # price: double
+  # id: String
+  # type: MaterialType
+  # validatePrice(double): double
+  # validateYear(int): int
+  + hashCode(): int
+  # validateId(String): String
+  + compareTo(Material): int
+  # validateStringField(String, String): String
+  + equals(Object): boolean
+  + toString(): String
+   discountedPrice: double
+   year: int
+   price: double
+   title: String
+   discountRate: double
+   displayInfo: String
+   type: MaterialType
+   id: String
+   creator: String
+}
+class MaterialAddedEvent {
+  + MaterialAddedEvent(Material): 
+  - material: Material
+  - timestamp: long
+  + toString(): String
+  + equals(Object): boolean
+  + hashCode(): int
+   description: String
+   eventType: String
+   timestamp: long
+   material: Material
+}
+interface MaterialBuilder<T> << interface >> {
+  + validate(): void
+  + build(): T
+  + reset(): void
+}
+class MaterialBundle {
+  + MaterialBundle(String, double): 
+  - components: List<MaterialComponent>
+  - bundleName: String
+  - bundleDiscount: double
+  - containsBundle(MaterialBundle): boolean
+  + addComponent(MaterialComponent): void
+  + getMaterialsByType(MaterialType): List<Material>
+  + equals(Object): boolean
+  + removeComponent(MaterialComponent): boolean
+  + hashCode(): int
+  + containsMaterial(Material): boolean
+  + containsType(MaterialType): boolean
+  + toString(): String
+   description: String
+   materials: List<Material>
+   bundleDiscount: double
+   price: double
+   leaf: boolean
+   components: List<MaterialComponent>
+   bundleName: String
+   discountedPrice: double
+   title: String
+   discountRate: double
+   itemCount: int
+   componentCount: int
+   totalSavings: double
+}
+class MaterialBundleBuilder {
+  + MaterialBundleBuilder(): 
+  - bundleName: String
+  - components: List<MaterialComponent>
+  - bundleDiscount: double
+  + setSmallDiscount(): MaterialBundleBuilder
+  + setLargeDiscount(): MaterialBundleBuilder
+  + hasComponents(): boolean
+  + reset(): void
+  + addComponent(MaterialComponent): MaterialBundleBuilder
+  + removeMaterial(Material): MaterialBundleBuilder
+  + addMaterial(Material): MaterialBundleBuilder
+  + build(): MaterialBundle
+  + toString(): String
+  + addMaterials(List<Material>): MaterialBundleBuilder
+  + validate(): void
+  + setMediumDiscount(): MaterialBundleBuilder
+  + removeComponent(MaterialComponent): MaterialBundleBuilder
+  + addComponents(List<MaterialComponent>): MaterialBundleBuilder
+  + clearComponents(): MaterialBundleBuilder
+  + addBundle(MaterialBundle): MaterialBundleBuilder
+   totalPrice: double
+   bundleDiscount: double
+   totalDiscountedPrice: double
+   components: List<MaterialComponent>
+   bundleDiscountPercent: double
+   bundleName: String
+   componentCount: int
+   totalSavings: double
+}
+interface MaterialComponent << interface >> {
+   materials: List<Material>
+   description: String
+   discountedPrice: double
+   price: double
+   title: String
+   composite: boolean
+   leaf: boolean
+   discountRate: double
+   itemCount: int
+}
+class MaterialController {
+  + MaterialController(MaterialStore): 
+  + getMaterialsByType(MaterialType): ResponseEntity<List<Material>>
+  + getMaterialById(String): ResponseEntity<Material>
+  + searchByCreator(String): ResponseEntity<List<Material>>
+  + deleteMaterial(String): ResponseEntity<Void>
+  + createMaterial(Material): ResponseEntity<Material>
+  + searchByTitle(String): ResponseEntity<List<Material>>
+  + updateMaterial(String, Material): ResponseEntity<Material>
+  + getRecentMaterials(int): ResponseEntity<List<Material>>
+  + getMaterialsByPriceRange(double, double): ResponseEntity<List<Material>>
+   materialCount: ResponseEntity<Integer>
+   inventoryStats: ResponseEntity<InventoryStats>
+   allMaterials: ResponseEntity<List<Material>>
+}
+class MaterialDecorator {
+  + MaterialDecorator(Material): 
+  # decoratedMaterial: Material
+  + hasDecorators(): boolean
+  + hashCode(): int
+  + toString(): String
+  + equals(Object): boolean
+   baseMaterial: Material
+   discountRate: double
+   decoratedMaterial: Material
+   displayInfo: String
+   decoratorCount: int
+   creator: String
+}
+class MaterialDirector {
+  + MaterialDirector(EBookBuilder, MaterialBundleBuilder): 
+  - bundleBuilder: MaterialBundleBuilder
+  + buildCourseBundle(String, List<Material>): MaterialBundle
+  + buildCustomBundle(String, List<Material>, double): MaterialBundle
+  + createBundleBuilder(): MaterialBundleBuilder
+  + buildNestedBundle(String, List<MaterialBundle>, double): MaterialBundle
+  + buildStarterBundle(String, List<Material>): MaterialBundle
+  + createEBookBuilder(): EBookBuilder
+  + buildStudentEBook(String, String, String, double): Material
+  + buildBasicEBook(String, String, String, double): Material
+  + buildTextbookBundle(String, List<Material>): MaterialBundle
+  + buildPremiumBundle(String, List<Material>): MaterialBundle
+  + buildPremiumEBook(String, String, String, double): Material
+   bundleBuilder: MaterialBundleBuilder
+   EBookBuilder: EBookBuilder
+}
+class MaterialEnhancementService {
+  + MaterialEnhancementService(): 
+  + calculateEnhancementCost(Material, Material): double
+  + getEnhancementCount(Material): int
+  + addDigitalAnnotations(Material): Material
+  + addExpeditedDelivery(Material, int): Material
+  + getEnhancementSummary(Material): String
+  + createDigitalPackage(Material): Material
+  + toString(): String
+  + getBasePrice(Material): double
+  + hasEnhancements(Material): boolean
+  + getBaseMaterial(Material): Material
+  + createPremiumPackage(Material, String, int): Material
+  + createGiftPackage(Material, String, int): Material
+  + hasEnhancement(Material, Class<MaterialDecorator>): boolean
+  + addGiftWrapping(Material, String): Material
+}
+interface MaterialEvent << interface >> {
+   description: String
+   eventType: String
+   timestamp: long
+   material: Material
+}
+class MaterialEventPublisher {
+  + MaterialEventPublisher(): 
+  - observers: List<MaterialObserver>
+  + publishPriceChanged(Material, double, double): void
+  + hasNoObservers(): boolean
+  + notifyObservers(MaterialEvent): void
+  + addObserver(MaterialObserver): void
+  + publishEvent(MaterialEvent): void
+  + hasObserver(MaterialObserver): boolean
+  + publishMaterialAdded(Material): void
+  + removeObserver(MaterialObserver): boolean
+  + getObserversOfType(Class<T>): List<T>
+  + clearObservers(): void
+  + toString(): String
+   observerCount: int
+   observers: List<MaterialObserver>
+}
+class MaterialFactory {
+  + MaterialFactory(): 
+  - createPrintedBook(Map<String, Object>): PrintedBook
+  - createAudioBook(Map<String, Object>): AudioBook
+  - getRequiredBoolean(Map<String, Object>, String): boolean
+  - createEBook(Map<String, Object>): EBook
+  + createMaterial(String, Map<String, Object>): Material
+  - getRequiredDouble(Map<String, Object>, String): double
+  - getRequiredInteger(Map<String, Object>, String): int
+  - createMagazine(Map<String, Object>): Magazine
+  - getOptionalString(Map<String, Object>, String, String): String
+  - getRequiredVideoType(Map<String, Object>, String): VideoType
+  - getOptionalStringList(Map<String, Object>, String): List<String>
+  - getRequiredMediaQuality(Map<String, Object>, String): MediaQuality
+  - getOptionalDouble(Map<String, Object>, String, double): double
+  - getRequiredString(Map<String, Object>, String): String
+  - createVideoMaterial(Map<String, Object>): VideoMaterial
+  - getOptionalBoolean(Map<String, Object>, String, boolean): boolean
+}
+interface MaterialIterator << interface >> {
+  + next(): Material
+  + reset(): void
+  + hasNext(): boolean
+   atBeginning: boolean
+   remainingCount: int
+   atEnd: boolean
+   totalCount: int
+   currentPosition: int
+}
+class MaterialIteratorFactory {
+  + MaterialIteratorFactory(): 
+  + findFirst(MaterialIterator, Predicate<Material>): Optional<Material>
+  + findAll(MaterialIterator, Predicate<Material>): List<Material>
+  + createCheapIterator(List<Material>, double): MaterialIterator
+  + createMagazineIterator(List<Material>): MaterialIterator
+  + collectAll(MaterialIterator): List<Material>
+  + getTotalCount(MaterialIterator): int
+  + createPriceSortedIterator(List<Material>, boolean): MaterialIterator
+  + createPriceRangeIterator(List<Material>, double, double): MaterialIterator
+  + count(MaterialIterator, Predicate<Material>): int
+  + createEBookIterator(List<Material>): MaterialIterator
+  + anyMatch(MaterialIterator, Predicate<Material>): boolean
+  + toString(): String
+  + createTypeIterator(List<Material>, MaterialType): MaterialIterator
+  + createExpensiveIterator(List<Material>, double): MaterialIterator
+  + createVideoIterator(List<Material>): MaterialIterator
+  + getRemainingCount(MaterialIterator): int
+  + createBookIterator(List<Material>): MaterialIterator
+  + createAudioBookIterator(List<Material>): MaterialIterator
+  + allMatch(MaterialIterator, Predicate<Material>): boolean
+}
+class MaterialLeaf {
+  + MaterialLeaf(Material): 
+  - material: Material
+  + equals(Object): boolean
+  + toString(): String
+  + hashCode(): int
+   description: String
+   materials: List<Material>
+   price: double
+   leaf: boolean
+   material: Material
+   type: MaterialType
+   id: String
+   year: int
+   discountedPrice: double
+   title: String
+   discountRate: double
+   itemCount: int
+   creator: String
+}
+class MaterialNotFoundException {
+  + MaterialNotFoundException(String, Throwable): 
+  + MaterialNotFoundException(String): 
+}
+interface MaterialObserver << interface >> {
+  + onEvent(MaterialEvent): void
+  + onAdded(MaterialSubject): void
+  + onRemoved(MaterialSubject): void
+   observerName: String
+}
+interface MaterialRepository << interface >> {
+  + findAll(): List<Material>
+  + exists(String): boolean
+  + count(): long
+  + save(Material): void
+  + findById(String): Optional<Material>
+  + delete(String): boolean
+  + deleteAll(): void
+}
+class MaterialService {
+  + MaterialService(MaterialRepository): 
+  + materialExists(String): boolean
+  + findMaterial(String): Material
+  + addMaterial(Material): void
+  + removeMaterial(String): boolean
+  - validateMaterial(Material): void
+  + findMaterialOptional(String): Optional<Material>
+  + clearAllMaterials(): void
+  + updateMaterial(Material): void
+   allMaterials: List<Material>
+   materialCount: long
+}
+interface MaterialStore << interface >> {
+  + clearInventory(): void
+  + getMaterialsByYear(int): List<Material>
+  + findById(String): Optional<Material>
+  + findByCreators(String[]): List<Material>
+  + addMaterial(Material): boolean
+  + getMaterialsByType(MaterialType): List<Material>
+  + filterMaterials(Predicate<Material>): List<Material>
+  + findRecentMaterials(int): List<Material>
+  + getMaterialsByPriceRange(double, double): List<Material>
+  + findWithPredicate(Predicate<Material>): List<Material>
+  + searchByTitle(String): List<Material>
+  + size(): int
+  + getSorted(Comparator<Material>): List<Material>
+  + searchByCreator(String): List<Material>
+  + removeMaterial(String): Optional<Material>
+   mediaMaterials: List<Media>
+   allMaterials: List<Material>
+   empty: boolean
+   totalInventoryValue: double
+   allMaterialsSorted: List<Material>
+   inventoryStats: InventoryStats
+   totalDiscountedValue: double
+}
+class MaterialStoreImpl {
+  + MaterialStoreImpl(): 
+  + MaterialStoreImpl(Collection<Material>): 
+  + getMaterialsByType(MaterialType): List<Material>
+  + addMaterial(Material): boolean
+  + groupByType(): Map<MaterialType, List<Material>>
+  + findByCreators(String[]): List<Material>
+  + findRecentMaterials(int): List<Material>
+  + clearInventory(): void
+  + getMaterialsByPriceRange(double, double): List<Material>
+  + removeMaterial(String): Optional<Material>
+  + findById(String): Optional<Material>
+  + searchByCreator(String): List<Material>
+  + size(): int
+  + filterMaterials(Predicate<Material>): List<Material>
+  + findWithPredicate(Predicate<Material>): List<Material>
+  + getMaterialsByYear(int): List<Material>
+  + getSorted(Comparator<Material>): List<Material>
+  + searchByTitle(String): List<Material>
+  + toString(): String
+   mediaMaterials: List<Media>
+   discountedMaterials: List<Material>
+   allMaterials: List<Material>
+   empty: boolean
+   totalInventoryValue: double
+   allDisplayInfo: List<String>
+   allMaterialsSorted: List<Material>
+   inventoryStats: InventoryStats
+   totalDiscountAmount: double
+   totalDiscountedValue: double
+}
+interface MaterialSubject << interface >> {
+  + notifyObservers(MaterialEvent): void
+  + removeObserver(MaterialObserver): boolean
+  + hasNoObservers(): boolean
+  + addObserver(MaterialObserver): void
+  + clearObservers(): void
+   observerCount: int
+}
+class MaterialTrie {
+  + MaterialTrie(): 
+  + insert(Material): void
+  + toString(): String
+  + searchByPrefix(String): List<Material>
+  + size(): int
+  + searchByPrefixWithLimit(String, int): List<Material>
+  + clear(): void
+  + hasPrefix(String): boolean
+  - cleanupEmptyNodes(List<TrieNode>): void
+  + remove(Material): boolean
+  - countPrefixes(TrieNode): int
+   allMaterials: List<Material>
+   empty: boolean
+}
+enum MaterialType << enumeration >> {
+  - MaterialType(String): 
+  - displayName: String
+  + values(): MaterialType[]
+  + valueOf(String): MaterialType
+   displayName: String
+}
+class MaterialTypeIterator {
+  + MaterialTypeIterator(List<Material>, MaterialType): 
+  - targetType: MaterialType
+  - totalCount: int
+  + next(): Material
+  + reset(): void
+  + hasNext(): boolean
+  + toString(): String
+  - advanceToNext(): void
+   atBeginning: boolean
+   remainingCount: int
+   atEnd: boolean
+   totalCount: int
+   currentPosition: int
+   targetType: MaterialType
+}
+interface MaterialVisitor << interface >> {
+  + visit(PrintedBook): void
+  + visit(AudioBook): void
+  + visit(Magazine): void
+  + visit(VideoMaterial): void
+  + visit(EBook): void
+}
+class MaterialsWrapper {
+  + MaterialsWrapper(): 
+  + MaterialsWrapper(List<Material>): 
+  - materials: List<Material>
+   materials: List<Material>
+}
+interface Media << interface >> {
+  + estimateDownloadTime(double): int
+   quality: MediaQuality
+   playbackInfo: String
+   streamingOnly: boolean
+   format: String
+   fileSize: double
+   duration: int
+}
+enum MediaQuality << enumeration >> {
+  - MediaQuality(String, int): 
+  - bitrate: int
+  - description: String
+  + toString(): String
+  + values(): MediaQuality[]
+  + valueOf(String): MediaQuality
+   description: String
+   bitrate: int
+}
+class ModernConcurrentMaterialStore {
+  + ModernConcurrentMaterialStore(): 
+  + ModernConcurrentMaterialStore(Collection<Material>): 
+  - scheduleMaintenanceTasks(): void
+  + addMaterialsBatchAsync(Collection<Material>): CompletableFuture<Map<String, Boolean>>
+  + findWithPredicate(Predicate<Material>): List<Material>
+  + toString(): String
+  + getSorted(Comparator<Material>): List<Material>
+  + findRecentMaterials(int): List<Material>
+  + groupByType(): Map<MaterialType, List<Material>>
+  + searchByCreator(String): List<Material>
+  + addMaterialAsync(Material): CompletableFuture<Boolean>
+  + getMaterialsByYear(int): List<Material>
+  + addMaterial(Material): boolean
+  + searchByTitleAsync(String): CompletableFuture<List<Material>>
+  + findById(String): Optional<Material>
+  + findByCreators(String[]): List<Material>
+  + getMaterialsByPriceRange(double, double): List<Material>
+  - ensureNotClosed(): void
+  - performMaintenance(): void
+  + removeMaterial(String): Optional<Material>
+  + findByIdsAsync(List<String>): CompletableFuture<Map<String, Material>>
+  + getMaterialsByType(MaterialType): List<Material>
+  + searchByTitle(String): List<Material>
+  + close(): void
+  + filterMaterials(Predicate<Material>): List<Material>
+  + parallelSearchAsync(String, String, MaterialType): CompletableFuture<List<Material>>
+  + size(): int
+  + findByIdAsync(String): CompletableFuture<Optional<Material>>
+  + clearInventory(): void
+   mediaMaterials: List<Media>
+   inventoryStatsAsync: CompletableFuture<InventoryStats>
+   discountedMaterials: List<Material>
+   allMaterials: List<Material>
+   empty: boolean
+   totalInventoryValue: double
+   allMaterialsSorted: List<Material>
+   inventoryStats: InventoryStats
+   totalDiscountAmount: double
+   totalDiscountedValue: double
+   totalInventoryValueAsync: CompletableFuture<Double>
+}
+entity ModernInventoryStats << record >> {
+  + ModernInventoryStats(int, double, double, int, int, int): 
+  + mediaCount(): int
+  + averagePrice(): double
+  + empty(): ModernInventoryStats
+  + uniqueTypes(): int
+  + totalCount(): int
+  + medianPrice(): double
+  + printCount(): int
+   summary: String
+   printPercentage: double
+   empty: boolean
+   mediaPercentage: double
+}
+class ModernJsonMaterialRepository {
+  + ModernJsonMaterialRepository(String): 
+  - initializeStorage(): void
+  + dataFileExists(): boolean
+  + deleteAll(): void
+  - saveAtomic(List<Material>): void
+  + close(): void
+  + count(): long
+  + createBackup(): boolean
+  + exists(String): boolean
+  - validateAndSanitizePath(String): Path
+  + deleteAll(Collection<String>): int
+  - ensureNotClosed(): void
+  + restoreFromBackup(String): boolean
+  + findAll(): List<Material>
+  - loadAllInternal(): List<Material>
+  + delete(String): boolean
+  + save(Material): void
+  + saveAll(Collection<Material>): void
+  + findById(String): Optional<Material>
+  + performMaintenance(): void
+   dataFileSize: long
+   filePath: String
+}
+interface ModernMaterialStore << interface >> {
+  + addMaterialsBatchAsync(List<Material>): CompletableFuture<BatchOperationResult>
+  + findByIdAsync(String): CompletableFuture<Optional<Material>>
+  + searchByTitleAsync(String): CompletableFuture<List<Material>>
+  + removeMaterialsBatchAsync(List<String>): CompletableFuture<BatchOperationResult>
+  + advancedSearchAsync(SearchCriteria): CompletableFuture<List<Material>>
+  + addMaterialAsync(Material): CompletableFuture<Boolean>
+   modernInventoryStatsAsync: CompletableFuture<ModernInventoryStats>
+}
+class ModernSearchCache {
+  + ModernSearchCache(): 
+  + ModernSearchCache(int, Duration, Duration): 
+  - performSizeBasedEviction(): void
+  + put(String, List<Material>): void
+  + size(): int
+  + resetStats(): void
+  + warmUp(Collection<String>, Function<String, List<Material>>): CompletableFuture<Void>
+  + invalidateAll(): void
+  + invalidateIf(Predicate<String>): int
+  + close(): void
+  + containsKey(String): boolean
+  + get(String, Function<String, List<Material>>): List<Material>
+  - performMaintenance(): void
+  + invalidate(String): boolean
+  + getAsync(String, Function<String, CompletableFuture<List<Material>>>): CompletableFuture<List<Material>>
+  - scheduleMaintenance(): void
+  + refresh(String, Function<String, List<Material>>): CompletableFuture<List<Material>>
+  - ensureNotClosed(): void
+   stats: CacheStats
+   empty: boolean
+}
+class PolymorphismDemo {
+  + PolymorphismDemo(): 
+  - demonstrateSOLIDPrinciples(MaterialStore): void
+  - demonstrateInterfaceSegregation(MaterialStore): void
+  + main(String[]): void
+  - processPolymorphically(Material): void
+  - demonstrateStreamingVsDownload(MaterialStore): void
+  - createSampleStore(): MaterialStore
+  - demonstrateAbstraction(MaterialStore): void
+  - demonstrateDynamicBinding(MaterialStore): void
+  - demonstratePolymorphicBehavior(MaterialStore): void
+  - demonstrateMediaVersatility(MaterialStore): void
+}
+class PriceChangedEvent {
+  + PriceChangedEvent(Material, double, double): 
+  - material: Material
+  - oldPrice: double
+  - timestamp: long
+  - newPrice: double
+  + hashCode(): int
+  + equals(Object): boolean
+  + toString(): String
+   description: String
+   eventType: String
+   priceIncrease: boolean
+   timestamp: long
+   priceDecrease: boolean
+   material: Material
+   oldPrice: double
+   newPrice: double
+   priceChangePercentage: double
+   priceChange: double
+}
+class PriceRangeIterator {
+  + PriceRangeIterator(List<Material>, double, double): 
+  - minPrice: double
+  - totalCount: int
+  - maxPrice: double
+  + hasNext(): boolean
+  - advanceToNext(): void
+  + toString(): String
+  + next(): Material
+  + reset(): void
+   minPrice: double
+   atBeginning: boolean
+   atEnd: boolean
+   currentPosition: int
+   priceRange: double
+   remainingCount: int
+   maxPrice: double
+   totalCount: int
+}
+class PriceSortedIterator {
+  + PriceSortedIterator(List<Material>, boolean): 
+  - ascending: boolean
+  + hasNext(): boolean
+  + next(): Material
+  + peekNext(): Material
+  + peek(): Material
+  + toString(): String
+  + reset(): void
+   atBeginning: boolean
+   remainingCount: int
+   atEnd: boolean
+   totalCount: int
+   currentPosition: int
+   ascending: boolean
+}
+class PrintedBook {
+  + PrintedBook(String, String, String, double, int): 
+  + PrintedBook(String, String, String, double, int, int, String, boolean): 
+  - publisher: String
+  - pages: int
+  - hardcover: boolean
+  - isbn: String
+  - author: String
+  + estimateReadingTime(int): double
+  - validateIsbn(String): String
+  - validatePages(int): int
+  + toString(): String
+   hardcover: boolean
+   pages: int
+   author: String
+   discountRate: double
+   displayInfo: String
+   isbn: String
+   publisher: String
+   creator: String
+}
+enum PublicationFrequency << enumeration >> {
+  - PublicationFrequency(String): 
+  + values(): PublicationFrequency[]
+  + valueOf(String): PublicationFrequency
+  + toString(): String
+}
+class RepositoryException {
+  + RepositoryException(String): 
+  + RepositoryException(Throwable): 
+  + RepositoryException(String, Throwable): 
+}
+entity SearchCriteria << record >> {
+  + SearchCriteria(Optional<String>, Optional<String>, Optional<MaterialType>, Optional<Double>, Optional<Double>, Optional<Integer>, Optional<Integer>): 
+  + creator(): Optional<String>
+  + yearTo(): Optional<Integer>
+  + title(): Optional<String>
+  + minPrice(): Optional<Double>
+  + yearFrom(): Optional<Integer>
+  + maxPrice(): Optional<Double>
+  + builder(): Builder
+  + hasAnyCriteria(): boolean
+  + type(): Optional<MaterialType>
+}
+class SearchResultCache {
+  + SearchResultCache(int): 
+  - maxSize: int
+  + containsKey(String): boolean
+  - evictLRU(): void
+  + toString(): String
+  + clear(): void
+  + put(String, List<Material>): void
+  + get(String): Optional<List<Material>>
+  + size(): int
+  + remove(String): boolean
+   stats: CacheStats
+   maxSize: int
+   empty: boolean
+   full: boolean
+}
+class ShippingCostCalculator {
+  + ShippingCostCalculator(): 
+  - totalShippingCost: double
+  + visit(PrintedBook): void
+  + visit(VideoMaterial): void
+  + calculateShippingCost(Material): double
+  + visit(AudioBook): void
+  + reset(): void
+  + visit(Magazine): void
+  + visit(EBook): void
+   totalShippingCost: double
+}
+class TrieNode {
+  ~ TrieNode(): 
+}
+class VPHandler {
+  + VPHandler(): 
+  - MAX_DISCOUNT: double
+  + handleRequest(DiscountRequest): void
+   handlerName: String
+   MAX_DISCOUNT: double
+}
+class VideoMaterial {
+  + VideoMaterial(String, String, String, double, int, int, String, double, MediaQuality, VideoType, String, List<String>, boolean, String): 
+  - videoType: VideoType
+  - format: String
+  - director: String
+  - quality: MediaQuality
+  - aspectRatio: String
+  - duration: int
+  - cast: List<String>
+  - fileSize: double
+  - rating: String
+  + getCompressedSize(double): double
+  + toString(): String
+  - validateDuration(int): int
+  - validateFileSize(double): double
+  + hasSubtitles(): boolean
+   format: String
+   streamingBandwidth: double
+   fileSize: double
+   displayInfo: String
+   rating: String
+   quality: MediaQuality
+   streamingOnly: boolean
+   aspectRatio: String
+   duration: int
+   discountRate: double
+   cast: List<String>
+   featureLength: boolean
+   creator: String
+   videoType: VideoType
+   director: String
+}
+enum VideoType << enumeration >> {
+  - VideoType(String): 
+  + toString(): String
+  + values(): VideoType[]
+  + valueOf(String): VideoType
+}
+
+AdvancedMaterialFactory        -[#595959,dashed]->  AudioBook                     : "«create»"
+AdvancedMaterialFactory        -[#595959,dashed]->  EBook                         : "«create»"
+AdvancedMaterialFactory        -[#595959,dashed]->  Magazine                      : "«create»"
+AdvancedMaterialFactory        -[#595959,dashed]->  PrintedBook                   : "«create»"
+AdvancedMaterialFactory        -[#595959,dashed]->  VideoMaterial                 : "«create»"
+AnalyticsData                  +-[#820000,plain]-  AnalyticsObserver             
+AnalyticsObserver              -[#595959,dashed]->  AnalyticsData                 : "«create»"
+AnalyticsObserver              -[#008200,dashed]-^  MaterialObserver              
+ApprovalStats                  +-[#820000,plain]-  DiscountApprovalService       
+AudioBook                      -[#000082,plain]-^  Material                      
+AudioBook                      -[#008200,dashed]-^  Media                         
+AudioBook                     "1" *-[#595959,plain]-> "quality\n1" MediaQuality                  
+AuditLogEntry                  +-[#820000,plain]-  AuditLogObserver              
+AuditLogObserver              "1" *-[#595959,plain]-> "auditLog\n*" AuditLogEntry                 
+AuditLogObserver               -[#595959,dashed]->  AuditLogEntry                 : "«create»"
+AuditLogObserver               -[#595959,dashed]->  AuditLogStats                 : "«create»"
+AuditLogObserver               -[#008200,dashed]-^  MaterialObserver              
+AuditLogStats                  +-[#820000,plain]-  AuditLogObserver              
+BatchOperationResult           +-[#820000,plain]-  ModernMaterialStore           
+BookArrayUtils                 -[#595959,dashed]->  Book                          : "«create»"
+BookstoreApplication           -[#595959,dashed]->  ModernConcurrentMaterialStore : "«create»"
+BookstoreArrayList             -[#595959,dashed]->  Book                          : "«create»"
+BookstoreArrayList            "1" *-[#595959,plain]-> "inventory\n*" Book                          
+BookstoreArrayList             -[#008200,dashed]-^  BookstoreAPI                  
+Builder                        +-[#820000,plain]-  SearchCriteria                
+Builder                        -[#595959,dashed]->  SearchCriteria                : "«create»"
+BundleService                  -[#595959,dashed]->  BundleStats                   : "«create»"
+BundleService                 "1" *-[#595959,plain]-> "bundles\n*" MaterialBundle                
+BundleService                  -[#595959,dashed]->  MaterialBundle                : "«create»"
+BundleService                  -[#595959,dashed]->  MaterialLeaf                  : "«create»"
+BundleStats                    +-[#820000,plain]-  BundleService                 
+CacheEntry                    "1" *-[#595959,plain]-> "results\n*" Material                      
+CacheEntry                    "1" *-[#595959,plain]-> "value\n*" Material                      
+CacheEntry                     +-[#820000,plain]-  ModernSearchCache             
+CacheEntry                     +-[#820000,plain]-  SearchResultCache             
+CacheStats                     +-[#820000,plain]-  ModernSearchCache             
+CacheStats                     +-[#820000,plain]-  SearchResultCache             
+CachedSearchService           "1" *-[#595959,plain]-> "repository\n1" MaterialRepository            
+CachedSearchService           "1" *-[#595959,plain]-> "trie\n1" MaterialTrie                  
+CachedSearchService            -[#595959,dashed]->  MaterialTrie                  : "«create»"
+CachedSearchService           "1" *-[#595959,plain]-> "cache\n1" SearchResultCache             
+CachedSearchService            -[#595959,dashed]->  SearchResultCache             : "«create»"
+ComponentBuilder               -[#595959,dashed]->  MaterialComponent             
+ConcurrentMaterialStore        -[#595959,dashed]->  InventoryStats                : "«create»"
+ConcurrentMaterialStore       "1" *-[#595959,plain]-> "materials\n*" Material                      
+ConcurrentMaterialStore        -[#008200,dashed]-^  MaterialStore                 
+DigitalAnnotationDecorator     -[#000082,plain]-^  MaterialDecorator             
+DirectorHandler                -[#000082,plain]-^  DiscountHandler               
+DiscountApprovalService        -[#595959,dashed]->  ApprovalStats                 : "«create»"
+DiscountApprovalService        -[#595959,dashed]->  DirectorHandler               : "«create»"
+DiscountApprovalService       "1" *-[#595959,plain]-> "chain\n1" DiscountHandler               
+DiscountApprovalService       "1" *-[#595959,plain]-> "processedRequests\n*" DiscountRequest               
+DiscountApprovalService        -[#595959,dashed]->  DiscountRequest               : "«create»"
+DiscountApprovalService        -[#595959,dashed]->  ManagerHandler                : "«create»"
+DiscountApprovalService        -[#595959,dashed]->  VPHandler                     : "«create»"
+DiscountRequest               "1" *-[#595959,plain]-> "material\n1" Material                      
+EBook                          -[#000082,plain]-^  Material                      
+EBook                          -[#008200,dashed]-^  Media                         
+EBook                         "1" *-[#595959,plain]-> "quality\n1" MediaQuality                  
+EBookBuilder                   -[#595959,dashed]->  EBook                         : "«create»"
+EBookBuilder                   -[#008200,dashed]-^  MaterialBuilder               
+EBookBuilder                  "1" *-[#595959,plain]-> "quality\n1" MediaQuality                  
+ExpeditedDeliveryDecorator     -[#000082,plain]-^  MaterialDecorator             
+GiftWrappingDecorator          -[#000082,plain]-^  MaterialDecorator             
+InvalidMaterialException       +-[#820000,plain]-  MaterialService               
+InventoryObserver              -[#008200,dashed]-^  MaterialObserver              
+InventoryStats                 +-[#820000,plain]-  MaterialStore                 
+JsonMaterialRepository         -[#008200,dashed]-^  MaterialRepository            
+JsonMaterialRepository         -[#595959,dashed]->  MaterialsWrapper              : "«create»"
+JsonMaterialRepository         -[#595959,dashed]->  RepositoryException           : "«create»"
+Magazine                       -[#000082,plain]-^  Material                      
+ManagerHandler                 -[#000082,plain]-^  DiscountHandler               
+Material                      "1" *-[#595959,plain]-> "type\n1" MaterialType                  
+MaterialAddedEvent            "1" *-[#595959,plain]-> "material\n1" Material                      
+MaterialAddedEvent             -[#008200,dashed]-^  MaterialEvent                 
+MaterialBuilder                -[#595959,dashed]->  Material                      
+MaterialBundle                 -[#008200,dashed]-^  MaterialComponent             
+MaterialBundle                "1" *-[#595959,plain]-> "components\n*" MaterialComponent             
+MaterialBundleBuilder          -[#008200,dashed]-^  ComponentBuilder              
+MaterialBundleBuilder          -[#595959,dashed]->  MaterialBundle                : "«create»"
+MaterialBundleBuilder         "1" *-[#595959,plain]-> "components\n*" MaterialComponent             
+MaterialBundleBuilder          -[#595959,dashed]->  MaterialLeaf                  : "«create»"
+MaterialController            "1" *-[#595959,plain]-> "materialStore\n1" MaterialStore                 
+MaterialDecorator              -[#000082,plain]-^  Material                      
+MaterialDecorator             "1" *-[#595959,plain]-> "decoratedMaterial\n1" Material                      
+MaterialDirector              "1" *-[#595959,plain]-> "eBookBuilder\n1" EBookBuilder                  
+MaterialDirector               -[#595959,dashed]->  EBookBuilder                  : "«create»"
+MaterialDirector               -[#595959,dashed]->  MaterialBundleBuilder         : "«create»"
+MaterialDirector              "1" *-[#595959,plain]-> "bundleBuilder\n1" MaterialBundleBuilder         
+MaterialEnhancementService     -[#595959,dashed]->  DigitalAnnotationDecorator    : "«create»"
+MaterialEnhancementService     -[#595959,dashed]->  ExpeditedDeliveryDecorator    : "«create»"
+MaterialEnhancementService     -[#595959,dashed]->  GiftWrappingDecorator         : "«create»"
+MaterialEventPublisher         -[#595959,dashed]->  MaterialAddedEvent            : "«create»"
+MaterialEventPublisher        "1" *-[#595959,plain]-> "observers\n*" MaterialObserver              
+MaterialEventPublisher         -[#008200,dashed]-^  MaterialSubject               
+MaterialEventPublisher         -[#595959,dashed]->  PriceChangedEvent             : "«create»"
+MaterialFactory                -[#595959,dashed]->  AudioBook                     : "«create»"
+MaterialFactory                -[#595959,dashed]->  EBook                         : "«create»"
+MaterialFactory                -[#595959,dashed]->  Magazine                      : "«create»"
+MaterialFactory                -[#595959,dashed]->  PrintedBook                   : "«create»"
+MaterialFactory                -[#595959,dashed]->  VideoMaterial                 : "«create»"
+MaterialIteratorFactory        -[#595959,dashed]->  MaterialTypeIterator          : "«create»"
+MaterialIteratorFactory        -[#595959,dashed]->  PriceRangeIterator            : "«create»"
+MaterialIteratorFactory        -[#595959,dashed]->  PriceSortedIterator           : "«create»"
+MaterialLeaf                  "1" *-[#595959,plain]-> "material\n1" Material                      
+MaterialLeaf                   -[#008200,dashed]-^  MaterialComponent             
+MaterialNotFoundException      +-[#820000,plain]-  MaterialService               
+MaterialService                -[#595959,dashed]->  InvalidMaterialException      : "«create»"
+MaterialService                -[#595959,dashed]->  MaterialNotFoundException     : "«create»"
+MaterialService               "1" *-[#595959,plain]-> "repository\n1" MaterialRepository            
+MaterialStoreImpl              -[#595959,dashed]->  InventoryStats                : "«create»"
+MaterialStoreImpl             "1" *-[#595959,plain]-> "inventory\n*" Material                      
+MaterialStoreImpl              -[#008200,dashed]-^  MaterialStore                 
+MaterialTrie                  "1" *-[#595959,plain]-> "root\n1" TrieNode                      
+MaterialTrie                   -[#595959,dashed]->  TrieNode                      : "«create»"
+MaterialType                   +-[#820000,plain]-  Material                      
+MaterialTypeIterator          "1" *-[#595959,plain]-> "materials\n*" Material                      
+MaterialTypeIterator           -[#008200,dashed]-^  MaterialIterator              
+MaterialTypeIterator          "1" *-[#595959,plain]-> "targetType\n1" MaterialType                  
+MaterialsWrapper              "1" *-[#595959,plain]-> "materials\n*" Material                      
+MediaQuality                   +-[#820000,plain]-  Media                         
+ModernConcurrentMaterialStore  -[#595959,dashed]->  InventoryStats                : "«create»"
+ModernConcurrentMaterialStore "1" *-[#595959,plain]-> "materials\n*" Material                      
+ModernConcurrentMaterialStore  -[#008200,dashed]-^  MaterialStore                 
+ModernInventoryStats           +-[#820000,plain]-  ModernMaterialStore           
+ModernJsonMaterialRepository   -[#008200,dashed]-^  MaterialRepository            
+ModernJsonMaterialRepository   -[#595959,dashed]->  MaterialsWrapper              : "«create»"
+ModernJsonMaterialRepository   -[#595959,dashed]->  RepositoryException           : "«create»"
+ModernMaterialStore            -[#008200,plain]-^  MaterialStore                 
+ModernSearchCache             "1" *-[#595959,plain]-> "cache\n*" CacheEntry                    
+ModernSearchCache              -[#595959,dashed]->  CacheStats                    : "«create»"
+PolymorphismDemo               -[#595959,dashed]->  AudioBook                     : "«create»"
+PolymorphismDemo               -[#595959,dashed]->  Magazine                      : "«create»"
+PolymorphismDemo               -[#595959,dashed]->  MaterialStoreImpl             : "«create»"
+PolymorphismDemo               -[#595959,dashed]->  PrintedBook                   : "«create»"
+PolymorphismDemo               -[#595959,dashed]->  VideoMaterial                 : "«create»"
+PriceChangedEvent             "1" *-[#595959,plain]-> "material\n1" Material                      
+PriceChangedEvent              -[#008200,dashed]-^  MaterialEvent                 
+PriceRangeIterator            "1" *-[#595959,plain]-> "materials\n*" Material                      
+PriceRangeIterator             -[#008200,dashed]-^  MaterialIterator              
+PriceSortedIterator           "1" *-[#595959,plain]-> "sortedMaterials\n*" Material                      
+PriceSortedIterator            -[#008200,dashed]-^  MaterialIterator              
+PrintedBook                    -[#000082,plain]-^  Material                      
+PublicationFrequency           +-[#820000,plain]-  Magazine                      
+SearchCriteria                 -[#595959,dashed]->  Builder                       : "«create»"
+SearchCriteria                 +-[#820000,plain]-  ModernMaterialStore           
+SearchResultCache              -[#595959,dashed]->  CacheEntry                    : "«create»"
+SearchResultCache             "1" *-[#595959,plain]-> "cache\n*" CacheEntry                    
+SearchResultCache              -[#595959,dashed]->  CacheStats                    : "«create»"
+ShippingCostCalculator         -[#008200,dashed]-^  MaterialVisitor               
+TrieNode                      "1" *-[#595959,plain]-> "materials\n*" Material                      
+TrieNode                       +-[#820000,plain]-  MaterialTrie                  
+VPHandler                      -[#000082,plain]-^  DiscountHandler               
+VideoMaterial                  -[#000082,plain]-^  Material                      
+VideoMaterial                  -[#008200,dashed]-^  Media                         
+VideoMaterial                 "1" *-[#595959,plain]-> "quality\n1" MediaQuality                  
+VideoMaterial                 "1" *-[#595959,plain]-> "videoType\n1" VideoType                     
+VideoType                      +-[#820000,plain]-  VideoMaterial                 
+@enduml

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Book.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">Book.java</span></div><h1>Book.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+import java.time.Year;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
+/**
+ * Represents an immutable book in the bookstore inventory.
+ * Books are uniquely identified by their ISBN.
+ * 
+ * &lt;p&gt;This class is immutable and thread-safe. All fields are validated
+ * during construction to ensure data integrity.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 1.0
+ * @since 2024-09-15
+ */
+public final class Book implements Comparable&lt;Book&gt; {
+    
+<span class="fc" id="L20">    private static final Pattern ISBN_13_PATTERN = Pattern.compile(&quot;^\\d{13}$&quot;);</span>
+<span class="fc" id="L21">    private static final Pattern ISBN_10_PATTERN = Pattern.compile(&quot;^\\d{9}[\\dX]$&quot;);</span>
+    private static final int MIN_YEAR = 1450; // Invention of printing press
+    
+    private final String isbn;
+    private final String title;
+    private final String author;
+    private final double price;
+    private final int year;
+    
+    /**
+     * Creates a new Book with validation.
+     * 
+     * @param isbn the International Standard Book Number (10 or 13 digits)
+     * @param title the book title (non-null, non-blank)
+     * @param author the primary author (non-null, non-blank)
+     * @param price the price in dollars (non-negative)
+     * @param year the publication year (1450 to current year + 1)
+     * @throws IllegalArgumentException if any parameter is invalid
+     * @throws NullPointerException if any string parameter is null
+     */
+<span class="fc" id="L41">    public Book(String isbn, String title, String author, double price, int year) {</span>
+<span class="fc" id="L42">        this.isbn = validateIsbn(isbn);</span>
+<span class="fc" id="L43">        this.title = validateStringField(title, &quot;Title&quot;);</span>
+<span class="fc" id="L44">        this.author = validateStringField(author, &quot;Author&quot;);</span>
+<span class="fc" id="L45">        this.price = validatePrice(price);</span>
+<span class="fc" id="L46">        this.year = validateYear(year);</span>
+<span class="fc" id="L47">    }</span>
+    
+    private String validateIsbn(String isbn) {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (isbn == null) {</span>
+<span class="fc" id="L51">            throw new NullPointerException(&quot;ISBN cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L54">        String cleaned = isbn.replaceAll(&quot;-&quot;, &quot;&quot;).trim();</span>
+        
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (!ISBN_10_PATTERN.matcher(cleaned).matches() &amp;&amp; </span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            !ISBN_13_PATTERN.matcher(cleaned).matches()) {</span>
+<span class="fc" id="L58">            throw new IllegalArgumentException(</span>
+                &quot;ISBN must be 10 or 13 digits. Provided: &quot; + isbn);
+        }
+        
+<span class="fc" id="L62">        return cleaned;</span>
+    }
+    
+    private String validateStringField(String value, String fieldName) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (value == null) {</span>
+<span class="fc" id="L67">            throw new NullPointerException(fieldName + &quot; cannot be null&quot;);</span>
+        }
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (value.trim().isEmpty()) {</span>
+<span class="fc" id="L70">            throw new IllegalArgumentException(fieldName + &quot; cannot be blank&quot;);</span>
+        }
+<span class="fc" id="L72">        return value.trim();</span>
+    }
+    
+    private double validatePrice(double price) {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (price &lt; 0.0) {</span>
+<span class="fc" id="L77">            throw new IllegalArgumentException(</span>
+                &quot;Price cannot be negative. Provided: &quot; + price);
+        }
+<span class="fc bfc" id="L80" title="All 4 branches covered.">        if (Double.isNaN(price) || Double.isInfinite(price)) {</span>
+<span class="fc" id="L81">            throw new IllegalArgumentException(</span>
+                &quot;Price must be a valid number. Provided: &quot; + price);
+        }
+<span class="fc" id="L84">        return price;</span>
+    }
+    
+    private int validateYear(int year) {
+<span class="fc" id="L88">        int currentYear = Year.now().getValue();</span>
+<span class="fc bfc" id="L89" title="All 4 branches covered.">        if (year &lt; MIN_YEAR || year &gt; currentYear + 1) {</span>
+<span class="fc" id="L90">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L91">                String.format(&quot;Year must be between %d and %d. Provided: %d&quot;,</span>
+<span class="fc" id="L92">                    MIN_YEAR, currentYear + 1, year));</span>
+        }
+<span class="fc" id="L94">        return year;</span>
+    }
+    
+    /**
+     * Gets the ISBN of this book.
+     * @return the ISBN (10 or 13 digits)
+     */
+    public String getIsbn() {
+<span class="fc" id="L102">        return isbn;</span>
+    }
+    
+    /**
+     * Gets the title of this book.
+     * @return the book title
+     */
+    public String getTitle() {
+<span class="fc" id="L110">        return title;</span>
+    }
+    
+    /**
+     * Gets the author of this book.
+     * @return the author name
+     */
+    public String getAuthor() {
+<span class="fc" id="L118">        return author;</span>
+    }
+    
+    /**
+     * Gets the price of this book.
+     * @return the price in dollars
+     */
+    public double getPrice() {
+<span class="fc" id="L126">        return price;</span>
+    }
+    
+    /**
+     * Gets the publication year of this book.
+     * @return the publication year
+     */
+    public int getYear() {
+<span class="fc" id="L134">        return year;</span>
+    }
+    
+    /**
+     * Compares this book with another book based on title (alphabetical order).
+     * 
+     * @param other the book to compare with
+     * @return negative if this book comes before, positive if after, 0 if equal
+     */
+    @Override
+    public int compareTo(Book other) {
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if (other == null) {</span>
+<span class="fc" id="L146">            throw new NullPointerException(&quot;Cannot compare to null Book&quot;);</span>
+        }
+<span class="fc" id="L148">        return this.title.compareToIgnoreCase(other.title);</span>
+    }
+    
+    /**
+     * Checks if this book is equal to another object.
+     * Books are considered equal if they have the same ISBN.
+     * 
+     * @param obj the object to compare with
+     * @return true if the objects are equal (same ISBN), false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        if (this == obj) return true;</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (!(obj instanceof Book)) return false;</span>
+<span class="fc" id="L162">        Book other = (Book) obj;</span>
+<span class="fc" id="L163">        return isbn.equals(other.isbn);</span>
+    }
+    
+    /**
+     * Generates hash code based on ISBN.
+     * 
+     * @return hash code of the ISBN
+     */
+    @Override
+    public int hashCode() {
+<span class="fc" id="L173">        return Objects.hash(isbn);</span>
+    }
+    
+    /**
+     * Returns a human-readable string representation of this book.
+     * 
+     * @return formatted string with book details
+     */
+    @Override
+    public String toString() {
+<span class="fc" id="L183">        return String.format(&quot;Book[ISBN=%s, Title='%s', Author='%s', Price=$%.2f, Year=%d]&quot;,</span>
+<span class="fc" id="L184">            isbn, title, author, price, year);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

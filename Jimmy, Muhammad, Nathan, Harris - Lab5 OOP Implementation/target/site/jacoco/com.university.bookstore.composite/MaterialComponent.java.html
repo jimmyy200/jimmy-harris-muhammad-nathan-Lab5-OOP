@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MaterialComponent.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.composite</a> &gt; <span class="el_source">MaterialComponent.java</span></div><h1>MaterialComponent.java</h1><pre class="source lang-java linenums">package com.university.bookstore.composite;
+
+import java.util.List;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Component interface for the Composite pattern.
+ * 
+ * &lt;p&gt;Represents both individual materials and composite bundles uniformly. The Composite Pattern is a structural design
+ * pattern that allows developers to treat individual objects and groups of objects uniformly. This is particularly 
+ * useful when working with tree-like structures, where both leaf objects (e.g., individual books) and composite 
+ * objects (e.g., bundles of books) need to share the same interface.&lt;/p&gt;
+ * 
+ * &lt;p&gt;The pattern promotes the principle of &quot;compose objects into tree structures to represent part-whole hierarchies.&quot;
+ * With Composite, clients can operate on single objects and entire compositions through a common interface,
+ * simplifying the design and improving extensibility.&lt;/p&gt;
+ * 
+ * &lt;p&gt;This interface allows clients to treat individual materials and material bundles uniformly, enabling 
+ * recursive composition and polymorphic operations.&lt;/p&gt;
+ * 
+ * &lt;p&gt;Example usage:&lt;/p&gt;
+ * &lt;pre&gt;{@code
+ * MaterialComponent book = new MaterialLeaf(new PrintedBook(...));
+ * MaterialComponent bundle = new MaterialBundle(&quot;Back-to-School Pack&quot;, 0.1);
+ * bundle.addComponent(book);
+ * 
+ * // Both can be treated uniformly
+ * double price = component.getPrice();
+ * String info = component.getDisplayInfo();
+ * }&lt;/pre&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ * @see MaterialLeaf
+ * @see MaterialBundle
+ * @see Material
+ */
+public interface MaterialComponent {
+    
+    /**
+     * Gets the title of this component.
+     * For individual materials, this is the material title.
+     * For bundles, this is the bundle name.
+     * 
+     * @return the component title
+     */
+    String getTitle();
+    
+    /**
+     * Gets the total price of this component.
+     * For individual materials, this is the material price.
+     * For bundles, this is the sum of all contained materials.
+     * 
+     * @return the total price
+     */
+    double getPrice();
+    
+    /**
+     * Gets the discounted price of this component.
+     * For individual materials, this applies the material's discount.
+     * For bundles, this applies the bundle discount to the total price.
+     * 
+     * @return the discounted price
+     */
+    double getDiscountedPrice();
+    
+    /**
+     * Gets a description of this component.
+     * Provides detailed information about the component and its contents.
+     * 
+     * @return the component description
+     */
+    String getDescription();
+    
+    /**
+     * Gets all materials contained in this component.
+     * For individual materials, returns a list containing only itself.
+     * For bundles, returns all materials in the bundle (recursively).
+     * 
+     * @return list of all contained materials
+     */
+    List&lt;Material&gt; getMaterials();
+    
+    /**
+     * Gets the total number of items in this component.
+     * For individual materials, returns 1.
+     * For bundles, returns the sum of all contained items.
+     * 
+     * @return the total item count
+     */
+    int getItemCount();
+    
+    /**
+     * Gets the discount rate applied to this component.
+     * 
+     * @return the discount rate (0.0 to 1.0)
+     */
+    double getDiscountRate();
+    
+    /**
+     * Checks if this component is a leaf (individual material).
+     * 
+     * @return true if this is a leaf component
+     */
+    boolean isLeaf();
+    
+    /**
+     * Checks if this component is a composite (bundle).
+     * 
+     * @return true if this is a composite component
+     */
+    default boolean isComposite() {
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        return !isLeaf();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

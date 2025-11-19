@@ -1,0 +1,1478 @@
+@startuml
+
+class com.university.bookstore.BookstoreApplication {
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+	{method} +materialStore () : com.university.bookstore.api.MaterialStore
+}
+
+
+interface com.university.bookstore.api.BookstoreAPI {
+	{method}  {abstract} +add ( paramBook1 : com.university.bookstore.model.Book ) : boolean
+	{method}  {abstract} +findByAuthor ( paramString1 : String ) : java.util.List
+	{method}  {abstract} +findByIsbn ( paramString1 : String ) : com.university.bookstore.model.Book
+	{method}  {abstract} +findByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method}  {abstract} +findByTitle ( paramString1 : String ) : java.util.List
+	{method}  {abstract} +findByYear ( paramint1 : int ) : java.util.List
+	{method}  {abstract} +getAllBooks () : java.util.List
+	{method}  {abstract} +getMostExpensive () : com.university.bookstore.model.Book
+	{method}  {abstract} +getMostRecent () : com.university.bookstore.model.Book
+	{method}  {abstract} +inventoryValue () : double
+	{method}  {abstract} +removeByIsbn ( paramString1 : String ) : boolean
+	{method}  {abstract} +size () : int
+	{method}  {abstract} +snapshotArray () : [Lcom.university.bookstore.model.Book;
+}
+
+
+interface com.university.bookstore.api.MaterialStore {
+	{method}  {abstract} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method}  {abstract} +clearInventory () : void
+	{method}  {abstract} +filterMaterials ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method}  {abstract} +findByCreators ( paramString;1 : [Ljava.lang.String; ) : java.util.List
+	{method}  {abstract} +findById ( paramString1 : String ) : java.util.Optional
+	{method}  {abstract} +findRecentMaterials ( paramint1 : int ) : java.util.List
+	{method}  {abstract} +findWithPredicate ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method}  {abstract} +getAllMaterials () : java.util.List
+	{method}  {abstract} +getAllMaterialsSorted () : java.util.List
+	{method}  {abstract} +getInventoryStats () : com.university.bookstore.api.MaterialStore$InventoryStats
+	{method}  {abstract} +getMaterialsByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method}  {abstract} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method}  {abstract} +getMaterialsByYear ( paramint1 : int ) : java.util.List
+	{method}  {abstract} +getMediaMaterials () : java.util.List
+	{method}  {abstract} +getSorted ( paramComparator1 : java.util.Comparator ) : java.util.List
+	{method}  {abstract} +getTotalDiscountedValue () : double
+	{method}  {abstract} +getTotalInventoryValue () : double
+	{method}  {abstract} +isEmpty () : boolean
+	{method}  {abstract} +removeMaterial ( paramString1 : String ) : java.util.Optional
+	{method}  {abstract} +searchByCreator ( paramString1 : String ) : java.util.List
+	{method}  {abstract} +searchByTitle ( paramString1 : String ) : java.util.List
+	{method}  {abstract} +size () : int
+}
+
+
+class com.university.bookstore.api.MaterialStore$InventoryStats {
+	{field} -averagePrice : double
+	{field} -mediaCount : int
+	{field} -medianPrice : double
+	{field} -printCount : int
+	{field} -totalCount : int
+	{field} -uniqueTypes : int
+	{method} +toString () : String
+}
+
+
+interface com.university.bookstore.api.ModernMaterialStore {
+	{method}  {abstract} +addMaterialAsync ( paramMaterial1 : com.university.bookstore.model.Material ) : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +addMaterialsBatchAsync ( paramList1 : java.util.List ) : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +advancedSearchAsync ( paramModernMaterialStore$SearchCriteria1 : com.university.bookstore.api.ModernMaterialStore$SearchCriteria ) : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +findByIdAsync ( paramString1 : String ) : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +getModernInventoryStatsAsync () : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +removeMaterialsBatchAsync ( paramList1 : java.util.List ) : java.util.concurrent.CompletableFuture
+	{method}  {abstract} +searchByTitleAsync ( paramString1 : String ) : java.util.concurrent.CompletableFuture
+}
+
+
+class com.university.bookstore.api.ModernMaterialStore$BatchOperationResult {
+	{field} -errors : java.util.List
+	{field} -failed : int
+	{field} -successful : int
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +errors () : java.util.List
+	{method} +failed () : int
+	{method} +hashCode () : int
+	{method} +isCompleteSuccess () : boolean
+	{method} +successRate () : double
+	{method} +successful () : int
+	{method} +toString () : String
+	{method} +totalOperations () : int
+}
+
+
+class com.university.bookstore.api.ModernMaterialStore$ModernInventoryStats {
+	{field} -averagePrice : double
+	{field} -mediaCount : int
+	{field} -medianPrice : double
+	{field} -printCount : int
+	{field} -totalCount : int
+	{field} -uniqueTypes : int
+	{method} +averagePrice () : double
+	{method}  {static} +empty () : com.university.bookstore.api.ModernMaterialStore$ModernInventoryStats
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getMediaPercentage () : double
+	{method} +getPrintPercentage () : double
+	{method} +getSummary () : String
+	{method} +hashCode () : int
+	{method} +isEmpty () : boolean
+	{method} +mediaCount () : int
+	{method} +medianPrice () : double
+	{method} +printCount () : int
+	{method} +toString () : String
+	{method} +totalCount () : int
+	{method} +uniqueTypes () : int
+}
+
+
+class com.university.bookstore.api.ModernMaterialStore$SearchCriteria {
+	{field} -creator : java.util.Optional
+	{field} -maxPrice : java.util.Optional
+	{field} -minPrice : java.util.Optional
+	{field} -title : java.util.Optional
+	{field} -type : java.util.Optional
+	{field} -yearFrom : java.util.Optional
+	{field} -yearTo : java.util.Optional
+	{method}  {static} +builder () : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+	{method} +creator () : java.util.Optional
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +hasAnyCriteria () : boolean
+	{method} +hashCode () : int
+	{method} +maxPrice () : java.util.Optional
+	{method} +minPrice () : java.util.Optional
+	{method} +title () : java.util.Optional
+	{method} +toString () : String
+	{method} +type () : java.util.Optional
+	{method} +yearFrom () : java.util.Optional
+	{method} +yearTo () : java.util.Optional
+}
+
+
+class com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder {
+	{field} -creator : java.util.Optional
+	{field} -maxPrice : java.util.Optional
+	{field} -minPrice : java.util.Optional
+	{field} -title : java.util.Optional
+	{field} -type : java.util.Optional
+	{field} -yearFrom : java.util.Optional
+	{field} -yearTo : java.util.Optional
+	{method} +build () : com.university.bookstore.api.ModernMaterialStore$SearchCriteria
+	{method} +withCreator ( paramString1 : String ) : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+	{method} +withPriceRange ( paramDouble1 : Double , paramDouble2 : Double ) : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+	{method} +withTitle ( paramString1 : String ) : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+	{method} +withType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+	{method} +withYearRange ( paramInteger1 : Integer , paramInteger2 : Integer ) : com.university.bookstore.api.ModernMaterialStore$SearchCriteria$Builder
+}
+
+
+interface com.university.bookstore.builder.ComponentBuilder {
+	{method}  {abstract} +build () : com.university.bookstore.composite.MaterialComponent
+	{method}  {abstract} +reset () : void
+	{method}  {abstract} +validate () : void
+}
+
+
+class com.university.bookstore.builder.EBookBuilder {
+	{field} +author : String
+	{field} +drmEnabled : boolean
+	{field} +fileFormat : String
+	{field} +fileSize : double
+	{field} +id : String
+	{field} +price : double
+	{field} +title : String
+	{field} +wordCount : int
+	{field} +year : int
+	{method} +build () : com.university.bookstore.model.EBook
+	{method} +disableDRM () : com.university.bookstore.builder.EBookBuilder
+	{method} +enableDRM () : com.university.bookstore.builder.EBookBuilder
+	{method} +reset () : void
+	{method} +setHighQuality () : com.university.bookstore.builder.EBookBuilder
+	{method} +setLowQuality () : com.university.bookstore.builder.EBookBuilder
+	{method} +toString () : String
+	{method} +validate () : void
+}
+
+
+interface com.university.bookstore.builder.MaterialBuilder {
+	{method}  {abstract} +build () : com.university.bookstore.model.Material
+	{method}  {abstract} +reset () : void
+	{method}  {abstract} +validate () : void
+}
+
+
+class com.university.bookstore.builder.MaterialBundleBuilder {
+	{field} +bundleDiscount : double
+	{field} +bundleName : String
+	{method} +addBundle ( paramMaterialBundle1 : com.university.bookstore.composite.MaterialBundle ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +addComponent ( paramMaterialComponent1 : com.university.bookstore.composite.MaterialComponent ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +addComponents ( paramList1 : java.util.List ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +addMaterials ( paramList1 : java.util.List ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +build () : com.university.bookstore.composite.MaterialBundle
+	{method} +clearComponents () : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +getBundleDiscountPercent () : double
+	{method} +getComponentCount () : int
+	{method} +getTotalDiscountedPrice () : double
+	{method} +getTotalPrice () : double
+	{method} +getTotalSavings () : double
+	{method} +hasComponents () : boolean
+	{method} +removeComponent ( paramMaterialComponent1 : com.university.bookstore.composite.MaterialComponent ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +removeMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +reset () : void
+	{method} +setBundleDiscountPercent ( paramdouble1 : double ) : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +setLargeDiscount () : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +setMediumDiscount () : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +setSmallDiscount () : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +toString () : String
+	{method} +validate () : void
+}
+
+
+class com.university.bookstore.builder.MaterialDirector {
+	{method} +buildBasicEBook ( paramString1 : String , paramString2 : String , paramString3 : String , paramdouble4 : double ) : com.university.bookstore.model.Material
+	{method} +buildCourseBundle ( paramString1 : String , paramList2 : java.util.List ) : com.university.bookstore.composite.MaterialBundle
+	{method} +buildCustomBundle ( paramString1 : String , paramList2 : java.util.List , paramdouble3 : double ) : com.university.bookstore.composite.MaterialBundle
+	{method} +buildNestedBundle ( paramString1 : String , paramList2 : java.util.List , paramdouble3 : double ) : com.university.bookstore.composite.MaterialBundle
+	{method} +buildPremiumBundle ( paramString1 : String , paramList2 : java.util.List ) : com.university.bookstore.composite.MaterialBundle
+	{method} +buildPremiumEBook ( paramString1 : String , paramString2 : String , paramString3 : String , paramdouble4 : double ) : com.university.bookstore.model.Material
+	{method} +buildStarterBundle ( paramString1 : String , paramList2 : java.util.List ) : com.university.bookstore.composite.MaterialBundle
+	{method} +buildStudentEBook ( paramString1 : String , paramString2 : String , paramString3 : String , paramdouble4 : double ) : com.university.bookstore.model.Material
+	{method} +buildTextbookBundle ( paramString1 : String , paramList2 : java.util.List ) : com.university.bookstore.composite.MaterialBundle
+	{method} +createBundleBuilder () : com.university.bookstore.builder.MaterialBundleBuilder
+	{method} +createEBookBuilder () : com.university.bookstore.builder.EBookBuilder
+}
+
+
+class com.university.bookstore.chain.DirectorHandler {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} {static} -MAX_DISCOUNT : double
+	{method} +getHandlerName () : String
+	{method} +getMaxDiscount () : double
+	{method} +handleRequest ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : void
+}
+
+
+class com.university.bookstore.chain.DiscountApprovalService {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{method} -buildDefaultChain () : com.university.bookstore.chain.DiscountHandler
+	{method} +calculateFinalPrice ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : double
+	{method} +clearRequests () : void
+	{method} +getApprovalStats () : com.university.bookstore.chain.DiscountApprovalService$ApprovalStats
+	{method} +getApprovedRequests () : java.util.List
+	{method} +getChainInfo () : String
+	{method} +getRejectedRequests () : java.util.List
+	{method} +getRequestsForCustomer ( paramString1 : String ) : java.util.List
+	{method} +getRequestsForMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : java.util.List
+	{method} +requestDiscount ( paramMaterial1 : com.university.bookstore.model.Material , paramdouble2 : double , paramString3 : String , paramString4 : String ) : com.university.bookstore.chain.DiscountRequest
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.chain.DiscountApprovalService$ApprovalStats {
+	{field} -approvalRate : double
+	{field} -approvedRequests : int
+	{field} -rejectedRequests : int
+	{field} -totalRequests : int
+	{field} -totalSavings : double
+	{method} +toString () : String
+}
+
+
+abstract class com.university.bookstore.chain.DiscountHandler {
+	{method} +canApprove ( paramdouble1 : double ) : boolean
+	{method} +getChainLength () : int
+	{method} +getHandlerInfo () : String
+	{method}  {abstract} +getHandlerName () : String
+	{method}  {abstract} +getMaxDiscount () : double
+	{method} +getNext () : com.university.bookstore.chain.DiscountHandler
+	{method}  {abstract} +handleRequest ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : void
+	{method} #passToNext ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : void
+	{method} +setNext ( paramDiscountHandler1 : com.university.bookstore.chain.DiscountHandler ) : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.chain.DiscountRequest {
+	{field} +approved : boolean
+	{field} +approvedBy : String
+	{field} -customerId : String
+	{field} -reason : String
+	{field} +rejectionReason : String
+	{field} -requestedDiscount : double
+	{field} -timestamp : long
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getDiscountedPrice () : double
+	{method} +getRequestedDiscountPercentage () : double
+	{method} +getSavingsAmount () : double
+	{method} +getSummary () : String
+	{method} +hashCode () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.chain.ManagerHandler {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} {static} -MAX_DISCOUNT : double
+	{method} +getHandlerName () : String
+	{method} +getMaxDiscount () : double
+	{method} +handleRequest ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : void
+}
+
+
+class com.university.bookstore.chain.VPHandler {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} {static} -MAX_DISCOUNT : double
+	{method} +getHandlerName () : String
+	{method} +getMaxDiscount () : double
+	{method} +handleRequest ( paramDiscountRequest1 : com.university.bookstore.chain.DiscountRequest ) : void
+}
+
+
+class com.university.bookstore.composite.BundleService {
+	{method} +addBundleToBundle ( paramString1 : String , paramString2 : String ) : void
+	{method} +addComponentToBundle ( paramString1 : String , paramMaterialComponent2 : com.university.bookstore.composite.MaterialComponent ) : void
+	{method} +addToBundle ( paramString1 : String , paramMaterial2 : com.university.bookstore.model.Material ) : void
+	{method} +calculateBundleSavings ( paramString1 : String ) : double
+	{method} +calculateTotalSavings () : double
+	{method} +clearAllBundles () : void
+	{method} +createBundle ( paramString1 : String , paramdouble2 : double ) : com.university.bookstore.composite.MaterialBundle
+	{method} +getAllBundles () : java.util.List
+	{method} +getBundle ( paramString1 : String ) : java.util.Optional
+	{method} +getBundleCount () : int
+	{method} +getBundleNames () : java.util.List
+	{method} +getBundleStats () : com.university.bookstore.composite.BundleService$BundleStats
+	{method} +getBundlesByDiscount ( paramdouble1 : double ) : java.util.List
+	{method} +getBundlesByMaterialType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method} +getBundlesByValueRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method} +getTotalBundleValue () : double
+	{method} +getTotalDiscountedBundleValue () : double
+	{method} +isEmpty () : boolean
+	{method} +removeBundle ( paramString1 : String ) : boolean
+	{method} +removeFromBundle ( paramString1 : String , paramMaterial2 : com.university.bookstore.model.Material ) : boolean
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.composite.BundleService$BundleStats {
+	{field} -averageDiscount : double
+	{field} -totalBundles : int
+	{field} -totalDiscountedValue : double
+	{field} -totalItems : int
+	{field} -totalSavings : double
+	{field} -totalValue : double
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.composite.MaterialBundle {
+	{field} -bundleDiscount : double
+	{field} -bundleName : String
+	{method} +addComponent ( paramMaterialComponent1 : com.university.bookstore.composite.MaterialComponent ) : void
+	{method} -containsBundle ( paramMaterialBundle1 : com.university.bookstore.composite.MaterialBundle ) : boolean
+	{method} +containsMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method} +containsType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : boolean
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getComponentCount () : int
+	{method} +getDescription () : String
+	{method} +getDiscountRate () : double
+	{method} +getDiscountedPrice () : double
+	{method} +getItemCount () : int
+	{method} +getMaterials () : java.util.List
+	{method} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method} +getPrice () : double
+	{method} +getTitle () : String
+	{method} +getTotalSavings () : double
+	{method} +hashCode () : int
+	{method} +isLeaf () : boolean
+	{method} +removeComponent ( paramMaterialComponent1 : com.university.bookstore.composite.MaterialComponent ) : boolean
+	{method} +toString () : String
+}
+
+
+interface com.university.bookstore.composite.MaterialComponent {
+	{method}  {abstract} +getDescription () : String
+	{method}  {abstract} +getDiscountRate () : double
+	{method}  {abstract} +getDiscountedPrice () : double
+	{method}  {abstract} +getItemCount () : int
+	{method}  {abstract} +getMaterials () : java.util.List
+	{method}  {abstract} +getPrice () : double
+	{method}  {abstract} +getTitle () : String
+	{method} +isComposite () : boolean
+	{method}  {abstract} +isLeaf () : boolean
+}
+
+
+class com.university.bookstore.composite.MaterialLeaf {
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getCreator () : String
+	{method} +getDescription () : String
+	{method} +getDiscountRate () : double
+	{method} +getDiscountedPrice () : double
+	{method} +getId () : String
+	{method} +getItemCount () : int
+	{method} +getMaterials () : java.util.List
+	{method} +getPrice () : double
+	{method} +getTitle () : String
+	{method} +getType () : com.university.bookstore.model.Material$MaterialType
+	{method} +getYear () : int
+	{method} +hashCode () : int
+	{method} +isLeaf () : boolean
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.controller.MaterialController {
+	{method} +createMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : org.springframework.http.ResponseEntity
+	{method} +deleteMaterial ( paramString1 : String ) : org.springframework.http.ResponseEntity
+	{method} +getAllMaterials () : org.springframework.http.ResponseEntity
+	{method} +getInventoryStats () : org.springframework.http.ResponseEntity
+	{method} +getMaterialById ( paramString1 : String ) : org.springframework.http.ResponseEntity
+	{method} +getMaterialCount () : org.springframework.http.ResponseEntity
+	{method} +getMaterialsByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : org.springframework.http.ResponseEntity
+	{method} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : org.springframework.http.ResponseEntity
+	{method} +getRecentMaterials ( paramint1 : int ) : org.springframework.http.ResponseEntity
+	{method} +searchByCreator ( paramString1 : String ) : org.springframework.http.ResponseEntity
+	{method} +searchByTitle ( paramString1 : String ) : org.springframework.http.ResponseEntity
+	{method} +updateMaterial ( paramString1 : String , paramMaterial2 : com.university.bookstore.model.Material ) : org.springframework.http.ResponseEntity
+}
+
+
+class com.university.bookstore.decorator.DigitalAnnotationDecorator {
+	{field} {static} -ANNOTATION_COST : double
+	{field} -annotations : java.util.List
+	{method} +addAnnotation ( paramString1 : String ) : void
+	{method} +clearAnnotations () : void
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getAnnotationCount () : int
+	{method} +getDigitalAnnotationCost () : double
+	{method} +getDisplayInfo () : String
+	{method} +getPrice () : double
+	{method} +hasAnnotations () : boolean
+	{method} +hashCode () : int
+	{method} +removeAnnotation ( paramint1 : int ) : String
+}
+
+
+class com.university.bookstore.decorator.ExpeditedDeliveryDecorator {
+	{field} {static} -EXPEDITED_COST : double
+	{field} -deliveryDays : int
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getDisplayInfo () : String
+	{method} +getExpeditedDeliveryCost () : double
+	{method} +getPrice () : double
+	{method} +hashCode () : int
+}
+
+
+class com.university.bookstore.decorator.GiftWrappingDecorator {
+	{field} {static} -GIFT_WRAPPING_COST : double
+	{field} -wrappingStyle : String
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getDisplayInfo () : String
+	{method} +getGiftWrappingCost () : double
+	{method} +getPrice () : double
+	{method} +hashCode () : int
+}
+
+
+abstract class com.university.bookstore.decorator.MaterialDecorator {
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getBaseMaterial () : com.university.bookstore.model.Material
+	{method} +getCreator () : String
+	{method} +getDecoratorCount () : int
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} +hasDecorators () : boolean
+	{method} +hashCode () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.decorator.MaterialEnhancementService {
+	{method} +addDigitalAnnotations ( paramMaterial1 : com.university.bookstore.model.Material ) : com.university.bookstore.model.Material
+	{method} +addExpeditedDelivery ( paramMaterial1 : com.university.bookstore.model.Material , paramint2 : int ) : com.university.bookstore.model.Material
+	{method} +addGiftWrapping ( paramMaterial1 : com.university.bookstore.model.Material , paramString2 : String ) : com.university.bookstore.model.Material
+	{method} +calculateEnhancementCost ( paramMaterial1 : com.university.bookstore.model.Material , paramMaterial2 : com.university.bookstore.model.Material ) : double
+	{method} +createDigitalPackage ( paramMaterial1 : com.university.bookstore.model.Material ) : com.university.bookstore.model.Material
+	{method} +createGiftPackage ( paramMaterial1 : com.university.bookstore.model.Material , paramString2 : String , paramint3 : int ) : com.university.bookstore.model.Material
+	{method} +createPremiumPackage ( paramMaterial1 : com.university.bookstore.model.Material , paramString2 : String , paramint3 : int ) : com.university.bookstore.model.Material
+	{method} +getBaseMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : com.university.bookstore.model.Material
+	{method} +getBasePrice ( paramMaterial1 : com.university.bookstore.model.Material ) : double
+	{method} +getEnhancementCount ( paramMaterial1 : com.university.bookstore.model.Material ) : int
+	{method} +getEnhancementSummary ( paramMaterial1 : com.university.bookstore.model.Material ) : String
+	{method} +hasEnhancement ( paramMaterial1 : com.university.bookstore.model.Material , paramClass2 : Class ) : boolean
+	{method} +hasEnhancements ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.demo.PolymorphismDemo {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{method}  {static} -createSampleStore () : com.university.bookstore.api.MaterialStore
+	{method}  {static} -demonstrateAbstraction ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstrateDynamicBinding ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstrateInterfaceSegregation ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstrateMediaVersatility ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstratePolymorphicBehavior ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstrateSOLIDPrinciples ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} -demonstrateStreamingVsDownload ( paramMaterialStore1 : com.university.bookstore.api.MaterialStore ) : void
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+	{method}  {static} -processPolymorphically ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+}
+
+
+class com.university.bookstore.factory.AdvancedMaterialFactory {
+	{method}  {static} -createAudioBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.AudioBook
+	{method}  {static} -createEBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.EBook
+	{method}  {static} -createMagazine ( paramMap1 : java.util.Map ) : com.university.bookstore.model.Magazine
+	{method}  {static} +createMaterial ( paramString1 : String , paramMap2 : java.util.Map ) : com.university.bookstore.model.Material
+	{method}  {static} -createPrintedBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.PrintedBook
+	{method}  {static} -createVideoMaterial ( paramMap1 : java.util.Map ) : com.university.bookstore.model.VideoMaterial
+	{method}  {static} -getRequiredBoolean ( paramMap1 : java.util.Map , paramString2 : String ) : boolean
+	{method}  {static} -getRequiredDouble ( paramMap1 : java.util.Map , paramString2 : String ) : double
+	{method}  {static} -getRequiredEnum ( paramMap1 : java.util.Map , paramString2 : String , paramClass3 : Class ) : Enum
+	{method}  {static} -getRequiredInt ( paramMap1 : java.util.Map , paramString2 : String ) : int
+	{method}  {static} -getRequiredString ( paramMap1 : java.util.Map , paramString2 : String ) : String
+	{method}  {static} -getRequiredStringList ( paramMap1 : java.util.Map , paramString2 : String ) : java.util.List
+	{method}  {static} -validateAudioBookProperties ( paramMap1 : java.util.Map ) : void
+	{method}  {static} -validateEBookProperties ( paramMap1 : java.util.Map ) : void
+	{method}  {static} -validateMagazineProperties ( paramMap1 : java.util.Map ) : void
+	{method}  {static} -validatePrintedBookProperties ( paramMap1 : java.util.Map ) : void
+	{method}  {static} -validateRequiredKeys ( paramMap1 : java.util.Map , paramString;2 : [Ljava.lang.String; ) : void
+	{method}  {static} +validateRequiredProperties ( paramString1 : String , paramMap2 : java.util.Map ) : void
+	{method}  {static} -validateVideoMaterialProperties ( paramMap1 : java.util.Map ) : void
+}
+
+
+class com.university.bookstore.factory.MaterialFactory {
+	{method}  {static} -createAudioBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.AudioBook
+	{method}  {static} -createEBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.EBook
+	{method}  {static} -createMagazine ( paramMap1 : java.util.Map ) : com.university.bookstore.model.Magazine
+	{method}  {static} +createMaterial ( paramString1 : String , paramMap2 : java.util.Map ) : com.university.bookstore.model.Material
+	{method}  {static} -createPrintedBook ( paramMap1 : java.util.Map ) : com.university.bookstore.model.PrintedBook
+	{method}  {static} -createVideoMaterial ( paramMap1 : java.util.Map ) : com.university.bookstore.model.VideoMaterial
+	{method}  {static} -getOptionalBoolean ( paramMap1 : java.util.Map , paramString2 : String , paramboolean3 : boolean ) : boolean
+	{method}  {static} -getOptionalDouble ( paramMap1 : java.util.Map , paramString2 : String , paramdouble3 : double ) : double
+	{method}  {static} -getOptionalString ( paramMap1 : java.util.Map , paramString2 : String , paramString3 : String ) : String
+	{method}  {static} -getOptionalStringList ( paramMap1 : java.util.Map , paramString2 : String ) : java.util.List
+	{method}  {static} -getRequiredBoolean ( paramMap1 : java.util.Map , paramString2 : String ) : boolean
+	{method}  {static} -getRequiredDouble ( paramMap1 : java.util.Map , paramString2 : String ) : double
+	{method}  {static} -getRequiredInteger ( paramMap1 : java.util.Map , paramString2 : String ) : int
+	{method}  {static} -getRequiredMediaQuality ( paramMap1 : java.util.Map , paramString2 : String ) : com.university.bookstore.model.Media$MediaQuality
+	{method}  {static} -getRequiredString ( paramMap1 : java.util.Map , paramString2 : String ) : String
+	{method}  {static} -getRequiredVideoType ( paramMap1 : java.util.Map , paramString2 : String ) : com.university.bookstore.model.VideoMaterial$VideoType
+}
+
+
+class com.university.bookstore.impl.BookstoreArrayList {
+	{method} +add ( paramBook1 : com.university.bookstore.model.Book ) : boolean
+	{method} +clear () : void
+	{method} +findByAuthor ( paramString1 : String ) : java.util.List
+	{method} +findByIsbn ( paramString1 : String ) : com.university.bookstore.model.Book
+	{method} +findByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method} +findByTitle ( paramString1 : String ) : java.util.List
+	{method} +findByYear ( paramint1 : int ) : java.util.List
+	{method} +getAllBooks () : java.util.List
+	{method} +getMostExpensive () : com.university.bookstore.model.Book
+	{method} +getMostRecent () : com.university.bookstore.model.Book
+	{method} +getStatistics () : java.util.Map
+	{method} +inventoryValue () : double
+	{method} +removeByIsbn ( paramString1 : String ) : boolean
+	{method} +size () : int
+	{method} +snapshotArray () : [Lcom.university.bookstore.model.Book;
+	{method} +sortByPrice () : void
+	{method} +sortByTitle () : void
+	{method} +sortByYear () : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.impl.ConcurrentMaterialStore {
+	{field} -lock : java.util.concurrent.locks.ReadWriteLock
+	{field} -readLock : java.util.concurrent.locks.Lock
+	{field} -writeLock : java.util.concurrent.locks.Lock
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method} +clearInventory () : void
+	{method} +filterMaterials ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +findByCreators ( paramString;1 : [Ljava.lang.String; ) : java.util.List
+	{method} +findById ( paramString1 : String ) : java.util.Optional
+	{method} +findRecentMaterials ( paramint1 : int ) : java.util.List
+	{method} +findWithPredicate ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +getAllDisplayInfo () : java.util.List
+	{method} +getAllMaterials () : java.util.List
+	{method} +getAllMaterialsSorted () : java.util.List
+	{method} +getDiscountedMaterials () : java.util.List
+	{method} +getInventoryStats () : com.university.bookstore.api.MaterialStore$InventoryStats
+	{method} +getMaterialsByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method} +getMaterialsByYear ( paramint1 : int ) : java.util.List
+	{method} +getMediaMaterials () : java.util.List
+	{method} +getSorted ( paramComparator1 : java.util.Comparator ) : java.util.List
+	{method} +getTotalDiscountAmount () : double
+	{method} +getTotalDiscountedValue () : double
+	{method} +getTotalInventoryValue () : double
+	{method} +groupByType () : java.util.Map
+	{method} +isEmpty () : boolean
+	{method} +removeMaterial ( paramString1 : String ) : java.util.Optional
+	{method} +searchByCreator ( paramString1 : String ) : java.util.List
+	{method} +searchByTitle ( paramString1 : String ) : java.util.List
+	{method} +size () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.impl.MaterialStoreImpl {
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean <<synchronized>> 
+	{method} +clearInventory () : void <<synchronized>> 
+	{method} +filterMaterials ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +findByCreators ( paramString;1 : [Ljava.lang.String; ) : java.util.List
+	{method} +findById ( paramString1 : String ) : java.util.Optional
+	{method} +findRecentMaterials ( paramint1 : int ) : java.util.List
+	{method} +findWithPredicate ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +getAllDisplayInfo () : java.util.List
+	{method} +getAllMaterials () : java.util.List
+	{method} +getAllMaterialsSorted () : java.util.List
+	{method} +getDiscountedMaterials () : java.util.List
+	{method} +getInventoryStats () : com.university.bookstore.api.MaterialStore$InventoryStats
+	{method} +getMaterialsByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method} +getMaterialsByYear ( paramint1 : int ) : java.util.List
+	{method} +getMediaMaterials () : java.util.List
+	{method} +getSorted ( paramComparator1 : java.util.Comparator ) : java.util.List
+	{method} +getTotalDiscountAmount () : double
+	{method} +getTotalDiscountedValue () : double
+	{method} +getTotalInventoryValue () : double
+	{method} +groupByType () : java.util.Map
+	{method} +isEmpty () : boolean
+	{method} +removeMaterial ( paramString1 : String ) : java.util.Optional <<synchronized>> 
+	{method} +searchByCreator ( paramString1 : String ) : java.util.List
+	{method} +searchByTitle ( paramString1 : String ) : java.util.List
+	{method} +size () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.impl.ModernConcurrentMaterialStore {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} -closed : boolean
+	{field} -executorService : java.util.concurrent.ExecutorService
+	{field} -scheduledExecutor : java.util.concurrent.ScheduledExecutorService
+	{field} -stampedLock : java.util.concurrent.locks.StampedLock
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method} +addMaterialAsync ( paramMaterial1 : com.university.bookstore.model.Material ) : java.util.concurrent.CompletableFuture
+	{method} +addMaterialsBatchAsync ( paramCollection1 : java.util.Collection ) : java.util.concurrent.CompletableFuture
+	{method} +clearInventory () : void
+	{method} +close () : void
+	{method} -ensureNotClosed () : void
+	{method} +filterMaterials ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +findByCreators ( paramString;1 : [Ljava.lang.String; ) : java.util.List
+	{method} +findById ( paramString1 : String ) : java.util.Optional
+	{method} +findByIdAsync ( paramString1 : String ) : java.util.concurrent.CompletableFuture
+	{method} +findByIdsAsync ( paramList1 : java.util.List ) : java.util.concurrent.CompletableFuture
+	{method} +findRecentMaterials ( paramint1 : int ) : java.util.List
+	{method} +findWithPredicate ( paramPredicate1 : java.util.function.Predicate ) : java.util.List
+	{method} +getAllMaterials () : java.util.List
+	{method} +getAllMaterialsSorted () : java.util.List
+	{method} +getDiscountedMaterials () : java.util.List
+	{method} +getInventoryStats () : com.university.bookstore.api.MaterialStore$InventoryStats
+	{method} +getInventoryStatsAsync () : java.util.concurrent.CompletableFuture
+	{method} +getMaterialsByPriceRange ( paramdouble1 : double , paramdouble2 : double ) : java.util.List
+	{method} +getMaterialsByType ( paramMaterial$MaterialType1 : com.university.bookstore.model.Material$MaterialType ) : java.util.List
+	{method} +getMaterialsByYear ( paramint1 : int ) : java.util.List
+	{method} +getMediaMaterials () : java.util.List
+	{method} +getSorted ( paramComparator1 : java.util.Comparator ) : java.util.List
+	{method} +getTotalDiscountAmount () : double
+	{method} +getTotalDiscountedValue () : double
+	{method} +getTotalInventoryValue () : double
+	{method} +getTotalInventoryValueAsync () : java.util.concurrent.CompletableFuture
+	{method} +groupByType () : java.util.Map
+	{method} +isEmpty () : boolean
+	{method} +parallelSearchAsync ( paramString1 : String , paramString2 : String , paramMaterial$MaterialType3 : com.university.bookstore.model.Material$MaterialType ) : java.util.concurrent.CompletableFuture
+	{method} -performMaintenance () : void
+	{method} +removeMaterial ( paramString1 : String ) : java.util.Optional
+	{method} -scheduleMaintenanceTasks () : void
+	{method} +searchByCreator ( paramString1 : String ) : java.util.List
+	{method} +searchByTitle ( paramString1 : String ) : java.util.List
+	{method} +searchByTitleAsync ( paramString1 : String ) : java.util.concurrent.CompletableFuture
+	{method} +size () : int
+	{method} +toString () : String
+}
+
+
+interface com.university.bookstore.iterator.MaterialIterator {
+	{method}  {abstract} +getCurrentPosition () : int
+	{method}  {abstract} +getRemainingCount () : int
+	{method}  {abstract} +getTotalCount () : int
+	{method}  {abstract} +hasNext () : boolean
+	{method}  {abstract} +isAtBeginning () : boolean
+	{method}  {abstract} +isAtEnd () : boolean
+	{method}  {abstract} +next () : com.university.bookstore.model.Material
+	{method}  {abstract} +reset () : void
+}
+
+
+class com.university.bookstore.iterator.MaterialIteratorFactory {
+	{method} +allMatch ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator , paramPredicate2 : java.util.function.Predicate ) : boolean
+	{method} +anyMatch ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator , paramPredicate2 : java.util.function.Predicate ) : boolean
+	{method} +collectAll ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator ) : java.util.List
+	{method} +count ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator , paramPredicate2 : java.util.function.Predicate ) : int
+	{method} +createAudioBookIterator ( paramList1 : java.util.List ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createBookIterator ( paramList1 : java.util.List ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createCheapIterator ( paramList1 : java.util.List , paramdouble2 : double ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createEBookIterator ( paramList1 : java.util.List ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createExpensiveIterator ( paramList1 : java.util.List , paramdouble2 : double ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createMagazineIterator ( paramList1 : java.util.List ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createPriceRangeIterator ( paramList1 : java.util.List , paramdouble2 : double , paramdouble3 : double ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createPriceSortedIterator ( paramList1 : java.util.List , paramboolean2 : boolean ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createTypeIterator ( paramList1 : java.util.List , paramMaterial$MaterialType2 : com.university.bookstore.model.Material$MaterialType ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +createVideoIterator ( paramList1 : java.util.List ) : com.university.bookstore.iterator.MaterialIterator
+	{method} +findAll ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator , paramPredicate2 : java.util.function.Predicate ) : java.util.List
+	{method} +findFirst ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator , paramPredicate2 : java.util.function.Predicate ) : java.util.Optional
+	{method} +getRemainingCount ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator ) : int
+	{method} +getTotalCount ( paramMaterialIterator1 : com.university.bookstore.iterator.MaterialIterator ) : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.iterator.MaterialTypeIterator {
+	{field} -currentIndex : int
+	{field} -totalCount : int
+	{method} -advanceToNext () : void
+	{method} +getCurrentPosition () : int
+	{method} +getRemainingCount () : int
+	{method} +hasNext () : boolean
+	{method} +isAtBeginning () : boolean
+	{method} +isAtEnd () : boolean
+	{method} +next () : com.university.bookstore.model.Material
+	{method} +reset () : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.iterator.PriceRangeIterator {
+	{field} -currentIndex : int
+	{field} -maxPrice : double
+	{field} -minPrice : double
+	{field} -totalCount : int
+	{method} -advanceToNext () : void
+	{method} +getCurrentPosition () : int
+	{method} +getPriceRange () : double
+	{method} +getRemainingCount () : int
+	{method} +hasNext () : boolean
+	{method} +isAtBeginning () : boolean
+	{method} +isAtEnd () : boolean
+	{method} +next () : com.university.bookstore.model.Material
+	{method} +reset () : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.iterator.PriceSortedIterator {
+	{field} -ascending : boolean
+	{field} -currentIndex : int
+	{method} +getCurrentPosition () : int
+	{method} +getRemainingCount () : int
+	{method} +getTotalCount () : int
+	{method} +hasNext () : boolean
+	{method} +isAtBeginning () : boolean
+	{method} +isAtEnd () : boolean
+	{method} +next () : com.university.bookstore.model.Material
+	{method} +peek () : com.university.bookstore.model.Material
+	{method} +peekNext () : com.university.bookstore.model.Material
+	{method} +reset () : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.model.AudioBook {
+	{field} -author : String
+	{field} -duration : int
+	{field} -fileSize : double
+	{field} -format : String
+	{field} -isbn : String
+	{field} -language : String
+	{field} -narrator : String
+	{field} -streamingOnly : boolean
+	{field} -unabridged : boolean
+	{method} +calculateListeningSessions ( paramint1 : int ) : int
+	{method} +getAdjustedDuration ( paramdouble1 : double ) : int
+	{method} +getCreator () : String
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} +toString () : String
+	{method} -validateDuration ( paramint1 : int ) : int
+	{method} -validateFileSize ( paramdouble1 : double ) : double
+	{method}  {static} -validateIsbn ( paramString1 : String ) : String
+}
+
+
+class com.university.bookstore.model.Book {
+	{field} {static} -ISBN_10_PATTERN : java.util.regex.Pattern
+	{field} {static} -ISBN_13_PATTERN : java.util.regex.Pattern
+	{field} {static} -MIN_YEAR : int
+	{field} -author : String
+	{field} -isbn : String
+	{field} -price : double
+	{field} -title : String
+	{field} -year : int
+	{method} +compareTo ( paramBook1 : com.university.bookstore.model.Book ) : int
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +hashCode () : int
+	{method} +toString () : String
+	{method} -validateIsbn ( paramString1 : String ) : String
+	{method} -validatePrice ( paramdouble1 : double ) : double
+	{method} -validateStringField ( paramString1 : String , paramString2 : String ) : String
+	{method} -validateYear ( paramint1 : int ) : int
+}
+
+
+class com.university.bookstore.model.EBook {
+	{field} {static} -DRM_FREE_DISCOUNT : double
+	{field} {static} -VALID_FORMATS : java.util.Set
+	{field} {static} -WORDS_PER_MINUTE : int
+	{field} -author : String
+	{field} -drmEnabled : boolean
+	{field} -fileFormat : String
+	{field} -fileSize : double
+	{field} -wordCount : int
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getCreator () : String
+	{method} +getDescription () : String
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} +getDuration () : int
+	{method} +getFormat () : String
+	{method} +getReadingTimeMinutes () : int
+	{method} +hashCode () : int
+	{method} +isStreamingOnly () : boolean
+	{method} +toString () : String
+	{method} -validateFileFormat ( paramString1 : String ) : String
+	{method} -validateFileSize ( paramdouble1 : double ) : double
+	{method} -validateWordCount ( paramint1 : int ) : int
+}
+
+
+class com.university.bookstore.model.Magazine {
+	{field} -category : String
+	{field} -frequency : String
+	{field} -issn : String
+	{field} -issueNumber : int
+	{field} -publisher : String
+	{method} +calculateAnnualSubscription () : double
+	{method} +getCreator () : String
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} -getIssuesPerYear () : int
+	{method} +toString () : String
+	{method}  {static} -validateIssn ( paramString1 : String ) : String
+	{method} -validateIssueNumber ( paramint1 : int ) : int
+}
+
+
+enum com.university.bookstore.model.Magazine$PublicationFrequency {
+	{field} +Annual
+	{field} +Bi-weekly
+	{field} +Daily
+	{field} +Monthly
+	{field} +Quarterly
+	{field} +Weekly
+}
+
+
+abstract class com.university.bookstore.model.Material {
+	{field} {static} #MIN_YEAR : int
+	{field} #id : String
+	{field} #price : double
+	{field} #title : String
+	{field} #year : int
+	{method} +compareTo ( paramMaterial1 : com.university.bookstore.model.Material ) : int
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method}  {abstract} +getCreator () : String
+	{method} +getDiscountRate () : double
+	{method} +getDiscountedPrice () : double
+	{method}  {abstract} +getDisplayInfo () : String
+	{method} +hashCode () : int
+	{method} +toString () : String
+	{method} #validateId ( paramString1 : String ) : String
+	{method} #validatePrice ( paramdouble1 : double ) : double
+	{method} #validateStringField ( paramString1 : String , paramString2 : String ) : String
+	{method} #validateYear ( paramint1 : int ) : int
+}
+
+
+enum com.university.bookstore.model.Material$MaterialType {
+	{field} +AUDIO_BOOK
+	{field} +BOOK
+	{field} +DOCUMENTARY
+	{field} +EBOOK
+	{field} +E_BOOK
+	{field} +MAGAZINE
+	{field} +MUSIC_ALBUM
+	{field} +PODCAST
+	{field} +VIDEO
+}
+
+
+interface com.university.bookstore.model.Media {
+	{method} +estimateDownloadTime ( paramdouble1 : double ) : int
+	{method}  {abstract} +getDuration () : int
+	{method}  {abstract} +getFileSize () : double
+	{method}  {abstract} +getFormat () : String
+	{method} +getPlaybackInfo () : String
+	{method}  {abstract} +getQuality () : com.university.bookstore.model.Media$MediaQuality
+	{method}  {abstract} +isStreamingOnly () : boolean
+}
+
+
+enum com.university.bookstore.model.Media$MediaQuality {
+	{field} +HD Quality
+	{field} +High Quality
+	{field} +Low Quality
+	{field} +Medium Quality
+	{field} +Physical Media
+	{field} +Standard Quality
+	{field} +Ultra HD
+}
+
+
+class com.university.bookstore.model.PrintedBook {
+	{field} {static} -ISBN_10_PATTERN : java.util.regex.Pattern
+	{field} {static} -ISBN_13_PATTERN : java.util.regex.Pattern
+	{field} -author : String
+	{field} -hardcover : boolean
+	{field} -isbn : String
+	{field} -pages : int
+	{field} -publisher : String
+	{method} +estimateReadingTime ( paramint1 : int ) : double
+	{method} +getCreator () : String
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} +toString () : String
+	{method}  {static} -validateIsbn ( paramString1 : String ) : String
+	{method} -validatePages ( paramint1 : int ) : int
+}
+
+
+class com.university.bookstore.model.VideoMaterial {
+	{field} -aspectRatio : String
+	{field} -cast : java.util.List
+	{field} -director : String
+	{field} -duration : int
+	{field} -fileSize : double
+	{field} -format : String
+	{field} -rating : String
+	{field} -subtitlesAvailable : boolean
+	{method} +getCompressedSize ( paramdouble1 : double ) : double
+	{method} +getCreator () : String
+	{method} +getDiscountRate () : double
+	{method} +getDisplayInfo () : String
+	{method} +getStreamingBandwidth () : double
+	{method} +hasSubtitles () : boolean
+	{method} +isFeatureLength () : boolean
+	{method} +isStreamingOnly () : boolean
+	{method} +toString () : String
+	{method} -validateDuration ( paramint1 : int ) : int
+	{method} -validateFileSize ( paramdouble1 : double ) : double
+}
+
+
+enum com.university.bookstore.model.VideoMaterial$VideoType {
+	{field} +Documentary
+	{field} +Educational
+	{field} +Movie
+	{field} +Short Film
+	{field} +TV Series
+	{field} +Tutorial
+}
+
+
+class com.university.bookstore.observer.AnalyticsObserver {
+	{field} -eventCounts : java.util.Map
+	{field} -firstEventTime : long
+	{field} -lastEventTime : long
+	{field} -materialTypeCounts : java.util.Map
+	{field} -totalEvents : int
+	{field} -totalValue : java.util.Map
+	{method} +clear () : void
+	{method} +getAnalyticsData () : com.university.bookstore.observer.AnalyticsObserver$AnalyticsData
+	{method} +getAverageEventRate () : double
+	{method} +getEventCount ( paramString1 : String ) : int
+	{method} +getEventStatistics () : java.util.Map
+	{method} +getEventTimeSpan () : long
+	{method} +getMaterialTypeCount ( paramString1 : String ) : int
+	{method} +getMaterialTypeStatistics () : java.util.Map
+	{method} +getObserverName () : String
+	{method} +getTotalInventoryValue () : double
+	{method} +getUniqueMaterialCount () : int
+	{method} +onEvent ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.AnalyticsObserver$AnalyticsData {
+	{field} -averageEventRate : double
+	{field} -eventStatistics : java.util.Map
+	{field} -eventTimeSpan : long
+	{field} -firstEventTime : long
+	{field} -lastEventTime : long
+	{field} -materialTypeStatistics : java.util.Map
+	{field} -totalEvents : int
+	{field} -totalInventoryValue : double
+	{field} -uniqueMaterialCount : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.AuditLogObserver {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} -maxLogSize : int
+	{method} +clearAuditLog () : void
+	{method} +getAuditLogForEventType ( paramString1 : String ) : java.util.List
+	{method} +getAuditLogForMaterial ( paramString1 : String ) : java.util.List
+	{method} +getAuditLogForTimeRange ( paramlong1 : long , paramlong2 : long ) : java.util.List
+	{method} +getAuditLogStats () : com.university.bookstore.observer.AuditLogObserver$AuditLogStats
+	{method} +getLogSize () : int
+	{method} +getObserverName () : String
+	{method} +onEvent ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +printAuditLog () : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.AuditLogObserver$AuditLogEntry {
+	{field} -description : String
+	{field} -eventType : String
+	{field} -materialId : String
+	{field} -materialTitle : String
+	{field} -timestamp : long
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.AuditLogObserver$AuditLogStats {
+	{field} -materialAddedCount : int
+	{field} -newestTimestamp : long
+	{field} -oldestTimestamp : long
+	{field} -priceChangedCount : int
+	{field} -totalEntries : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.InventoryObserver {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{field} -inventoryCounts : java.util.Map
+	{field} -totalEvents : int
+	{field} -totalValue : java.util.Map
+	{method} +clear () : void
+	{method} +getAllInventoryCounts () : java.util.Map
+	{method} +getAllTotalValues () : java.util.Map
+	{method} +getInventoryCount ( paramString1 : String ) : int
+	{method} +getObserverName () : String
+	{method} +getTotalInventoryCount () : int
+	{method} +getTotalInventoryValue () : double
+	{method} +getUniqueMaterialCount () : int
+	{method} -handleMaterialAdded ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} -handlePriceChanged ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +onEvent ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.observer.MaterialAddedEvent {
+	{field} -timestamp : long
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getDescription () : String
+	{method} +getEventType () : String
+	{method} +hashCode () : int
+	{method} +toString () : String
+}
+
+
+interface com.university.bookstore.observer.MaterialEvent {
+	{method}  {abstract} +getDescription () : String
+	{method}  {abstract} +getEventType () : String
+	{method}  {abstract} +getMaterial () : com.university.bookstore.model.Material
+	{method}  {abstract} +getTimestamp () : long
+}
+
+
+class com.university.bookstore.observer.MaterialEventPublisher {
+	{field} {static} -LOGGER : org.slf4j.Logger
+	{method} +addObserver ( paramMaterialObserver1 : com.university.bookstore.observer.MaterialObserver ) : void
+	{method} +clearObservers () : void
+	{method} +getObserverCount () : int
+	{method} +getObserversOfType ( paramClass1 : Class ) : java.util.List
+	{method} +hasNoObservers () : boolean
+	{method} +hasObserver ( paramMaterialObserver1 : com.university.bookstore.observer.MaterialObserver ) : boolean
+	{method} +notifyObservers ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +publishEvent ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +publishMaterialAdded ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +publishPriceChanged ( paramMaterial1 : com.university.bookstore.model.Material , paramdouble2 : double , paramdouble3 : double ) : void
+	{method} +removeObserver ( paramMaterialObserver1 : com.university.bookstore.observer.MaterialObserver ) : boolean
+	{method} +toString () : String
+}
+
+
+interface com.university.bookstore.observer.MaterialObserver {
+	{method} +getObserverName () : String
+	{method} +onAdded ( paramMaterialSubject1 : com.university.bookstore.observer.MaterialSubject ) : void
+	{method}  {abstract} +onEvent ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method} +onRemoved ( paramMaterialSubject1 : com.university.bookstore.observer.MaterialSubject ) : void
+}
+
+
+interface com.university.bookstore.observer.MaterialSubject {
+	{method}  {abstract} +addObserver ( paramMaterialObserver1 : com.university.bookstore.observer.MaterialObserver ) : void
+	{method}  {abstract} +clearObservers () : void
+	{method}  {abstract} +getObserverCount () : int
+	{method}  {abstract} +hasNoObservers () : boolean
+	{method}  {abstract} +notifyObservers ( paramMaterialEvent1 : com.university.bookstore.observer.MaterialEvent ) : void
+	{method}  {abstract} +removeObserver ( paramMaterialObserver1 : com.university.bookstore.observer.MaterialObserver ) : boolean
+}
+
+
+class com.university.bookstore.observer.PriceChangedEvent {
+	{field} -newPrice : double
+	{field} -oldPrice : double
+	{field} -timestamp : long
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +getDescription () : String
+	{method} +getEventType () : String
+	{method} +getPriceChange () : double
+	{method} +getPriceChangePercentage () : double
+	{method} +hashCode () : int
+	{method} +isPriceDecrease () : boolean
+	{method} +isPriceIncrease () : boolean
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.repository.JsonMaterialRepository {
+	{field} {static} -MAX_PATH_LENGTH : int
+	{field} {static} -SAFE_BASE_DIR : String
+	{field} -dataFile : java.io.File
+	{field} -filePath : String
+	{field} -objectMapper : com.fasterxml.jackson.databind.ObjectMapper
+	{method} +count () : long
+	{method} +dataFileExists () : boolean
+	{method} +delete ( paramString1 : String ) : boolean
+	{method} +deleteAll () : void
+	{method} +exists ( paramString1 : String ) : boolean
+	{method} +findAll () : java.util.List
+	{method} +findById ( paramString1 : String ) : java.util.Optional
+	{method} +getDataFileSize () : long
+	{method} -loadAll () : java.util.List
+	{method} +save ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} -validateAndSanitizePath ( paramString1 : String ) : String
+}
+
+
+interface com.university.bookstore.repository.MaterialRepository {
+	{method}  {abstract} +count () : long
+	{method}  {abstract} +delete ( paramString1 : String ) : boolean
+	{method}  {abstract} +deleteAll () : void
+	{method}  {abstract} +exists ( paramString1 : String ) : boolean
+	{method}  {abstract} +findAll () : java.util.List
+	{method}  {abstract} +findById ( paramString1 : String ) : java.util.Optional
+	{method}  {abstract} +save ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+}
+
+
+class com.university.bookstore.repository.MaterialsWrapper {
+}
+
+
+class com.university.bookstore.repository.ModernJsonMaterialRepository {
+	{field} {static} -LOGGER : java.util.logging.Logger
+	{field} {static} -MAX_PATH_LENGTH : int
+	{field} {static} -SAFE_BASE_DIR : String
+	{field} -backupFile : java.nio.file.Path
+	{field} -closed : boolean
+	{field} -dataFile : java.nio.file.Path
+	{field} -fileLock : java.util.concurrent.locks.ReadWriteLock
+	{field} -objectMapper : com.fasterxml.jackson.databind.ObjectMapper
+	{method} +close () : void
+	{method} +count () : long
+	{method} +createBackup () : boolean
+	{method} +dataFileExists () : boolean
+	{method} +delete ( paramString1 : String ) : boolean
+	{method} +deleteAll () : void
+	{method} +deleteAll ( paramCollection1 : java.util.Collection ) : int
+	{method} -ensureNotClosed () : void
+	{method} +exists ( paramString1 : String ) : boolean
+	{method} +findAll () : java.util.List
+	{method} +findById ( paramString1 : String ) : java.util.Optional
+	{method} +getDataFileSize () : long
+	{method} +getFilePath () : String
+	{method} -initializeStorage () : void
+	{method} -loadAllInternal () : java.util.List
+	{method} +performMaintenance () : void
+	{method} +restoreFromBackup ( paramString1 : String ) : boolean
+	{method} +save ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +saveAll ( paramCollection1 : java.util.Collection ) : void
+	{method} -saveAtomic ( paramList1 : java.util.List ) : void
+	{method} -validateAndSanitizePath ( paramString1 : String ) : java.nio.file.Path
+}
+
+
+class com.university.bookstore.repository.RepositoryException {
+	{field} {static} -serialVersionUID : long
+}
+
+
+class com.university.bookstore.search.CachedSearchService {
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +clear () : void
+	{method} +getCacheStats () : com.university.bookstore.search.SearchResultCache$CacheStats
+	{method} +getIndexSize () : int
+	{method} -initializeTrie () : void
+	{method} -invalidateCacheForMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +isIndexEmpty () : boolean
+	{method} +refreshIndex () : void
+	{method} +removeMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +searchByPrefix ( paramString1 : String ) : java.util.List
+	{method} +searchByPrefixWithLimit ( paramString1 : String , paramint2 : int ) : java.util.List
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.search.MaterialTrie {
+	{field} -root : com.university.bookstore.search.MaterialTrie$TrieNode
+	{method} -cleanupEmptyNodes ( paramList1 : java.util.List ) : void
+	{method} +clear () : void
+	{method} -countPrefixes ( paramMaterialTrie$TrieNode1 : com.university.bookstore.search.MaterialTrie$TrieNode ) : int
+	{method} +getAllMaterials () : java.util.List
+	{method} +hasPrefix ( paramString1 : String ) : boolean
+	{method} +insert ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +isEmpty () : boolean
+	{method} +remove ( paramMaterial1 : com.university.bookstore.model.Material ) : boolean
+	{method} +searchByPrefix ( paramString1 : String ) : java.util.List
+	{method} +searchByPrefixWithLimit ( paramString1 : String , paramint2 : int ) : java.util.List
+	{method} +size () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.search.ModernSearchCache {
+	{field} {static} -LOGGER : java.util.logging.Logger
+	{field} -cache : java.util.Map
+	{field} -closed : boolean
+	{field} -evictionCount : java.util.concurrent.atomic.LongAdder
+	{field} -hitCount : java.util.concurrent.atomic.LongAdder
+	{field} -idleTime : java.time.Duration
+	{field} -loadCount : java.util.concurrent.atomic.LongAdder
+	{field} -loadingExecutor : java.util.concurrent.ExecutorService
+	{field} -maintenanceExecutor : java.util.concurrent.ScheduledExecutorService
+	{field} -maxSize : int
+	{field} -missCount : java.util.concurrent.atomic.LongAdder
+	{field} -totalLoadTime : java.util.concurrent.atomic.LongAdder
+	{field} -ttl : java.time.Duration
+	{method} +close () : void
+	{method} +containsKey ( paramString1 : String ) : boolean
+	{method} -ensureNotClosed () : void
+	{method} +get ( paramString1 : String , paramFunction2 : java.util.function.Function ) : java.util.List
+	{method} +getAsync ( paramString1 : String , paramFunction2 : java.util.function.Function ) : java.util.concurrent.CompletableFuture
+	{method} +getStats () : com.university.bookstore.search.ModernSearchCache$CacheStats
+	{method} +invalidate ( paramString1 : String ) : boolean
+	{method} +invalidateAll () : void
+	{method} +invalidateIf ( paramPredicate1 : java.util.function.Predicate ) : int
+	{method} +isEmpty () : boolean
+	{method} -performMaintenance () : void
+	{method} -performSizeBasedEviction () : void
+	{method} +put ( paramString1 : String , paramList2 : java.util.List ) : void
+	{method} +refresh ( paramString1 : String , paramFunction2 : java.util.function.Function ) : java.util.concurrent.CompletableFuture
+	{method} +resetStats () : void
+	{method} -scheduleMaintenance () : void
+	{method} +size () : int
+	{method} +warmUp ( paramCollection1 : java.util.Collection , paramFunction2 : java.util.function.Function ) : java.util.concurrent.CompletableFuture
+}
+
+
+class com.university.bookstore.search.ModernSearchCache$CacheStats {
+	{field} -averageLoadTime : double
+	{field} -evictionCount : long
+	{field} -hitCount : long
+	{field} -hitRate : double
+	{field} -loadCount : long
+	{field} -missCount : long
+	{field} -size : int
+	{field} -totalAccessCount : long
+	{method} +averageLoadTime () : double
+	{method} +equals ( paramObject1 : Object ) : boolean
+	{method} +evictionCount () : long
+	{method} +getSummary () : String
+	{method} +hashCode () : int
+	{method} +hitCount () : long
+	{method} +hitRate () : double
+	{method} +loadCount () : long
+	{method} +missCount () : long
+	{method} +size () : int
+	{method} +toString () : String
+	{method} +totalAccessCount () : long
+}
+
+
+class com.university.bookstore.search.SearchResultCache {
+	{field} -accessOrder : java.util.Deque
+	{field} -cache : java.util.Map
+	{field} -maxSize : int
+	{method} +clear () : void
+	{method} +containsKey ( paramString1 : String ) : boolean
+	{method} -evictLRU () : void
+	{method} +get ( paramString1 : String ) : java.util.Optional
+	{method} +getStats () : com.university.bookstore.search.SearchResultCache$CacheStats
+	{method} +isEmpty () : boolean
+	{method} +isFull () : boolean
+	{method} +put ( paramString1 : String , paramList2 : java.util.List ) : void
+	{method} +remove ( paramString1 : String ) : boolean
+	{method} +size () : int
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.search.SearchResultCache$CacheStats {
+	{field} -averageAge : double
+	{field} -currentSize : int
+	{field} -hitRatio : double
+	{field} -maxSize : int
+	{field} -totalHits : long
+	{field} -totalRequests : long
+	{method} +toString () : String
+}
+
+
+class com.university.bookstore.service.MaterialService {
+	{method} +addMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} +clearAllMaterials () : void
+	{method} +findMaterial ( paramString1 : String ) : com.university.bookstore.model.Material
+	{method} +findMaterialOptional ( paramString1 : String ) : java.util.Optional
+	{method} +getAllMaterials () : java.util.List
+	{method} +getMaterialCount () : long
+	{method} +materialExists ( paramString1 : String ) : boolean
+	{method} +removeMaterial ( paramString1 : String ) : boolean
+	{method} +updateMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+	{method} -validateMaterial ( paramMaterial1 : com.university.bookstore.model.Material ) : void
+}
+
+
+class com.university.bookstore.service.MaterialService$InvalidMaterialException {
+	{field} {static} -serialVersionUID : long
+}
+
+
+class com.university.bookstore.service.MaterialService$MaterialNotFoundException {
+	{field} {static} -serialVersionUID : long
+}
+
+
+class com.university.bookstore.utils.BookArrayUtils {
+	{method}  {static} +averagePrice ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : double
+	{method}  {static} +countBeforeYear ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramint2 : int ) : int
+	{method}  {static} +countByAuthor ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramString2 : String ) : int
+	{method}  {static} +countByDecade ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : java.util.Map
+	{method}  {static} +filterByDecade ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramint2 : int ) : [Lcom.university.bookstore.model.Book;
+	{method}  {static} +filterByYearRange ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramint2 : int , paramint3 : int ) : [Lcom.university.bookstore.model.Book;
+	{method}  {static} +filterPriceAtMost ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramdouble2 : double ) : [Lcom.university.bookstore.model.Book;
+	{method}  {static} +findLongestTitle ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : com.university.bookstore.model.Book
+	{method}  {static} +findOldest ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : com.university.bookstore.model.Book
+	{method}  {static} +merge ( paramBook;1 : [Lcom.university.bookstore.model.Book; , paramBook;2 : [Lcom.university.bookstore.model.Book; ) : [Lcom.university.bookstore.model.Book;
+	{method}  {static} +removeDuplicates ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : [Lcom.university.bookstore.model.Book;
+	{method}  {static} +sortByPrice ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : void
+	{method}  {static} +sortByYear ( paramBook;1 : [Lcom.university.bookstore.model.Book; ) : void
+}
+
+
+class com.university.bookstore.utils.LoggerFactory {
+	{method}  {static} +getLogger ( paramClass1 : Class ) : org.slf4j.Logger
+	{method}  {static} +getLogger ( paramString1 : String ) : org.slf4j.Logger
+}
+
+
+interface com.university.bookstore.visitor.MaterialVisitor {
+	{method}  {abstract} +visit ( paramAudioBook1 : com.university.bookstore.model.AudioBook ) : void
+	{method}  {abstract} +visit ( paramEBook1 : com.university.bookstore.model.EBook ) : void
+	{method}  {abstract} +visit ( paramMagazine1 : com.university.bookstore.model.Magazine ) : void
+	{method}  {abstract} +visit ( paramPrintedBook1 : com.university.bookstore.model.PrintedBook ) : void
+	{method}  {abstract} +visit ( paramVideoMaterial1 : com.university.bookstore.model.VideoMaterial ) : void
+}
+
+
+class com.university.bookstore.visitor.ShippingCostCalculator {
+	{field} {static} -DIGITAL_ITEM_RATE : double
+	{field} {static} -MAGAZINE_FLAT_RATE : double
+	{field} {static} -PHYSICAL_ITEM_RATE : double
+	{field} -totalShippingCost : double
+	{method} +calculateShippingCost ( paramMaterial1 : com.university.bookstore.model.Material ) : double
+	{method} +reset () : void
+	{method} +visit ( paramAudioBook1 : com.university.bookstore.model.AudioBook ) : void
+	{method} +visit ( paramEBook1 : com.university.bookstore.model.EBook ) : void
+	{method} +visit ( paramMagazine1 : com.university.bookstore.model.Magazine ) : void
+	{method} +visit ( paramPrintedBook1 : com.university.bookstore.model.PrintedBook ) : void
+	{method} +visit ( paramVideoMaterial1 : com.university.bookstore.model.VideoMaterial ) : void
+}
+
+
+
+
+com.university.bookstore.api.ModernMaterialStore ..|>  com.university.bookstore.api.MaterialStore
+com.university.bookstore.builder.EBookBuilder -->  com.university.bookstore.model.Media$MediaQuality : quality
+com.university.bookstore.builder.EBookBuilder ..|>  com.university.bookstore.builder.MaterialBuilder
+com.university.bookstore.builder.MaterialBundleBuilder "1" o-- "0..*"  com.university.bookstore.composite.MaterialComponent : components
+com.university.bookstore.builder.MaterialBundleBuilder ..|>  com.university.bookstore.builder.ComponentBuilder
+com.university.bookstore.builder.MaterialDirector *--  com.university.bookstore.builder.EBookBuilder : eBookBuilder
+com.university.bookstore.builder.MaterialDirector *--  com.university.bookstore.builder.MaterialBundleBuilder : bundleBuilder
+com.university.bookstore.chain.DirectorHandler --|>  com.university.bookstore.chain.DiscountHandler
+com.university.bookstore.chain.DiscountApprovalService "1" o-- "0..*"  com.university.bookstore.chain.DiscountRequest : processedRequests
+com.university.bookstore.chain.DiscountApprovalService *--  com.university.bookstore.chain.DiscountHandler : chain
+com.university.bookstore.chain.DiscountHandler -->  com.university.bookstore.chain.DiscountHandler : nextHandler
+com.university.bookstore.chain.DiscountRequest *--  com.university.bookstore.model.Material : material
+com.university.bookstore.chain.ManagerHandler --|>  com.university.bookstore.chain.DiscountHandler
+com.university.bookstore.chain.VPHandler --|>  com.university.bookstore.chain.DiscountHandler
+com.university.bookstore.composite.BundleService "1" o-- "0..*"  com.university.bookstore.composite.MaterialBundle : bundles
+com.university.bookstore.composite.MaterialBundle "1" o-- "0..*"  com.university.bookstore.composite.MaterialComponent : components
+com.university.bookstore.composite.MaterialBundle ..|>  com.university.bookstore.composite.MaterialComponent
+com.university.bookstore.composite.MaterialLeaf *--  com.university.bookstore.model.Material : material
+com.university.bookstore.composite.MaterialLeaf ..|>  com.university.bookstore.composite.MaterialComponent
+com.university.bookstore.controller.MaterialController *--  com.university.bookstore.api.MaterialStore : materialStore
+com.university.bookstore.decorator.DigitalAnnotationDecorator --|>  com.university.bookstore.decorator.MaterialDecorator
+com.university.bookstore.decorator.ExpeditedDeliveryDecorator --|>  com.university.bookstore.decorator.MaterialDecorator
+com.university.bookstore.decorator.GiftWrappingDecorator --|>  com.university.bookstore.decorator.MaterialDecorator
+com.university.bookstore.decorator.MaterialDecorator *--  com.university.bookstore.model.Material : decoratedMaterial
+com.university.bookstore.decorator.MaterialDecorator --|>  com.university.bookstore.model.Material
+com.university.bookstore.impl.BookstoreArrayList "1" o-- "0..*"  com.university.bookstore.model.Book : inventory
+com.university.bookstore.impl.BookstoreArrayList ..|>  com.university.bookstore.api.BookstoreAPI
+com.university.bookstore.impl.ConcurrentMaterialStore "1" o-- "0..*"  com.university.bookstore.model.Material : materials
+com.university.bookstore.impl.ConcurrentMaterialStore ..|>  com.university.bookstore.api.MaterialStore
+com.university.bookstore.impl.MaterialStoreImpl "1" o-- "0..*"  com.university.bookstore.model.Material : idIndex
+com.university.bookstore.impl.MaterialStoreImpl "1" o-- "0..*"  com.university.bookstore.model.Material : inventory
+com.university.bookstore.impl.MaterialStoreImpl ..|>  com.university.bookstore.api.MaterialStore
+com.university.bookstore.impl.ModernConcurrentMaterialStore "1" o-- "0..*"  com.university.bookstore.model.Material : materials
+com.university.bookstore.impl.ModernConcurrentMaterialStore ..|>  com.university.bookstore.api.MaterialStore
+com.university.bookstore.iterator.MaterialTypeIterator "1" o-- "0..*"  com.university.bookstore.model.Material : materials
+com.university.bookstore.iterator.MaterialTypeIterator *--  com.university.bookstore.model.Material$MaterialType : targetType
+com.university.bookstore.iterator.MaterialTypeIterator ..|>  com.university.bookstore.iterator.MaterialIterator
+com.university.bookstore.iterator.PriceRangeIterator "1" o-- "0..*"  com.university.bookstore.model.Material : materials
+com.university.bookstore.iterator.PriceRangeIterator ..|>  com.university.bookstore.iterator.MaterialIterator
+com.university.bookstore.iterator.PriceSortedIterator "1" o-- "0..*"  com.university.bookstore.model.Material : sortedMaterials
+com.university.bookstore.iterator.PriceSortedIterator ..|>  com.university.bookstore.iterator.MaterialIterator
+com.university.bookstore.model.AudioBook *--  com.university.bookstore.model.Media$MediaQuality : quality
+com.university.bookstore.model.AudioBook --|>  com.university.bookstore.model.Material
+com.university.bookstore.model.AudioBook ..|>  com.university.bookstore.model.Media
+com.university.bookstore.model.EBook *--  com.university.bookstore.model.Media$MediaQuality : quality
+com.university.bookstore.model.EBook --|>  com.university.bookstore.model.Material
+com.university.bookstore.model.EBook ..|>  com.university.bookstore.model.Media
+com.university.bookstore.model.Magazine --|>  com.university.bookstore.model.Material
+com.university.bookstore.model.Material *--  com.university.bookstore.model.Material$MaterialType : type
+com.university.bookstore.model.PrintedBook --|>  com.university.bookstore.model.Material
+com.university.bookstore.model.VideoMaterial *--  com.university.bookstore.model.Media$MediaQuality : quality
+com.university.bookstore.model.VideoMaterial *--  com.university.bookstore.model.VideoMaterial$VideoType : videoType
+com.university.bookstore.model.VideoMaterial --|>  com.university.bookstore.model.Material
+com.university.bookstore.model.VideoMaterial ..|>  com.university.bookstore.model.Media
+com.university.bookstore.observer.AnalyticsObserver ..|>  com.university.bookstore.observer.MaterialObserver
+com.university.bookstore.observer.AuditLogObserver "1" o-- "0..*"  com.university.bookstore.observer.AuditLogObserver$AuditLogEntry : auditLog
+com.university.bookstore.observer.AuditLogObserver ..|>  com.university.bookstore.observer.MaterialObserver
+com.university.bookstore.observer.InventoryObserver ..|>  com.university.bookstore.observer.MaterialObserver
+com.university.bookstore.observer.MaterialAddedEvent *--  com.university.bookstore.model.Material : material
+com.university.bookstore.observer.MaterialAddedEvent ..|>  com.university.bookstore.observer.MaterialEvent
+com.university.bookstore.observer.MaterialEventPublisher "1" o-- "0..*"  com.university.bookstore.observer.MaterialObserver : observers
+com.university.bookstore.observer.MaterialEventPublisher ..|>  com.university.bookstore.observer.MaterialSubject
+com.university.bookstore.observer.PriceChangedEvent *--  com.university.bookstore.model.Material : material
+com.university.bookstore.observer.PriceChangedEvent ..|>  com.university.bookstore.observer.MaterialEvent
+com.university.bookstore.repository.JsonMaterialRepository ..|>  com.university.bookstore.repository.MaterialRepository
+com.university.bookstore.repository.MaterialsWrapper "1" o-- "0..*"  com.university.bookstore.model.Material : materials
+com.university.bookstore.repository.ModernJsonMaterialRepository ..|>  com.university.bookstore.repository.MaterialRepository
+com.university.bookstore.search.CachedSearchService *--  com.university.bookstore.repository.MaterialRepository : repository
+com.university.bookstore.search.CachedSearchService *--  com.university.bookstore.search.MaterialTrie : trie
+com.university.bookstore.search.CachedSearchService *--  com.university.bookstore.search.SearchResultCache : cache
+com.university.bookstore.service.MaterialService *--  com.university.bookstore.repository.MaterialRepository : repository
+com.university.bookstore.visitor.ShippingCostCalculator ..|>  com.university.bookstore.visitor.MaterialVisitor
+
+
+@enduml

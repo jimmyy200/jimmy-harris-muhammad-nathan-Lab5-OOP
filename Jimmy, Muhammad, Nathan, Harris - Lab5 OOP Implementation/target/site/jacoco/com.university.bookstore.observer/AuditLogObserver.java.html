@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuditLogObserver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.observer</a> &gt; <span class="el_source">AuditLogObserver.java</span></div><h1>AuditLogObserver.java</h1><pre class="source lang-java linenums">package com.university.bookstore.observer;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Observer that maintains an audit log of all material events.
+ * Provides a complete history of system activities for compliance and debugging.
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class AuditLogObserver implements MaterialObserver {
+    
+<span class="fc" id="L21">    private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogObserver.class);</span>
+    
+    private final List&lt;AuditLogEntry&gt; auditLog;
+    private final int maxLogSize;
+    
+    /**
+     * Creates a new audit log observer with unlimited log size.
+     */
+    public AuditLogObserver() {
+<span class="fc" id="L30">        this(Integer.MAX_VALUE);</span>
+<span class="fc" id="L31">    }</span>
+    
+    /**
+     * Creates a new audit log observer with the specified maximum log size.
+     * 
+     * @param maxLogSize the maximum number of log entries to keep
+     */
+<span class="fc" id="L38">    public AuditLogObserver(int maxLogSize) {</span>
+<span class="fc" id="L39">        this.auditLog = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L40">        this.maxLogSize = maxLogSize;</span>
+<span class="fc" id="L41">    }</span>
+    
+    @Override
+    public void onEvent(MaterialEvent event) {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (event == null) {</span>
+<span class="nc" id="L46">            return;</span>
+        }
+        
+<span class="fc" id="L49">        AuditLogEntry entry = new AuditLogEntry(</span>
+<span class="fc" id="L50">            event.getTimestamp(),</span>
+<span class="fc" id="L51">            event.getEventType(),</span>
+<span class="fc" id="L52">            event.getMaterial().getId(),</span>
+<span class="fc" id="L53">            event.getMaterial().getTitle(),</span>
+<span class="fc" id="L54">            event.getDescription()</span>
+        );
+        
+<span class="fc" id="L57">        auditLog.add(entry);</span>
+        
+        // Maintain log size limit
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">        if (auditLog.size() &gt; maxLogSize) {</span>
+<span class="nc" id="L61">            auditLog.remove(0); // Remove oldest entry</span>
+        }
+<span class="fc" id="L63">    }</span>
+    
+    /**
+     * Gets all audit log entries.
+     * 
+     * @return list of audit log entries
+     */
+    public List&lt;AuditLogEntry&gt; getAuditLog() {
+<span class="fc" id="L71">        return new ArrayList&lt;&gt;(auditLog);</span>
+    }
+    
+    /**
+     * Gets audit log entries for a specific material.
+     * 
+     * @param materialId the material ID to filter by
+     * @return list of audit log entries for the material
+     */
+    public List&lt;AuditLogEntry&gt; getAuditLogForMaterial(String materialId) {
+<span class="nc" id="L81">        return auditLog.stream()</span>
+<span class="nc" id="L82">            .filter(entry -&gt; Objects.equals(entry.getMaterialId(), materialId))</span>
+<span class="nc" id="L83">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets audit log entries for a specific event type.
+     * 
+     * @param eventType the event type to filter by
+     * @return list of audit log entries for the event type
+     */
+    public List&lt;AuditLogEntry&gt; getAuditLogForEventType(String eventType) {
+<span class="nc" id="L93">        return auditLog.stream()</span>
+<span class="nc" id="L94">            .filter(entry -&gt; Objects.equals(entry.getEventType(), eventType))</span>
+<span class="nc" id="L95">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets audit log entries within a time range.
+     * 
+     * @param startTime the start time in milliseconds
+     * @param endTime the end time in milliseconds
+     * @return list of audit log entries within the time range
+     */
+    public List&lt;AuditLogEntry&gt; getAuditLogForTimeRange(long startTime, long endTime) {
+<span class="nc" id="L106">        return auditLog.stream()</span>
+<span class="nc bnc" id="L107" title="All 4 branches missed.">            .filter(entry -&gt; entry.getTimestamp() &gt;= startTime &amp;&amp; entry.getTimestamp() &lt;= endTime)</span>
+<span class="nc" id="L108">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Prints the audit log to the console.
+     */
+    public void printAuditLog() {
+<span class="nc" id="L115">        auditLog.forEach(entry -&gt; LOGGER.info(&quot;Audit: {}&quot;, entry.toString()));</span>
+<span class="nc" id="L116">    }</span>
+    
+    /**
+     * Gets the number of audit log entries.
+     * 
+     * @return the log size
+     */
+    public int getLogSize() {
+<span class="nc" id="L124">        return auditLog.size();</span>
+    }
+    
+    /**
+     * Clears the audit log.
+     */
+    public void clearAuditLog() {
+<span class="nc" id="L131">        auditLog.clear();</span>
+<span class="nc" id="L132">    }</span>
+    
+    /**
+     * Gets audit log statistics.
+     * 
+     * @return audit log statistics
+     */
+    public AuditLogStats getAuditLogStats() {
+<span class="nc" id="L140">        int totalEntries = auditLog.size();</span>
+<span class="nc" id="L141">        int materialAddedCount = (int) auditLog.stream()</span>
+<span class="nc" id="L142">            .filter(entry -&gt; &quot;MATERIAL_ADDED&quot;.equals(entry.getEventType()))</span>
+<span class="nc" id="L143">            .count();</span>
+<span class="nc" id="L144">        int priceChangedCount = (int) auditLog.stream()</span>
+<span class="nc" id="L145">            .filter(entry -&gt; &quot;PRICE_CHANGED&quot;.equals(entry.getEventType()))</span>
+<span class="nc" id="L146">            .count();</span>
+        
+<span class="nc" id="L148">        long oldestTimestamp = auditLog.stream()</span>
+<span class="nc" id="L149">            .mapToLong(AuditLogEntry::getTimestamp)</span>
+<span class="nc" id="L150">            .min()</span>
+<span class="nc" id="L151">            .orElse(0L);</span>
+        
+<span class="nc" id="L153">        long newestTimestamp = auditLog.stream()</span>
+<span class="nc" id="L154">            .mapToLong(AuditLogEntry::getTimestamp)</span>
+<span class="nc" id="L155">            .max()</span>
+<span class="nc" id="L156">            .orElse(0L);</span>
+        
+<span class="nc" id="L158">        return new AuditLogStats(</span>
+            totalEntries,
+            materialAddedCount,
+            priceChangedCount,
+            oldestTimestamp,
+            newestTimestamp
+        );
+    }
+    
+    @Override
+    public String getObserverName() {
+<span class="nc" id="L169">        return &quot;AuditLogObserver&quot;;</span>
+    }
+    
+    /**
+     * Represents a single audit log entry.
+     */
+    public static class AuditLogEntry {
+        private final long timestamp;
+        private final String eventType;
+        private final String materialId;
+        private final String materialTitle;
+        private final String description;
+        
+        /**
+         * Creates an audit log entry.
+         * 
+         * @param timestamp when the event occurred
+         * @param eventType type of event
+         * @param materialId ID of the material
+         * @param materialTitle title of the material
+         * @param description event description
+         */
+        public AuditLogEntry(long timestamp, String eventType, String materialId, 
+<span class="fc" id="L192">                           String materialTitle, String description) {</span>
+<span class="fc" id="L193">            this.timestamp = timestamp;</span>
+<span class="fc" id="L194">            this.eventType = eventType;</span>
+<span class="fc" id="L195">            this.materialId = materialId;</span>
+<span class="fc" id="L196">            this.materialTitle = materialTitle;</span>
+<span class="fc" id="L197">            this.description = description;</span>
+<span class="fc" id="L198">        }</span>
+        
+        /** Gets the timestamp of the event. @return timestamp of the event */
+<span class="nc" id="L201">        public long getTimestamp() { return timestamp; }</span>
+        /** Gets the type of event. @return type of event */
+<span class="fc" id="L203">        public String getEventType() { return eventType; }</span>
+        /** Gets the ID of the material. @return ID of the material */
+<span class="nc" id="L205">        public String getMaterialId() { return materialId; }</span>
+        /** Gets the title of the material. @return title of the material */
+<span class="nc" id="L207">        public String getMaterialTitle() { return materialTitle; }</span>
+        /** Gets the event description. @return event description */
+<span class="nc" id="L209">        public String getDescription() { return description; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L213">            return String.format(&quot;[%s] %s: %s (ID: %s) - %s&quot;,</span>
+                new Date(timestamp),
+                eventType,
+                materialTitle,
+                materialId,
+                description);
+        }
+    }
+    
+    /**
+     * Statistics for the audit log.
+     */
+    public static class AuditLogStats {
+        private final int totalEntries;
+        private final int materialAddedCount;
+        private final int priceChangedCount;
+        private final long oldestTimestamp;
+        private final long newestTimestamp;
+        
+        /**
+         * Creates audit log statistics.
+         * 
+         * @param totalEntries total number of entries
+         * @param materialAddedCount number of material added events
+         * @param priceChangedCount number of price changed events
+         * @param oldestTimestamp timestamp of oldest entry
+         * @param newestTimestamp timestamp of newest entry
+         */
+        public AuditLogStats(int totalEntries, int materialAddedCount, int priceChangedCount,
+<span class="nc" id="L242">                           long oldestTimestamp, long newestTimestamp) {</span>
+<span class="nc" id="L243">            this.totalEntries = totalEntries;</span>
+<span class="nc" id="L244">            this.materialAddedCount = materialAddedCount;</span>
+<span class="nc" id="L245">            this.priceChangedCount = priceChangedCount;</span>
+<span class="nc" id="L246">            this.oldestTimestamp = oldestTimestamp;</span>
+<span class="nc" id="L247">            this.newestTimestamp = newestTimestamp;</span>
+<span class="nc" id="L248">        }</span>
+        
+        /** Gets the total number of entries. @return total number of entries */
+<span class="nc" id="L251">        public int getTotalEntries() { return totalEntries; }</span>
+        /** Gets the number of material added events. @return number of material added events */
+<span class="nc" id="L253">        public int getMaterialAddedCount() { return materialAddedCount; }</span>
+        /** Gets the number of price changed events. @return number of price changed events */
+<span class="nc" id="L255">        public int getPriceChangedCount() { return priceChangedCount; }</span>
+        /** Gets the timestamp of oldest entry. @return timestamp of oldest entry */
+<span class="nc" id="L257">        public long getOldestTimestamp() { return oldestTimestamp; }</span>
+        /** Gets the timestamp of newest entry. @return timestamp of newest entry */
+<span class="nc" id="L259">        public long getNewestTimestamp() { return newestTimestamp; }</span>
+        
+        @Override
+        public String toString() {
+<span class="nc" id="L263">            return String.format(&quot;AuditLogStats[Total=%d, Added=%d, PriceChanged=%d, Oldest=%s, Newest=%s]&quot;,</span>
+<span class="nc" id="L264">                totalEntries, materialAddedCount, priceChangedCount,</span>
+                new Date(oldestTimestamp), new Date(newestTimestamp));
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="nc" id="L271">        return String.format(&quot;AuditLogObserver[LogSize=%d, MaxSize=%d]&quot;, getLogSize(), maxLogSize);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

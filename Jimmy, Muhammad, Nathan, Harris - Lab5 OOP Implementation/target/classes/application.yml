@@ -1,0 +1,49 @@
+# Spring Boot Configuration for Bookstore Management System
+# This demonstrates minimal configuration needed to extend the existing design
+
+spring:
+  application:
+    name: bookstore-management-system
+  
+  # Server configuration
+  server:
+    port: 8080
+    servlet:
+      context-path: /
+  
+  # JSON configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# Logging configuration
+logging:
+  level:
+    com.university.bookstore: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Management endpoints (optional)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Application specific configuration
+bookstore:
+  # Default material store implementation
+  store:
+    type: modern-concurrent
+  # API configuration
+  api:
+    version: v1
+    base-path: /api
+

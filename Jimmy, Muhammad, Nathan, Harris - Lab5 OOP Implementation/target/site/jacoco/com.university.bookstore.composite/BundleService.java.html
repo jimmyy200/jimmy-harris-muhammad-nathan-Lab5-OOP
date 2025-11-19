@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BundleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.composite</a> &gt; <span class="el_source">BundleService.java</span></div><h1>BundleService.java</h1><pre class="source lang-java linenums">package com.university.bookstore.composite;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import com.university.bookstore.model.Material;
+
+/**
+ * Service for managing material bundles using the Composite pattern.
+ * Provides operations for creating, managing, and analyzing material bundles.
+ * 
+ * &lt;p&gt;This service demonstrates the Composite pattern in action by providing
+ * a high-level interface for working with both individual materials and bundles.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 3.0
+ * @since 2024-09-15
+ */
+public class BundleService {
+    
+    private final Map&lt;String, MaterialBundle&gt; bundles;
+    
+    /**
+     * Creates a new bundle service.
+     */
+<span class="fc" id="L29">    public BundleService() {</span>
+<span class="fc" id="L30">        this.bundles = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L31">    }</span>
+    
+    /**
+     * Creates a new material bundle with the specified name and discount.
+     * 
+     * @param name the bundle name
+     * @param discount the discount rate (0.0 to 1.0)
+     * @return the created bundle
+     * @throws IllegalArgumentException if name is null or empty
+     */
+    public MaterialBundle createBundle(String name, double discount) {
+<span class="fc bfc" id="L42" title="All 4 branches covered.">        if (name == null || name.trim().isEmpty()) {</span>
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;Bundle name cannot be null or empty&quot;);</span>
+        }
+        
+<span class="fc" id="L46">        String bundleName = name.trim();</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (bundles.containsKey(bundleName)) {</span>
+<span class="fc" id="L48">            throw new IllegalArgumentException(&quot;Bundle already exists: &quot; + bundleName);</span>
+        }
+        
+<span class="fc" id="L51">        MaterialBundle bundle = new MaterialBundle(bundleName, discount);</span>
+<span class="fc" id="L52">        bundles.put(bundleName, bundle);</span>
+<span class="fc" id="L53">        return bundle;</span>
+    }
+    
+    /**
+     * Adds a material to the specified bundle.
+     * 
+     * @param bundleName the name of the bundle
+     * @param material the material to add
+     * @throws IllegalArgumentException if bundle not found or material is null
+     */
+    public void addToBundle(String bundleName, Material material) {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (material == null) {</span>
+<span class="fc" id="L65">            throw new IllegalArgumentException(&quot;Material cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L68">        MaterialBundle bundle = bundles.get(bundleName);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (bundle == null) {</span>
+<span class="fc" id="L70">            throw new IllegalArgumentException(&quot;Bundle not found: &quot; + bundleName);</span>
+        }
+        
+<span class="fc" id="L73">        bundle.addComponent(new MaterialLeaf(material));</span>
+<span class="fc" id="L74">    }</span>
+    
+    /**
+     * Adds a bundle to another bundle (nested bundles).
+     * 
+     * @param parentBundleName the name of the parent bundle
+     * @param childBundleName the name of the child bundle to add
+     * @throws IllegalArgumentException if either bundle is not found
+     */
+    public void addBundleToBundle(String parentBundleName, String childBundleName) {
+<span class="fc" id="L84">        MaterialBundle parent = bundles.get(parentBundleName);</span>
+<span class="fc" id="L85">        MaterialBundle child = bundles.get(childBundleName);</span>
+        
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (parent == null) {</span>
+<span class="fc" id="L88">            throw new IllegalArgumentException(&quot;Parent bundle not found: &quot; + parentBundleName);</span>
+        }
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (child == null) {</span>
+<span class="fc" id="L91">            throw new IllegalArgumentException(&quot;Child bundle not found: &quot; + childBundleName);</span>
+        }
+        
+<span class="fc" id="L94">        parent.addComponent(child);</span>
+<span class="fc" id="L95">    }</span>
+    
+    /**
+     * Adds a component to the specified bundle.
+     * 
+     * @param bundleName the name of the bundle
+     * @param component the component to add
+     * @throws IllegalArgumentException if bundle not found or component is null
+     */
+    public void addComponentToBundle(String bundleName, MaterialComponent component) {
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (component == null) {</span>
+<span class="fc" id="L106">            throw new IllegalArgumentException(&quot;Component cannot be null&quot;);</span>
+        }
+        
+<span class="fc" id="L109">        MaterialBundle bundle = bundles.get(bundleName);</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (bundle == null) {</span>
+<span class="nc" id="L111">            throw new IllegalArgumentException(&quot;Bundle not found: &quot; + bundleName);</span>
+        }
+        
+<span class="fc" id="L114">        bundle.addComponent(component);</span>
+<span class="fc" id="L115">    }</span>
+    
+    /**
+     * Removes a material from the specified bundle.
+     * 
+     * @param bundleName the name of the bundle
+     * @param material the material to remove
+     * @return true if the material was removed, false if not found
+     */
+    public boolean removeFromBundle(String bundleName, Material material) {
+<span class="fc" id="L125">        MaterialBundle bundle = bundles.get(bundleName);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (bundle == null) {</span>
+<span class="fc" id="L127">            return false;</span>
+        }
+        
+<span class="fc" id="L130">        return bundle.removeComponent(new MaterialLeaf(material));</span>
+    }
+    
+    /**
+     * Gets a bundle by name.
+     * 
+     * @param name the bundle name
+     * @return Optional containing the bundle if found
+     */
+    public Optional&lt;MaterialBundle&gt; getBundle(String name) {
+<span class="fc" id="L140">        return Optional.ofNullable(bundles.get(name));</span>
+    }
+    
+    /**
+     * Gets all bundles.
+     * 
+     * @return list of all bundles
+     */
+    public List&lt;MaterialBundle&gt; getAllBundles() {
+<span class="fc" id="L149">        return new ArrayList&lt;&gt;(bundles.values());</span>
+    }
+    
+    /**
+     * Gets all bundle names.
+     * 
+     * @return list of bundle names
+     */
+    public List&lt;String&gt; getBundleNames() {
+<span class="fc" id="L158">        return new ArrayList&lt;&gt;(bundles.keySet());</span>
+    }
+    
+    /**
+     * Calculates the total savings for a bundle.
+     * 
+     * @param bundleName the name of the bundle
+     * @return the total savings amount
+     * @throws IllegalArgumentException if bundle not found
+     */
+    public double calculateBundleSavings(String bundleName) {
+<span class="fc" id="L169">        MaterialBundle bundle = bundles.get(bundleName);</span>
+<span class="fc bfc" id="L170" title="All 2 branches covered.">        if (bundle == null) {</span>
+<span class="fc" id="L171">            throw new IllegalArgumentException(&quot;Bundle not found: &quot; + bundleName);</span>
+        }
+        
+<span class="fc" id="L174">        return bundle.getTotalSavings();</span>
+    }
+    
+    /**
+     * Calculates the total savings across all bundles.
+     * 
+     * @return the total savings amount
+     */
+    public double calculateTotalSavings() {
+<span class="fc" id="L183">        return bundles.values().stream()</span>
+<span class="fc" id="L184">            .mapToDouble(MaterialBundle::getTotalSavings)</span>
+<span class="fc" id="L185">            .sum();</span>
+    }
+    
+    /**
+     * Gets the total value of all bundles.
+     * 
+     * @return the total value
+     */
+    public double getTotalBundleValue() {
+<span class="fc" id="L194">        return bundles.values().stream()</span>
+<span class="fc" id="L195">            .mapToDouble(MaterialBundle::getPrice)</span>
+<span class="fc" id="L196">            .sum();</span>
+    }
+    
+    /**
+     * Gets the total discounted value of all bundles.
+     * 
+     * @return the total discounted value
+     */
+    public double getTotalDiscountedBundleValue() {
+<span class="fc" id="L205">        return bundles.values().stream()</span>
+<span class="fc" id="L206">            .mapToDouble(MaterialBundle::getDiscountedPrice)</span>
+<span class="fc" id="L207">            .sum();</span>
+    }
+    
+    /**
+     * Gets bundles that contain materials of the specified type.
+     * 
+     * @param type the material type to filter by
+     * @return list of bundles containing the specified type
+     */
+    public List&lt;MaterialBundle&gt; getBundlesByMaterialType(Material.MaterialType type) {
+<span class="fc" id="L217">        return bundles.values().stream()</span>
+<span class="fc" id="L218">            .filter(bundle -&gt; bundle.containsType(type))</span>
+<span class="fc" id="L219">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets bundles with discounts greater than or equal to the specified threshold.
+     * 
+     * @param minDiscount the minimum discount rate
+     * @return list of bundles meeting the criteria
+     */
+    public List&lt;MaterialBundle&gt; getBundlesByDiscount(double minDiscount) {
+<span class="fc" id="L229">        return bundles.values().stream()</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">            .filter(bundle -&gt; bundle.getDiscountRate() &gt;= minDiscount)</span>
+<span class="fc" id="L231">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Gets bundles with values within the specified range.
+     * 
+     * @param minValue the minimum value
+     * @param maxValue the maximum value
+     * @return list of bundles within the value range
+     */
+    public List&lt;MaterialBundle&gt; getBundlesByValueRange(double minValue, double maxValue) {
+<span class="fc" id="L242">        return bundles.values().stream()</span>
+<span class="fc" id="L243">            .filter(bundle -&gt; {</span>
+<span class="fc" id="L244">                double value = bundle.getPrice();</span>
+<span class="fc bfc" id="L245" title="All 4 branches covered.">                return value &gt;= minValue &amp;&amp; value &lt;= maxValue;</span>
+            })
+<span class="fc" id="L247">            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);</span>
+    }
+    
+    /**
+     * Removes a bundle by name.
+     * 
+     * @param name the bundle name
+     * @return true if the bundle was removed, false if not found
+     */
+    public boolean removeBundle(String name) {
+<span class="fc bfc" id="L257" title="All 2 branches covered.">        return bundles.remove(name) != null;</span>
+    }
+    
+    /**
+     * Clears all bundles.
+     */
+    public void clearAllBundles() {
+<span class="fc" id="L264">        bundles.clear();</span>
+<span class="fc" id="L265">    }</span>
+    
+    /**
+     * Gets the number of bundles.
+     * 
+     * @return the bundle count
+     */
+    public int getBundleCount() {
+<span class="fc" id="L273">        return bundles.size();</span>
+    }
+    
+    /**
+     * Checks if any bundles exist.
+     * 
+     * @return true if no bundles exist
+     */
+    public boolean isEmpty() {
+<span class="fc" id="L282">        return bundles.isEmpty();</span>
+    }
+    
+    /**
+     * Gets bundle statistics.
+     * 
+     * @return bundle statistics
+     */
+    public BundleStats getBundleStats() {
+<span class="fc" id="L291">        int totalBundles = bundles.size();</span>
+<span class="fc" id="L292">        int totalItems = bundles.values().stream()</span>
+<span class="fc" id="L293">            .mapToInt(MaterialBundle::getItemCount)</span>
+<span class="fc" id="L294">            .sum();</span>
+<span class="fc" id="L295">        double totalValue = getTotalBundleValue();</span>
+<span class="fc" id="L296">        double totalDiscountedValue = getTotalDiscountedBundleValue();</span>
+<span class="fc" id="L297">        double totalSavings = calculateTotalSavings();</span>
+<span class="fc" id="L298">        double averageDiscount = bundles.values().stream()</span>
+<span class="fc" id="L299">            .mapToDouble(MaterialBundle::getDiscountRate)</span>
+<span class="fc" id="L300">            .average()</span>
+<span class="fc" id="L301">            .orElse(0.0);</span>
+        
+<span class="fc" id="L303">        return new BundleStats(</span>
+            totalBundles,
+            totalItems,
+            totalValue,
+            totalDiscountedValue,
+            totalSavings,
+            averageDiscount
+        );
+    }
+    
+    /**
+     * Statistics class for bundle analysis.
+     */
+    public static class BundleStats {
+        private final int totalBundles;
+        private final int totalItems;
+        private final double totalValue;
+        private final double totalDiscountedValue;
+        private final double totalSavings;
+        private final double averageDiscount;
+        
+        public BundleStats(int totalBundles, int totalItems, double totalValue,
+<span class="fc" id="L325">                          double totalDiscountedValue, double totalSavings, double averageDiscount) {</span>
+<span class="fc" id="L326">            this.totalBundles = totalBundles;</span>
+<span class="fc" id="L327">            this.totalItems = totalItems;</span>
+<span class="fc" id="L328">            this.totalValue = totalValue;</span>
+<span class="fc" id="L329">            this.totalDiscountedValue = totalDiscountedValue;</span>
+<span class="fc" id="L330">            this.totalSavings = totalSavings;</span>
+<span class="fc" id="L331">            this.averageDiscount = averageDiscount;</span>
+<span class="fc" id="L332">        }</span>
+        
+<span class="fc" id="L334">        public int getTotalBundles() { return totalBundles; }</span>
+<span class="fc" id="L335">        public int getTotalItems() { return totalItems; }</span>
+<span class="fc" id="L336">        public double getTotalValue() { return totalValue; }</span>
+<span class="fc" id="L337">        public double getTotalDiscountedValue() { return totalDiscountedValue; }</span>
+<span class="fc" id="L338">        public double getTotalSavings() { return totalSavings; }</span>
+<span class="fc" id="L339">        public double getAverageDiscount() { return averageDiscount; }</span>
+        
+        @Override
+        public String toString() {
+<span class="fc" id="L343">            return String.format(&quot;BundleStats[Bundles=%d, Items=%d, Value=$%.2f, Discounted=$%.2f, Savings=$%.2f, AvgDiscount=%.1f%%]&quot;,</span>
+<span class="fc" id="L344">                totalBundles, totalItems, totalValue, totalDiscountedValue, totalSavings, averageDiscount * 100);</span>
+        }
+    }
+    
+    @Override
+    public String toString() {
+<span class="fc" id="L350">        return String.format(&quot;BundleService[Bundles=%d, TotalValue=$%.2f, TotalSavings=$%.2f]&quot;,</span>
+<span class="fc" id="L351">            getBundleCount(), getTotalBundleValue(), calculateTotalSavings());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

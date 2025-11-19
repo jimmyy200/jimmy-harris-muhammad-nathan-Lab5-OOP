@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Media.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bookstore-lab</a> &gt; <a href="index.source.html" class="el_package">com.university.bookstore.model</a> &gt; <span class="el_source">Media.java</span></div><h1>Media.java</h1><pre class="source lang-java linenums">package com.university.bookstore.model;
+
+/**
+ * Interface for materials with multimedia content.
+ * Demonstrates interface segregation principle and multiple inheritance through interfaces.
+ * 
+ * &lt;p&gt;This interface defines behavior for audio and video materials,
+ * including duration, format, and playback capabilities.&lt;/p&gt;
+ * 
+ * @author Navid Mohaghegh
+ * @version 2.0
+ * @since 2024-09-15
+ */
+public interface Media {
+    
+    /**
+     * Gets the duration of the media in minutes.
+     * 
+     * @return duration in minutes
+     */
+    int getDuration();
+    
+    /**
+     * Gets the file format of the media.
+     * 
+     * @return format string (e.g., &quot;MP3&quot;, &quot;MP4&quot;, &quot;WAV&quot;)
+     */
+    String getFormat();
+    
+    /**
+     * Gets the file size in megabytes.
+     * 
+     * @return size in MB
+     */
+    double getFileSize();
+    
+    /**
+     * Checks if the media requires an internet connection.
+     * 
+     * @return true if streaming required, false if downloadable
+     */
+    boolean isStreamingOnly();
+    
+    /**
+     * Gets the quality setting for the media.
+     * 
+     * @return quality descriptor
+     */
+    MediaQuality getQuality();
+    
+    /**
+     * Gets playback information as a formatted string.
+     * 
+     * @return playback details
+     */
+    default String getPlaybackInfo() {
+<span class="fc" id="L57">        return String.format(&quot;Duration: %d min, Format: %s, Quality: %s, Size: %.1f MB&quot;,</span>
+<span class="fc" id="L58">            getDuration(), getFormat(), getQuality(), getFileSize());</span>
+    }
+    
+    /**
+     * Calculates estimated download time based on connection speed.
+     * 
+     * @param mbps download speed in megabits per second
+     * @return estimated time in seconds
+     */
+    default int estimateDownloadTime(double mbps) {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (isStreamingOnly()) {</span>
+<span class="nc" id="L69">            return 0;</span>
+        }
+<span class="fc" id="L71">        double megabits = getFileSize() * 8;</span>
+<span class="fc" id="L72">        return (int) Math.ceil(megabits / mbps);</span>
+    }
+    
+    /**
+     * Quality levels for media content.
+     */
+<span class="fc" id="L78">    enum MediaQuality {</span>
+<span class="fc" id="L79">        LOW(&quot;Low Quality&quot;, 64),</span>
+<span class="fc" id="L80">        MEDIUM(&quot;Medium Quality&quot;, 96),</span>
+<span class="fc" id="L81">        STANDARD(&quot;Standard Quality&quot;, 128),</span>
+<span class="fc" id="L82">        HIGH(&quot;High Quality&quot;, 256),</span>
+<span class="fc" id="L83">        HD(&quot;HD Quality&quot;, 320),</span>
+<span class="fc" id="L84">        ULTRA_HD(&quot;Ultra HD&quot;, 512),</span>
+<span class="fc" id="L85">        PHYSICAL(&quot;Physical Media&quot;, 0);</span>
+        
+        private final String description;
+        private final int bitrate;
+        
+<span class="fc" id="L90">        MediaQuality(String description, int bitrate) {</span>
+<span class="fc" id="L91">            this.description = description;</span>
+<span class="fc" id="L92">            this.bitrate = bitrate;</span>
+<span class="fc" id="L93">        }</span>
+        
+        public String getDescription() {
+<span class="fc" id="L96">            return description;</span>
+        }
+        
+        public int getBitrate() {
+<span class="fc" id="L100">            return bitrate;</span>
+        }
+        
+        @Override
+        public String toString() {
+<span class="fc" id="L105">            return description;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
