@@ -1,15 +1,7 @@
 package com.university.bookstore.Lab5Implementations;
 
-class TreeNode<T>{
-    TreeNode<T> left;
-    TreeNode<T> right;
-    T data;
-    TreeNode(T data){
-        this.data = data;
-        this.left = null;
-        this.right = null;
-    }
-}
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearchTree<T> {
 
@@ -35,27 +27,50 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
     }
 
     @Override
-    public void inOrderTraversal() {
-
+    public void inOrderTraversal(TreeNode<T> node) {
+        if (node != null){
+            inOrderTraversal(node.left);
+            System.out.println(node.data);
+            inOrderTraversal(node.right);
+        }
     }
 
     @Override
-    public void preOrderTraversal() {
-
+    public void preOrderTraversal(TreeNode<T> node) {
+        if (node != null){
+            System.out.println(node.data);
+            preOrderTraversal(node.left);
+            preOrderTraversal(node.right);
+        }
     }
 
     @Override
-    public void postOrderTraversal() {
-
+    public void postOrderTraversal(TreeNode<T> node) {
+        if (node != null){
+            postOrderTraversal(node.left);
+            postOrderTraversal(node.right);
+            System.out.println(node.data);
+        }
     }
 
     @Override
-    public void levelOrderTraversal() {
+    public void levelOrderTraversal(TreeNode<T> node) {
+        if (node == null) return;
 
+        Queue<TreeNode<T>> queue = new LinkedList<>();
+        queue.offer(node);
+
+        while (!queue.isEmpty()){
+            TreeNode<T> cur = queue.poll();
+            System.out.println(cur.data);
+
+            if (cur.left != null)queue.offer(cur.left);
+            if (cur.right != null)queue.offer(cur.right);
+        }
     }
 
     @Override
-    public int height() {
+    public int height(TreeNode<T> node) {
         return -1;
     }
 

@@ -8,11 +8,11 @@ package com.university.bookstore.Lab5Implementations;
      void insert(T data);
      boolean contains(T data);
      void delete(T data);
-     void inOrderTraversal();
-     void preOrderTraversal();
-     void postOrderTraversal();
-     void levelOrderTraversal();
-     int height();
+     void inOrderTraversal(TreeNode<T> node);
+     void preOrderTraversal(TreeNode<T> node);
+     void postOrderTraversal(TreeNode<T> node);
+     void levelOrderTraversal(TreeNode<T> node);
+     int height(TreeNode<T> node);
      int size();
      boolean isEmpty();
  }
