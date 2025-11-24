@@ -71,7 +71,12 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
 
     @Override
     public int height(TreeNode<T> node) {
-        return -1;
+        if (node == null) return -1;
+
+        int leftHeight = height(node.left);
+        int rightHeight = height(node.right);
+
+        return 1 + Math.max(height(node.left), height(node.right));
     }
 
     @Override
