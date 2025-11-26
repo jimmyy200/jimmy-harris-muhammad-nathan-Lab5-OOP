@@ -11,31 +11,83 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         root = null;
         size = 0;
     }
+
+    public void insert(T key){
+        root = insert(root, key);
+    }
+
     @Override
-    public TreeNode<Integer> insert(TreeNode<Integer> node, int key) {
+    public TreeNode<T> insert(TreeNode<T> node, T key) {
         if (node == null) {
             return new TreeNode<>(key);
         }
 
-        if (key < node.data){
+        if (key.compareTo(node.data) < 0){
             node.left = insert(node.left, key);
-        } else if (key > node.data){
+        } else if (key.compareTo(node.data) > 0){
             node.right = insert(node.right, key);
         }
 
         return node;
     }
 
+    public boolean contains(T key){
+        return contains(root, key);
+    }
     @Override
-    public boolean contains(TreeNode<T> node) {
-        return false;
+    public boolean contains(TreeNode<T> node, T key) {
+        if (node == null) {
+            return false;
+        }
+        int cmp = key.compareTo(node.data);
+        if (cmp == 0) {
+            return true;
+        } else if  (cmp < 0) {
+            return contains(node.left, key);
+        } else {
+            return contains(node.right, key);
+        }
     }
 
+    private TreeNode<T> findMinimum(TreeNode<T> node){
+        while (node.left != null){
+            node = node.left;
+        }
+        return node;
+    }
+    public void delete(T key){
+        delete(root, key);
+    }
     @Override
-    public void delete(TreeNode<T> node) {
-
+    public TreeNode<T> delete(TreeNode<T> node, T key) {
+        if (node == null) {
+            return null;
+        }
+        int cmp = key.compareTo(node.data);
+        if (cmp < 0) {
+            node.left = delete(node.left, key);
+        } else if (cmp > 0){
+            node.right = delete(node.right, key);
+        } else {
+            if (node.left == null && node.right == null){
+                return null;
+            }
+            if (node.left == null){
+                return node.right;
+            }
+            if (node.right == null){
+                return node.left;
+            }
+            TreeNode<T> successor = findMinimum(node.right);
+            node.data = successor.data;
+            node.right = delete(node.right, node.data);
+        }
+        return node;
     }
 
+    public void inOrderTraversal(){
+        inOrderTraversal(root);
+    }
     @Override
     public void inOrderTraversal(TreeNode<T> node) {
         if (node != null){
@@ -45,6 +97,9 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         }
     }
 
+    public void preOrderTraversal(){
+        preOrderTraversal(root);
+    }
     @Override
     public void preOrderTraversal(TreeNode<T> node) {
         if (node != null){
@@ -54,6 +109,9 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         }
     }
 
+    public void postOrderTraversal(){
+        postOrderTraversal(root);
+    }
     @Override
     public void postOrderTraversal(TreeNode<T> node) {
         if (node != null){
@@ -63,6 +121,9 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         }
     }
 
+    public void levelOrderTraversal(){
+        levelOrderTraversal(root);
+    }
     @Override
     public void levelOrderTraversal(TreeNode<T> node) {
         if (node == null) return;
@@ -79,6 +140,9 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         }
     }
 
+    public int height(){
+        return height(root);
+    }
     @Override
     public int height(TreeNode<T> node) {
         if (node == null) return -1;

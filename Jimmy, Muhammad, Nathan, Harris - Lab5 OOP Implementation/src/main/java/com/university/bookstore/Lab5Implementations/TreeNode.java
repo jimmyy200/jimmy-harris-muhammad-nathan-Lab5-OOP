@@ -1,6 +1,6 @@
 package com.university.bookstore.Lab5Implementations;
 
-public class TreeNode<T> {
+public class TreeNode<T extends Comparable<T>> {
     TreeNode<T> left;
     TreeNode<T> right;
     T data;
