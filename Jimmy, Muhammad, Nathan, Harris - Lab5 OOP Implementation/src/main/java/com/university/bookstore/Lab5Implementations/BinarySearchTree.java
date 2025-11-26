@@ -5,9 +5,9 @@ package com.university.bookstore.Lab5Implementations;
   * Students must implement all methods.
   */
  public interface BinarySearchTree<T extends Comparable<T>> {
-     void insert(T data);
-     boolean contains(T data);
-     void delete(T data);
+     TreeNode insert(TreeNode<Integer> node, int key);
+     boolean contains(TreeNode<T> node);
+     void delete(TreeNode<T> node);
      void inOrderTraversal(TreeNode<T> node);
      void preOrderTraversal(TreeNode<T> node);
      void postOrderTraversal(TreeNode<T> node);

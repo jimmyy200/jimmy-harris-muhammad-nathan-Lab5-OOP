@@ -12,17 +12,27 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         size = 0;
     }
     @Override
-    public void insert(T data) {
+    public TreeNode<Integer> insert(TreeNode<Integer> node, int key) {
+        if (node == null) {
+            return new TreeNode<>(key);
+        }
 
+        if (key < node.data){
+            node.left = insert(node.left, key);
+        } else if (key > node.data){
+            node.right = insert(node.right, key);
+        }
+
+        return node;
     }
 
     @Override
-    public boolean contains(T data) {
+    public boolean contains(TreeNode<T> node) {
         return false;
     }
 
     @Override
-    public void delete(T data) {
+    public void delete(TreeNode<T> node) {
 
     }
 
