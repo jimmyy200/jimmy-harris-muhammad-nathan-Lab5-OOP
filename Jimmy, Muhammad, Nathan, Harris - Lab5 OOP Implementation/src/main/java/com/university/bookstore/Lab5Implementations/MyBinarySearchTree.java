@@ -113,10 +113,12 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
         } else if (cmp > 0){
             node.right = delete(node.right, key);
         } else {
+            // if no children
             if (node.left == null && node.right == null){
                 size--;
                 return null;
             }
+            // if it has only left/right child
             if (node.left == null){
                 size--;
                 return node.right;
@@ -125,6 +127,7 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
                 size--;
                 return node.left;
             }
+            //if it has 2 children
             TreeNode<T> successor = findMinimum(node.right);
             node.data = successor.data;
             node.right = delete(node.right, node.data);
