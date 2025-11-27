@@ -27,7 +27,7 @@ public class MyBinarySearchTree <T extends Comparable<T>> implements BinarySearc
     /**
      * Inserts object into the BST
      * @param node starting point (root)
-     * @param key object/data type to be inserted
+     * @param key generic object/data type to be inserted
      * @return root
      */
     @Override
