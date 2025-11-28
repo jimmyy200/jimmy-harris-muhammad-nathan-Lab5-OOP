@@ -1,12 +1,11 @@
 package com.university.bookstore.Lab5Implementations;
 
-import com.university.bookstore.DoublyLinkedList;
-import com.university.bookstore.MaterialLinkedList;
-import com.university.bookstore.BinarySearchTree;
-import com.university.bookstore.MyBinarySearchTree;
+import com.university.bookstore.Lab5Implementations.DoublyLinkedList;
+import com.university.bookstore.Lab5Implementations.MaterialLinkedList;
+import com.university.bookstore.Lab5Implementations.BinarySearchTree;
+import com.university.bookstore.Lab5Implementations.MyBinarySearchTree;
 
 import org.junit.jupiter.api.Test;
-
 
 public class PerformanceTests {
 
@@ -73,4 +72,3 @@ public class PerformanceTests {
         System.out.println("w:" + (c - b));
     }
 }
-
