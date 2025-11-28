@@ -1,13 +1,12 @@
 package com.university.bookstore.Lab5Implementations;
 
-import com.university.bookstore.api.DoublyLinkedList;
-
-public class MaterialLinkedList implements DoublyLinkedList{
+public class MaterialLinkedList<T> implements DoublyLinkedList<T>{
     private Node<T> head;
     private Node<T> tail;
     private int size;
 
-    int size(){
+    @Override
+    public int size(){
         return size;
     }
     
@@ -30,6 +29,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size = 1;
     }
 
+    @Override
     public void addFirst(T data){
         Node<T> newNode = new Node<>(data);
         if (head != null){
@@ -46,6 +46,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size++;
     }
 
+    @Override
     public void addFirst(Node<T> newNode){
         if (head != null){
             newNode.next = head;
@@ -61,6 +62,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size++;
     }
 
+    @Override
     public void addLast(T data){
         Node<T> newNode = new Node<>(data);
         if (tail != null){
@@ -77,6 +79,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size++;
     }
 
+    @Override
     public void addLast(Node<T> newNode){
         if (tail != null){
             newNode.prev = tail;
@@ -92,9 +95,10 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size++;
     }
 
+    @Override
     public void insertAt(int index, T data){
         Node<T> newNode = new Node<>(data);
-        if (size > index){
+        if (index > size || index < 0){
             throw new Exception("Index out of bounds");
         }
         else if (size == index){
@@ -110,14 +114,15 @@ public class MaterialLinkedList implements DoublyLinkedList{
             Node prevNode = crNode.prev;
             crNode.prev = newNode;
             newNode.next = crNode;
-            prevNode.next = crNode;
+            prevNode.next = newNode;
             newNode.prev = prevNode;
         }
         size++;
     }
 
+    @Override
     public void insertAt(int index, Node newNode){
-        if (size > index){
+        if (index > size || index < 0){
             throw new Exception("Index out of bounds");
         }
         else if (size == index){
@@ -133,41 +138,62 @@ public class MaterialLinkedList implements DoublyLinkedList{
             Node prevNode = crNode.prev;
             crNode.prev = newNode;
             newNode.next = crNode;
-            prevNode.next = crNode;
+            prevNode.next = newNode;
             newNode.prev = prevNode;
         }
         size++;
     }
 
+    @Override
     public T removeFirst(){
         if (head == null){
             throw new Exception("There is no Node in the list");
         }
-        Node nextNode = head.next;
-        head.next = null;
         T returnValue = head.data;
-        head.data = null;
-        head = nextNode;
-        nextNode.prev = null;
+        if (head.next == null){
+            head.data = null;
+            head = null;
+        }
+        else {
+            Node nextNode = head.next;
+            head.next = null;
+            head.data = null;
+            head = nextNode;
+            nextNode.prev = null;
+        }
         size--;
         return returnValue;
     }
 
+    @Override
     public T removeLast(){
         if (tail == null){
             throw new Exception("There is no Node in the list");
         }
-        Node prevNode = tail.prev;
-        tail.prev = null;
         T returnValue = tail.data;
-        tail.data = null;
-        tail = prevNode;
-        prevNode.next = null;
+        if (tail.prev == null){
+            tail.data = null;
+            tail = null;
+        }
+        else {
+            Node prevNode = tail.prev;
+            tail.prev = null;
+            tail.data = null;
+            tail = prevNode;
+            prevNode.next = null;
+        }
         size--;
         return returnValue;
     }
 
+    @Override
     public T removeAt(int index){
+        if (index == 0){
+            return removeFirst();
+        }
+        if (index == size - 1){
+            return removeLast();
+        }
         Node crNode = head.next;
         for (int x = 0; x < index; x++){
             if (crNode == null){
@@ -186,6 +212,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         return returnValue;
     }
 
+    @Override
     public T getFirst(){
         if (head == null){
             throw new Exception("There is no head node");
@@ -195,6 +222,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         }
     }
 
+    @Override
     public T getLast(){
         if (tail == null){
             throw new Exception("There is no tail node");
@@ -204,6 +232,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         }
     }
 
+    @Override
     public T getAt(int index){
         if (index >= size){
             throw new Exception("Index out of bounds");
@@ -220,6 +249,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         }
     }
 
+    @Override
     public boolean isEmpty(){
         if (size == 0 && head == null && tail == null){
             return true;
@@ -229,6 +259,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         }
     }
 
+    @Override
     public void clear(){
         Node crNode = head;
         while (crNode != null){
@@ -243,6 +274,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         size = 0;
     }
     
+    @Override
     public boolean contains(T data){
         Node crNode = head;
         while (crNode != null){
@@ -254,6 +286,7 @@ public class MaterialLinkedList implements DoublyLinkedList{
         return false;
     }
 
+    @Override
     public int indexOf(T data){
         Node crNode = head;
         for (int x = 0; x < size; x++){
