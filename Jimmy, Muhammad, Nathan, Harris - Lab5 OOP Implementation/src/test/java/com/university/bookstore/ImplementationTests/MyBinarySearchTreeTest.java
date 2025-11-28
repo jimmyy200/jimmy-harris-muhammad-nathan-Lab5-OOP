@@ -1,4 +1,4 @@
-package com.university.bookstore.Lab5Implementations;
+package com.university.bookstore.ImplementationTests;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -142,3 +142,4 @@ public class MyBinarySearchTreeTest {
         assertFalse(a.isEmpty());
     }
 }
+
