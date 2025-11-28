@@ -1,9 +1,13 @@
 package com.university.bookstore.ImplementationTests;
 
+import com.university.bookstore.BinarySearchTree;
+import com.university.bookstore.MyBinarySearchTree;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MyBinarySearchTreeTest {
 
@@ -142,4 +146,5 @@ public class MyBinarySearchTreeTest {
         assertFalse(a.isEmpty());
     }
 }
+
 
