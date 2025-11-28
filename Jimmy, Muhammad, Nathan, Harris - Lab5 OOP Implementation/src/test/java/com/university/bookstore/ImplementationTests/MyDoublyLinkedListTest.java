@@ -1,5 +1,4 @@
-package com.university.bookstore.Lab5Implementations;
-
+package com.university.bookstore.ImplementationTests;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -154,3 +153,4 @@ public class MyDoublyLinkedListTest {
         assertThrows(Exception.class, () -> a.removeAt(5));
     }
 }
+
