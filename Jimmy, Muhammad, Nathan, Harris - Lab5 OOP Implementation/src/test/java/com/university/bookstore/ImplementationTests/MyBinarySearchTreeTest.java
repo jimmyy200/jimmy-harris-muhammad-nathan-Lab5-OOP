@@ -1,7 +1,7 @@
 package com.university.bookstore.ImplementationTests;
 
-import com.university.bookstore.BinarySearchTree;
-import com.university.bookstore.MyBinarySearchTree;
+import com.university.bookstore.Lab5Implementations.BinarySearchTree;
+import com.university.bookstore.Lab5Implementations.MyBinarySearchTree;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -146,5 +146,3 @@ public class MyBinarySearchTreeTest {
         assertFalse(a.isEmpty());
     }
 }
-
-
